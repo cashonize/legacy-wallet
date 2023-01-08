@@ -1,6 +1,13 @@
+body {
+    margin: 0px
+}
 .wallet {
     margin: auto;
     margin-top: 30px;
+}
+.depositQr {
+    margin: auto;
+    display: block;
 }
 footer {
   position: absolute;

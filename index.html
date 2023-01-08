@@ -10,37 +10,35 @@
 
         DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
         const wallet = await TestNetWallet.named("mywallet");
-        //const wallet = await TestNetWallet.fromSeed('grass artefact broccoli age trade ghost shadow gain caution canyon machine trumpet');
-        console.log(wallet)
 
         const balance = await wallet.getBalance();
         const balanceTokens = await wallet.getAllTokenBalances();
-        document.querySelector('#balance').innerText = `${balance.sat} testnet satoshi`;
+        document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
         //document.querySelector('#tokenBalance').innerText = `$${balance.usd}`;
-        console.log(balanceTokens)
 
         wallet.watchBalance((balance) => {
-            document.querySelector('#balance').innerText = `${balance.sat} testnet satoshi`;
+            document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
             //document.querySelector('#tokenBalance').innerText = `${balance.sat} testnet satoshi`;
         });
         const addr = await wallet.getDepositAddress();
         const tokenAddr = await wallet.getTokenDepositAddress ();
         document.querySelector('#depositAddr').innerText = addr;
-        console.log(tokenAddr)
 
         const qr = await wallet.getTokenDepositQr();
         document.querySelector('#depositQr').src = qr.src;
 
         document.querySelector('#send').addEventListener("click", async () => {
         const addr = document.querySelector('#sendAddr').value;
-        await wallet.send([{cashaddr: addr, value: 1000, unit: "sat"}]);
+        const {txId} = await wallet.send([{cashaddr: addr, value: 1000, unit: "sat"}]);
         alert('Sent 1000 sats to ' + addr);
+        console.log('Sent 1000 sats to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
         });
 
         document.querySelector('#sendMax').addEventListener("click", async () => {
         const addr = document.querySelector('#sendAddr').value;
-        await wallet.sendMax(addr);
+        const {txId} = await wallet.sendMax(addr);
         alert('Sent all funds to ' + addr);
+        console.log('Sent all funds to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
         });
 
     })</script>
@@ -50,8 +48,9 @@
             <div>Wallet balance: <span id="balance"></span></div>
             <div>Wallet token balance: <span id="tokenBalance"></span></div>
             <div>CashTokens enabled address: <span id="depositAddr"></span></div>
-            <div>Deposit QR: <img id="depositQr"/></div>
+            <div>Deposit QR: <img id="depositQr" class="depositQr"/></div>
             <div>
+            <br>
             Send to address
             <input id="sendAddr"></input>
             <input type="button" id="send" value="Send 1000 sats"></input>
@@ -61,7 +60,7 @@
     </main>
   </body>
   <footer>
-        <a href="https://github.com/mr-zwets/BCH-Watchlist" target="_blanc">
+        <a href="https://github.com/mr-zwets/mvp-cashtokens-webwallet" target="_blanc">
             <img class="githublogo" src="./github.png">
         </a>
         <p>
