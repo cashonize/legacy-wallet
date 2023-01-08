@@ -12,39 +12,67 @@
         const wallet = await TestNetWallet.named("mywallet");
 
         const balance = await wallet.getBalance();
-        const balanceTokens = await wallet.getAllTokenBalances();
+        const getTokensResponse = await wallet.getAllTokenBalances();
+        const arrayTokens = Object.keys(getTokensResponse);
         document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
-        //document.querySelector('#tokenBalance').innerText = `$${balance.usd}`;
+        document.querySelector('#tokenBalance').innerText = `${arrayTokens.length} different tokentypes`;
 
         wallet.watchBalance((balance) => {
             document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
-            //document.querySelector('#tokenBalance').innerText = `${balance.sat} testnet satoshi`;
         });
         const addr = await wallet.getDepositAddress();
         const tokenAddr = await wallet.getTokenDepositAddress ();
-        document.querySelector('#depositAddr').innerText = addr;
+        document.querySelector('#depositAddr').innerText = tokenAddr;
 
         const qr = await wallet.getTokenDepositQr();
         document.querySelector('#depositQr').src = qr.src;
 
         document.querySelector('#send').addEventListener("click", async () => {
-        const addr = document.querySelector('#sendAddr').value;
-        const {txId} = await wallet.send([{cashaddr: addr, value: 1000, unit: "sat"}]);
-        alert('Sent 1000 sats to ' + addr);
-        console.log('Sent 1000 sats to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
+          const addr = document.querySelector('#sendAddr').value;
+          const {txId} = await wallet.send([{cashaddr: addr, value: 1000, unit: "sat"}]);
+          alert('Sent 1000 sats to ' + addr);
+          console.log('Sent 1000 sats to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
         });
 
         document.querySelector('#sendMax').addEventListener("click", async () => {
-        const addr = document.querySelector('#sendAddr').value;
-        const {txId} = await wallet.sendMax(addr);
-        alert('Sent all funds to ' + addr);
-        console.log('Sent all funds to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
+          const addr = document.querySelector('#sendAddr').value;
+          const {txId} = await wallet.sendMax(addr);
+          alert('Sent all funds to ' + addr);
+          console.log('Sent all funds to ' + addr + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        });
+
+        document.querySelector('#createTokens').addEventListener("click", async () => {
+          const tokenAmount = document.querySelector('#tokenAmount').value;
+          const genesisResponse = await wallet.tokenGenesis({
+              amount: tokenAmount,            // fungible token amount
+              value: 1000,                    // Satoshi value
+            });
+          const {tokenId} = genesisResponse.tokenIds[0];
+          const {txId} = genesisResponse;
+
+          alert(`Created ${tokenAmount} fungible tokens`);
+          console.log(`Created ${tokenAmount} fungible tokens` + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        });
+
+        document.querySelector('#createMintingToken').addEventListener("click", async () => {
+          const tokenAmount = document.querySelector('#tokenAmount').value;
+          const genesisResponse = await wallet.tokenGenesis({
+              commitment: "",             // NFT Commitment message
+              capability: NFTCapability.minting, // NFT capability
+              value: 1000,                    // Satoshi value
+            });
+          const tokenId = genesisResponse.tokenIds[0];
+          const {txId} = genesisResponse;
+
+          alert(`Created minting token for category ${tokenId}`);
+          console.log(`Created minting token for category ${tokenId}` + `\nhttps://chipnet.imaginary.cash/tx/${txId}`);
         });
 
     })</script>
     <main style="display: flex; flex-direction: row;">
         <div class="wallet">
             <h1>My CashTokens Webwallet</h1>
+            <b>Connected to chipnet</b>
             <div>Wallet balance: <span id="balance"></span></div>
             <div>Wallet token balance: <span id="tokenBalance"></span></div>
             <div>CashTokens enabled address: <span id="depositAddr"></span></div>
@@ -55,6 +83,15 @@
             <input id="sendAddr"></input>
             <input type="button" id="send" value="Send 1000 sats"></input>
             <input type="button" id="sendMax" value="Send All Funds"></input>
+            <br>
+            or
+            <br>
+            Create fungible tokens
+            <input id="tokenAmount"></input>
+            <input type="button" id="createTokens" value="Create"></input>
+            <br>
+            Create a minting token for NFTs
+            <input type="button" id="createMintingToken" value="Create"></input>
             </div>
         </div>
     </main>
