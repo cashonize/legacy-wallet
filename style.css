@@ -1,0 +1,17 @@
+.wallet {
+    margin: auto;
+    margin-top: 30px;
+}
+footer {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  bottom: 10px;
+}
+.githublogo {
+  width: 64px;
+  position: relative;
+  top: -5px;
+  left: -5px;
+}
