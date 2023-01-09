@@ -1,44 +1,57 @@
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="style.css" />
     <script defer src="https://cdn.mainnet.cash/mainnet-1.0.6.js"></script>
-  </head>
-  <body>
+</head>
+<body>
     <main>
-        <div class="wallet">
-            <h1>My CashTokens Webwallet</h1>
-            <b>Connected to chipnet</b>
+        <h1>My CashTokens Webwallet</h1>
+        <b>Connected to chipnet</b>
+        <div>Change to <span id="view" class="view">TokenView</span></div>
+        <br>
+        <div id="walletView">
             <div>Wallet balance: <span id="balance"></span></div>
             <div>Wallet token balance: <span id="tokenBalance"></span></div>
             <div>Address: <span id="depositAddr"></span></div>
-            <div>Deposit QR: <img id="depositQr" class="depositQr"/></div>
+            <div>Deposit QR: <img id="depositQr" class="depositQr" /></div>
             <div>
-            <br>
-            Send tBCH to
-            <input id="sendAddr" placeholder="address"></input>
-            <input type="button" id="send" value="Send 1000 sats"></input>
-            <input type="button" id="sendMax" value="Send All Funds"></input>
-            <br>
-            or
-            <br>
-            Create fungible tokens 
-            <input id="tokenAmount" placeholder="total supply"></input>
-            <input type="button" id="createTokens" value="Create"></input>
-            <br>
-            Create a minting token for NFTs
-            <input type="button" id="createMintingToken" value="Create"></input>
+                <br>
+                Send tBCH to
+                <input id="sendAddr" placeholder="address"></input>
+                <input type="button" id="send" value="Send 1000 sats"></input>
+                <input type="button" id="sendMax" value="Send All Funds"></input>
+                <br>
+                or
+                <br>
+                Create fungible tokens
+                <input id="tokenAmount" placeholder="total supply"></input>
+                <input type="button" id="createTokens" value="Create"></input>
+                <br>
+                Create a minting token for NFTs
+                <input type="button" id="createMintingToken" value="Create"></input>
             </div>
         </div>
+        <div id="tokenView" style="display: none;">
+            <template id="token-template">
+                <div class="item">
+                    <div id="tokenType"></div>
+                    <div id="tokenID"></div>
+                    <div id="tokenInfo"></div>
+                </div>
+            </template>
+
+            <div id="Placeholder"></div>
+        </div>
     </main>
-  </body>
-  <footer>
-        <a href="https://github.com/mr-zwets/mvp-cashtokens-webwallet" target="_blanc">
-            <img class="githublogo" src="./github.png">
-        </a>
-        <p>
-            built with <a href="https://mainnet.cash/" target="_blanc">Mainnet.cash</a>
-        </p>
-    </footer>
+</body>
+<footer>
+    <a href="https://github.com/mr-zwets/mvp-cashtokens-webwallet" target="_blanc">
+        <img class="githublogo" src="./github.png">
+    </a>
+    <p>
+        built with <a href="https://mainnet.cash/" target="_blanc">Mainnet.cash</a>
+    </p>
+</footer>
 </html>
 <script type="module" src="./script.js"></script>
