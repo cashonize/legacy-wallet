@@ -21,10 +21,12 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   const balance = await wallet.getBalance();
   const getTokensResponse = await wallet.getAllTokenBalances();
-  let arrayTokens = []
-  Object.keys(getTokensResponse).forEach(tokenId => {
-    arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId] })
-  });
+  let arrayTokens = [];
+  for(const tokenId of Object.keys(getTokensResponse)){
+    const utxos = await wallet.getTokenUtxos(tokenId);
+    const tokenData = utxos[0].token;
+    arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
+  }
 
   document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
   document.querySelector('#tokenBalance').innerText = `${arrayTokens.length} different tokentypes`;
@@ -93,7 +95,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
-      const tokenType = (token.amount == 0) ? "NFT" : "Fungible Tokens";
+      let tokenType = "Fungible Tokens";
+      if(token.amount == 0) tokenType = (token.tokenData.capability)? "minting NFT" : "NFT";
       tokenCard.querySelector("#tokenType").textContent = tokenType;
       tokenCard.querySelector("#tokenID").textContent = token.tokenId;
       const textTokenAmount = `Token amount: ${token.amount}`
@@ -113,6 +116,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           sendTokens(inputAddress, token.amount, token.tokenId);
         }
       } else {
+        const capability = token.tokenData.capability
+        console.log(capability)
         const nftSend = tokenCard.querySelector('#nftSend');
         nftSend.style = "display:block;"
         const sendNftButton = nftSend.querySelector("#sendNFT");
