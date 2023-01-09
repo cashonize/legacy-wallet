@@ -37,7 +37,21 @@
                 <div class="item">
                     <div id="tokenType"></div>
                     <div id="tokenID"></div>
-                    <div id="tokenInfo"></div>
+                    <div id="tokenAmount"></div>
+                    <br>
+                    <div id="tokenSend" style="display: none;">
+                        Send these tokens to 
+                        <input id="tokenAddress" placeholder="tokenAddress"></input>
+                        <input type="button" id="sendSomeButton" value="Send 10"></input>
+                        <input type="button" id="sendAllButton" value="Send All"></input>
+                    </div>
+
+                    <div id="nftSend" style="display: none;">
+                      Send this NFT to 
+                      <input id="tokenAddress" placeholder="tokenAddress"></input>
+                      <input type="button" id="sendNFT" value="Send NFT"></input>
+                  </div>
+                    <br>
                 </div>
             </template>
 

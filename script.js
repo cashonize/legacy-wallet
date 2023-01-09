@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   // change view logic
   let tokenView = false;
-  document.querySelector('#view').onclick = (event) => {
-    const pageNav = tokenView? "WalletView" : "TokenView";
+  document.querySelector('#view').onclick = () => {
+    const pageNav = tokenView ? "WalletView" : "TokenView";
     document.querySelector('#view').innerText = pageNav;
-    const displayWalletView = `display: ${tokenView? "none" : "block"};`;
-    const displayTokenView = `display: ${tokenView? "block" : "none"};`;
+    const displayWalletView = `display: ${tokenView ? "none" : "block"};`;
+    const displayTokenView = `display: ${tokenView ? "block" : "none"};`;
     document.querySelector('#walletView').style = displayWalletView;
     document.querySelector('#tokenView').style = displayTokenView;
     tokenView = !tokenView;
@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   const balance = await wallet.getBalance();
   const getTokensResponse = await wallet.getAllTokenBalances();
   let arrayTokens = []
-  Object.keys(getTokensResponse).forEach( tokenId => {
-    arrayTokens.push({tokenId, amount:getTokensResponse[tokenId]})
+  Object.keys(getTokensResponse).forEach(tokenId => {
+    arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId] })
   });
-  
+
   document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
   document.querySelector('#tokenBalance').innerText = `${arrayTokens.length} different tokentypes`;
 
@@ -79,23 +79,71 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
   });
 
+  // Display tokenlist
+  function createListWithTemplate(tokens) {
+    const Placeholder = document.getElementById("Placeholder");
+    const ul = document.createElement("ul");
+    ul.setAttribute("id", "Placeholder");
+    const template = document.getElementById("token-template");
+
+    tokens.forEach(async (token, index) => {
+      const tokenCard = document.importNode(template.content, true);
+      const tokenType = (token.amount == 0) ? "NFT" : "Fungible Tokens";
+      tokenCard.querySelector("#tokenType").textContent = tokenType;
+      tokenCard.querySelector("#tokenID").textContent = token.tokenId;
+      const textTokenAmount = `Token amount: ${token.amount}`
+      // display fungible token amount & fungible token send
+      if (token.amount != 0) {
+        tokenCard.querySelector("#tokenAmount").textContent = textTokenAmount;
+        const tokenSend = tokenCard.querySelector('#tokenSend');
+        tokenSend.style = "display:block;"
+        const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
+        sendSomeButton.onclick = () => {
+          const inputAddress = tokenSend.querySelector('#tokenAddress').value;
+          sendTokens(inputAddress, 10, token.tokenId)
+        }
+        const sendAllButton = tokenSend.querySelector("#sendAllButton")
+        sendAllButton.onclick = () => {
+          const inputAddress = tokenSend.querySelector('#tokenAddress').value;
+          sendTokens(inputAddress, token.amount, token.tokenId);
+        } 
+      } else {
+        const nftSend = tokenCard.querySelector('#nftSend');
+        nftSend.style = "display:block;"
+        const sendNftButton = nftSend.querySelector("#sendNFT");
+        sendNftButton.onclick = () => {
+          const inputAddress = nftSend.querySelector('#tokenAddress').value;
+          sendNft(inputAddress, token.tokenId)
+        }
+      }
+      ul.appendChild(tokenCard);
+    });
+    Placeholder.replaceWith(ul);
+  }
+
+  async function sendTokens(address, amount, tokenId) {
+    const { txId } = await wallet.send([
+      new TokenSendRequest({
+        cashaddr: address,
+        amount: amount,
+        tokenId: tokenId,
+      }),
+    ]);
+    alert(`Sent ${amount} fungible tokens of category ${tokenId}`);
+    console.log(`Sent ${amount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+  }
+
+  async function sendNft(address, tokenId) {
+    const { txId } = await wallet.send([
+      new TokenSendRequest({
+        cashaddr: address,
+        tokenId: tokenId,
+        commitment: "",
+        capability: NFTCapability.none,
+      }),
+    ]);
+    alert(`Sent NFT of category ${tokenId} to ${address}`);
+    console.log(`Sent NFT of category ${tokenId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+  }
+
 })
-
-// Display tokenlist
-function createListWithTemplate(tokens) {
-  const Placeholder = document.getElementById("Placeholder");
-  const ul = document.createElement("ul");
-  ul.setAttribute("id", "Placeholder");
-  const template = document.getElementById("token-template");
-
-  tokens.forEach(async (token, index) => {
-    const tokenCard = document.importNode(template.content, true);
-    const tokenType = (token.amount == 0)? "NFT" : "Fungible Tokens";
-    tokenCard.querySelector("#tokenType").textContent = tokenType;
-    tokenCard.querySelector("#tokenID").textContent = token.tokenId;
-
-    tokenCard.querySelector("#tokenInfo").textContent = "";
-    ul.appendChild(tokenCard);
-  });
-  Placeholder.replaceWith(ul);
-}
