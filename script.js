@@ -21,15 +21,18 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   const balance = await wallet.getBalance();
   const getTokensResponse = await wallet.getAllTokenBalances();
+  const tokenCategories = Object.keys(getTokensResponse);
   let arrayTokens = [];
-  for(const tokenId of Object.keys(getTokensResponse)){
+  for (const tokenId of tokenCategories) {
     const utxos = await wallet.getTokenUtxos(tokenId);
-    const tokenData = utxos[0].token;
-    arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
+    for (const utxo of utxos) {
+      const tokenData = utxo.token;
+      arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
+    }
   }
 
   document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
-  document.querySelector('#tokenBalance').innerText = `${arrayTokens.length} different tokentypes`;
+  document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
 
   wallet.watchBalance((balance) => {
     document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
@@ -95,10 +98,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
+      const tokenCapability = token.tokenData.capability;
       let tokenType = "Fungible Tokens";
-      if(token.amount == 0) tokenType = (token.tokenData.capability)? "minting NFT" : "NFT";
+      if (token.amount == 0) tokenType = (tokenCapability == "minting") ? "minting NFT" : "immutible NFT";
       tokenCard.querySelector("#tokenType").textContent = tokenType;
       tokenCard.querySelector("#tokenID").textContent = token.tokenId;
+      if (token.tokenData.commitment != "") {
+        tokenCard.querySelector("#tokenCommitment").textContent = token.tokenData.commitment;
+      }
       const textTokenAmount = `Token amount: ${token.amount}`
       // display fungible token amount & fungible token send
       if (token.amount != 0) {
@@ -116,14 +123,19 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           sendTokens(inputAddress, token.amount, token.tokenId);
         }
       } else {
-        const capability = token.tokenData.capability
-        console.log(capability)
         const nftSend = tokenCard.querySelector('#nftSend');
-        nftSend.style = "display:block;"
+        nftSend.style = "display:block;";
         const sendNftButton = nftSend.querySelector("#sendNFT");
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
           sendNft(inputAddress, token.tokenId)
+        }
+        const nftMint = tokenCard.querySelector('#nftMint');
+        if (tokenCapability == "minting") nftMint.style = "display:block;"
+        const mintNftButton = nftMint.querySelector("#mintNFT");
+        mintNftButton.onclick = () => {
+          const tokenCommitment = nftMint.querySelector('#commitmentInput').value;
+          mintNft(token.tokenId, tokenCommitment)
         }
       }
       ul.appendChild(tokenCard);
@@ -154,6 +166,23 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     ]);
     alert(`Sent NFT of category ${tokenId} to ${address}`);
     console.log(`Sent NFT of category ${tokenId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+  }
+
+  async function mintNft(tokenId, tokenCommitment) {
+    try {
+      const { txId } = await wallet.tokenMint(
+        tokenId,
+        [
+          new TokenMintRequest({
+            commitment: tokenCommitment,
+            capability: NFTCapability.none,
+            value: 1000,
+          })
+        ],
+      );
+      alert(`Minted immutible NFT of category ${tokenId}`);
+      console.log(`Minted immutible NFT of category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch (error) { alert(error) }
   }
 
 })
