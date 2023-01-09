@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   // initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
+  console.log(wallet)
 
   const balance = await wallet.getBalance();
   const getTokensResponse = await wallet.getAllTokenBalances();
