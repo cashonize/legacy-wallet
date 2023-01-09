@@ -55,29 +55,33 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   });
 
   document.querySelector('#createTokens').addEventListener("click", async () => {
-    const tokenAmount = document.querySelector('#tokenAmount').value;
-    const genesisResponse = await wallet.tokenGenesis({
-      amount: tokenAmount,            // fungible token amount
-      value: 1000,                    // Satoshi value
-    });
-    const { tokenId } = genesisResponse.tokenIds[0];
-    const { txId } = genesisResponse;
+    try {
+      const tokenAmount = document.querySelector('#tokenAmount').value;
+      const genesisResponse = await wallet.tokenGenesis({
+        amount: tokenAmount,            // fungible token amount
+        value: 1000,                    // Satoshi value
+      });
+      const { tokenId } = genesisResponse.tokenIds[0];
+      const { txId } = genesisResponse;
 
-    alert(`Created ${tokenAmount} fungible tokens of category ${tokenId}`);
-    console.log(`Created ${tokenAmount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      alert(`Created ${tokenAmount} fungible tokens of category ${tokenId}`);
+      console.log(`Created ${tokenAmount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch (error) { alert(error) }
   });
 
   document.querySelector('#createMintingToken').addEventListener("click", async () => {
-    const genesisResponse = await wallet.tokenGenesis({
-      commitment: "",             // NFT Commitment message
-      capability: NFTCapability.minting, // NFT capability
-      value: 1000,                    // Satoshi value
-    });
-    const tokenId = genesisResponse.tokenIds[0];
-    const { txId } = genesisResponse;
+    try {
+      const genesisResponse = await wallet.tokenGenesis({
+        commitment: "",             // NFT Commitment message
+        capability: NFTCapability.minting, // NFT capability
+        value: 1000,                    // Satoshi value
+      });
+      const tokenId = genesisResponse.tokenIds[0];
+      const { txId } = genesisResponse;
 
-    alert(`Created minting token for category ${tokenId}`);
-    console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      alert(`Created minting token for category ${tokenId}`);
+      console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch (error) { alert(error) }
   });
 
   // Display tokenlist
@@ -107,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         sendAllButton.onclick = () => {
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
           sendTokens(inputAddress, token.amount, token.tokenId);
-        } 
+        }
       } else {
         const nftSend = tokenCard.querySelector('#nftSend');
         nftSend.style = "display:block;"
