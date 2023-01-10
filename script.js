@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   // make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
 
+  // Test that indexedDB is available
+  var db = window.indexedDB.open('test');
+  db.onerror = () => alert("Can't use indexedDB, might be because of private window.")
+
   // change view logic
   let tokenView = false;
   document.querySelector('#view').onclick = () => {
