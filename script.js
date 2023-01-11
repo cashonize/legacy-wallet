@@ -104,7 +104,12 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const tokenCard = document.importNode(template.content, true);
       const tokenCapability = token.tokenData.capability;
       let tokenType = "Fungible Tokens";
-      if (token.amount == 0) tokenType = (tokenCapability == "minting") ? "minting NFT" : "immutible NFT";
+      const nftTypes = {
+        minting: "minting NFT",
+        mutable: "mutable NFT",
+        none: "immutable NFT"
+      };
+      if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
       tokenCard.querySelector("#tokenID").textContent = token.tokenId;
       if (token.tokenData.commitment != "") {
