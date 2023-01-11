@@ -110,9 +110,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const tokenCapability = token.tokenData.capability;
       let tokenType = "Fungible Tokens";
       const nftTypes = {
-        minting: "minting NFT",
-        mutable: "mutable NFT",
-        none: "immutable NFT"
+        minting: "Minting NFT",
+        mutable: "Mutable NFT",
+        none: "Immutable NFT"
       };
       if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
@@ -195,8 +195,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           })
         ],
       );
-      alert(`Minted immutible NFT of category ${tokenId}`);
-      console.log(`Minted immutible NFT of category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      alert(`Minted immutable NFT of category ${tokenId}`);
+      console.log(`Minted immutable NFT of category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
