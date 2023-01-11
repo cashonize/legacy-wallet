@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         amount: tokenAmount,            // fungible token amount
         value: 1000,                    // Satoshi value
       });
-      const { tokenId } = genesisResponse.tokenIds[0];
+      const tokenId = genesisResponse.tokenIds[0];
       const { txId } = genesisResponse;
 
       alert(`Created ${tokenAmount} fungible tokens of category ${tokenId}`);
@@ -128,8 +128,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         tokenSend.style = "display:block;"
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
         sendSomeButton.onclick = () => {
+          const amount = tokenSend.querySelector('#sendTokenAmount').value;
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, 10, token.tokenId)
+          sendTokens(inputAddress, amount, token.tokenId)
         }
         const sendAllButton = tokenSend.querySelector("#sendAllButton")
         sendAllButton.onclick = () => {
