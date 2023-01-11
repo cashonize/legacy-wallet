@@ -1,7 +1,11 @@
-body {
-    margin: 0px
+header {
+  margin: 0px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
-main {
+body {
+    margin: 0px;
     margin-top: 30px;
     display: flex;
     align-items: center;

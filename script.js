@@ -50,17 +50,22 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   createListWithTemplate(arrayTokens);
 
   document.querySelector('#send').addEventListener("click", async () => {
-    const addr = document.querySelector('#sendAddr').value;
-    const { txId } = await wallet.send([{ cashaddr: addr, value: 1000, unit: "sat" }]);
-    alert(`Sent 1000 sats to ${addr}`);
-    console.log(`Sent 1000 sats to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    try{
+      const amount = document.querySelector('#sendAmount').value;
+      const addr = document.querySelector('#sendAddr').value;
+      const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
+      alert(`Sent ${amount} sats to ${addr}`);
+      console.log(`Sent ${amount} sats to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+  } catch(error) { alert(error) }
   });
 
   document.querySelector('#sendMax').addEventListener("click", async () => {
-    const addr = document.querySelector('#sendAddr').value;
-    const { txId } = await wallet.sendMax(addr);
-    alert(`Sent all funds to ${addr}`);
-    console.log(`Sent all funds to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    try{
+      const addr = document.querySelector('#sendAddr').value;
+      const { txId } = await wallet.sendMax(addr);
+      alert(`Sent all funds to ${addr}`);
+      console.log(`Sent all funds to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch(error) { alert(error) }
   });
 
   document.querySelector('#createTokens').addEventListener("click", async () => {
