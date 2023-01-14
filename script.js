@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       };
       if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
-      tokenCard.querySelector("#tokenID").textContent = token.tokenId;
+      tokenCard.querySelector("#tokenID").textContent = `TokenId: ${token.tokenId}`;
       if (token.tokenData.commitment != "") {
         tokenCard.querySelector("#tokenCommitment").textContent = token.tokenData.commitment;
       }
