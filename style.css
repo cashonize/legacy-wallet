@@ -29,6 +29,10 @@ main{
   margin: auto;
   display: block;
   width: 70%;
+  max-width: 250px;
+}
+input {
+  margin: 2px 0;
 }
 footer {
   position: absolute;
