@@ -8,11 +8,11 @@ header {
 body {
   margin: 0px;
   margin-top: 30px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  display: block;
 }
 main{
+  display: flex;
+  justify-content: center;
   margin: 0 20px;
 }
 .view {
@@ -46,4 +46,11 @@ footer {
   position: relative;
   top: -5px;
   left: -5px;
+}
+
+@media screen and (max-height: 700px) {
+  footer {
+    position: inherit;
+    margin-top: 60px;
+  }
 }
