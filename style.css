@@ -4,6 +4,7 @@ header {
   align-items: center;
   flex-direction: column;
   margin-bottom: 25px;
+  text-align: center;
 }
 body {
   margin: 0px;
