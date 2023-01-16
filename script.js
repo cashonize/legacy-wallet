@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
   console.log(wallet)
+  Config.ValidateTokenAddresses = true;
 
   const balance = await wallet.getBalance();
   const getTokensResponse = await wallet.getAllTokenBalances();
@@ -55,28 +56,28 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   const qr = await wallet.getTokenDepositQr();
   document.querySelector('#depositQr').src = qr.src;
   createListWithTemplate(arrayTokens);
-  if(!arrayTokens.length) {
+  if (!arrayTokens.length) {
     const divNoTokens = document.querySelector('#noTokensFound');;
     divNoTokens.textContent = "Currently there are no tokens in this wallet";
   }
 
   document.querySelector('#send').addEventListener("click", async () => {
-    try{
+    try {
       const amount = document.querySelector('#sendAmount').value;
       const addr = document.querySelector('#sendAddr').value;
       const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
       alert(`Sent ${amount} sats to ${addr}`);
       console.log(`Sent ${amount} sats to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-  } catch(error) { alert(error) }
+    } catch (error) { alert(error) }
   });
 
   document.querySelector('#sendMax').addEventListener("click", async () => {
-    try{
+    try {
       const addr = document.querySelector('#sendAddr').value;
       const { txId } = await wallet.sendMax(addr);
       alert(`Sent all funds to ${addr}`);
       console.log(`Sent all funds to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-    } catch(error) { alert(error) }
+    } catch (error) { alert(error) }
   });
 
   document.querySelector('#createTokens').addEventListener("click", async () => {
@@ -127,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       };
       if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
-      const displayId = `${token.tokenId.slice(0,20)}...${token.tokenId.slice(-10)}`;
+      const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = `TokenId: ${displayId}`;
       if (token.tokenData.commitment != "") {
         tokenCard.querySelector("#tokenCommitment").textContent = token.tokenData.commitment;
@@ -171,28 +172,32 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   }
 
   async function sendTokens(address, amount, tokenId) {
-    const { txId } = await wallet.send([
-      new TokenSendRequest({
-        cashaddr: address,
-        amount: amount,
-        tokenId: tokenId,
-      }),
-    ]);
-    alert(`Sent ${amount} fungible tokens of category ${tokenId}`);
-    console.log(`Sent ${amount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    try {
+      const { txId } = await wallet.send([
+        new TokenSendRequest({
+          cashaddr: address,
+          amount: amount,
+          tokenId: tokenId,
+        }),
+      ]);
+      alert(`Sent ${amount} fungible tokens of category ${tokenId}`);
+      console.log(`Sent ${amount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch (error) { alert(error) }
   }
 
   async function sendNft(address, tokenId) {
-    const { txId } = await wallet.send([
-      new TokenSendRequest({
-        cashaddr: address,
-        tokenId: tokenId,
-        commitment: "",
-        capability: NFTCapability.none,
-      }),
-    ]);
-    alert(`Sent NFT of category ${tokenId} to ${address}`);
-    console.log(`Sent NFT of category ${tokenId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    try {
+      const { txId } = await wallet.send([
+        new TokenSendRequest({
+          cashaddr: address,
+          tokenId: tokenId,
+          commitment: "",
+          capability: NFTCapability.none,
+        }),
+      ]);
+      alert(`Sent NFT of category ${tokenId} to ${address}`);
+      console.log(`Sent NFT of category ${tokenId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+    } catch (error) { alert(error) }
   }
 
   async function mintNft(tokenId, tokenCommitment) {
