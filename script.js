@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   let tokenCategories = [];
   fetchTokens()
   async function fetchTokens() {
+    arrayTokens = [];
     const getTokensResponse = await wallet.getAllTokenBalances();
     tokenCategories = Object.keys(getTokensResponse);
     for (const tokenId of tokenCategories) {
@@ -53,7 +54,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       }
     }
     document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
-    createListWithTemplate(arrayTokens);
+    // Eiyher display tokens in wallet or display there are no tokens
+    if (arrayTokens.length) {
+      createListWithTemplate(arrayTokens);
+    } else {
+      const divNoTokens = document.querySelector('#noTokensFound');;
+      divNoTokens.textContent = "Currently there are no tokens in this wallet";
+    }
   }
 
   wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
@@ -89,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     try {
       const tokenAmount = document.querySelector('#tokenAmount').value;
       const genesisResponse = await wallet.tokenGenesis({
+        cashaddr: tokenAddr,
         amount: tokenAmount,            // fungible token amount
         value: 1000,                    // Satoshi value
       });
@@ -103,6 +111,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   document.querySelector('#createMintingToken').addEventListener("click", async () => {
     try {
       const genesisResponse = await wallet.tokenGenesis({
+        cashaddr: tokenAddr,
         commitment: "",             // NFT Commitment message
         capability: NFTCapability.minting, // NFT capability
         value: 1000,                    // Satoshi value
@@ -115,11 +124,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     } catch (error) { alert(error) }
   });
 
-  // Check if there are tokens in the wallet
-  if (!arrayTokens.length) {
-    const divNoTokens = document.querySelector('#noTokensFound');;
-    divNoTokens.textContent = "Currently there are no tokens in this wallet";
-  }
   // Create tokenlist
   function createListWithTemplate(tokens) {
     const Placeholder = document.getElementById("Placeholder");
@@ -219,6 +223,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         tokenId,
         [
           new TokenMintRequest({
+            cashaddr: tokenAddr,
             commitment: tokenCommitment,
             capability: NFTCapability.none,
             value: 1000,
