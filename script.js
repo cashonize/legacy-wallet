@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", async (event) => {
-  // make sure rest of code executes after mainnet-js has been imported properly
+  // Make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
 
   // Test that indexedDB is available
   var db = window.indexedDB.open('test');
   db.onerror = () => alert("Can't use indexedDB, might be because of private window.")
 
-  // change view logic
+  // Change view logic
   let currentView = 0;
   let otherViews = [1, 2];
   document.querySelector('#view1').onclick = () => showCurrentView(otherViews[0]);
@@ -26,41 +26,45 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelector('#view2').innerText = nav[otherViews[1]];
   }
 
-  // initialize wallet
+  // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
   console.log(wallet)
   Config.ValidateTokenAddresses = true;
 
+  // Display BCH balance and watch for changes
   const balance = await wallet.getBalance();
-  const getTokensResponse = await wallet.getAllTokenBalances();
-  const tokenCategories = Object.keys(getTokensResponse);
-  let arrayTokens = [];
-  for (const tokenId of tokenCategories) {
-    const utxos = await wallet.getTokenUtxos(tokenId);
-    for (const utxo of utxos) {
-      const tokenData = utxo.token;
-      arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
-    }
-  }
-
   document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
-  document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
-
   wallet.watchBalance((balance) => {
     document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
   });
-  const tokenAddr = await wallet.getTokenDepositAddress();
-  document.querySelector('#depositAddr').innerText = tokenAddr;
-
-  const qr = await wallet.getTokenDepositQr();
-  document.querySelector('#depositQr').src = qr.src;
-  createListWithTemplate(arrayTokens);
-  if (!arrayTokens.length) {
-    const divNoTokens = document.querySelector('#noTokensFound');;
-    divNoTokens.textContent = "Currently there are no tokens in this wallet";
+  // Display token categories, construct arrayTokens and watch for changes
+  let arrayTokens = [];
+  let tokenCategories = [];
+  fetchTokens()
+  async function fetchTokens() {
+    const getTokensResponse = await wallet.getAllTokenBalances();
+    tokenCategories = Object.keys(getTokensResponse);
+    for (const tokenId of tokenCategories) {
+      const utxos = await wallet.getTokenUtxos(tokenId);
+      for (const utxo of utxos) {
+        const tokenData = utxo.token;
+        arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
+      }
+    }
+    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
+    createListWithTemplate(arrayTokens);
   }
 
+  wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
+
+  // Initilize address and display QR code
+  const tokenAddr = await wallet.getTokenDepositAddress();
+  document.querySelector('#depositAddr').innerText = tokenAddr;
+  const qr = await wallet.getTokenDepositQr();
+  document.querySelector('#depositQr').src = qr.src;
+
+  // Functionality buttons BchWallet view
   document.querySelector('#send').addEventListener("click", async () => {
     try {
       const amount = document.querySelector('#sendAmount').value;
@@ -80,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     } catch (error) { alert(error) }
   });
 
+  // Functionality buttons CreateTokens view
   document.querySelector('#createTokens').addEventListener("click", async () => {
     try {
       const tokenAmount = document.querySelector('#tokenAmount').value;
@@ -110,7 +115,12 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     } catch (error) { alert(error) }
   });
 
-  // Display tokenlist
+  // Check if there are tokens in the wallet
+  if (!arrayTokens.length) {
+    const divNoTokens = document.querySelector('#noTokensFound');;
+    divNoTokens.textContent = "Currently there are no tokens in this wallet";
+  }
+  // Create tokenlist
   function createListWithTemplate(tokens) {
     const Placeholder = document.getElementById("Placeholder");
     const ul = document.createElement("ul");
@@ -171,6 +181,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     Placeholder.replaceWith(ul);
   }
 
+  // Functionality buttons MyTokens view
   async function sendTokens(address, amount, tokenId) {
     try {
       const { txId } = await wallet.send([
@@ -180,8 +191,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           tokenId: tokenId,
         }),
       ]);
-      alert(`Sent ${amount} fungible tokens of category ${tokenId}`);
-      console.log(`Sent ${amount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      alert(`Sent ${amount} fungible tokens of category ${displayId}`);
+      console.log(`Sent ${amount} fungible tokens of category ${displayId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
@@ -195,8 +207,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           capability: NFTCapability.none,
         }),
       ]);
-      alert(`Sent NFT of category ${tokenId} to ${address}`);
-      console.log(`Sent NFT of category ${tokenId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      alert(`Sent NFT of category ${displayId} to ${address}`);
+      console.log(`Sent NFT of category ${displayId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
@@ -212,8 +225,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           })
         ],
       );
-      alert(`Minted immutable NFT of category ${tokenId}`);
-      console.log(`Minted immutable NFT of category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      alert(`Minted immutable NFT of category ${displayId}`);
+      console.log(`Minted immutable NFT of category ${displayId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
