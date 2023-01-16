@@ -7,16 +7,24 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   db.onerror = () => alert("Can't use indexedDB, might be because of private window.")
 
   // change view logic
-  let tokenView = false;
-  document.querySelector('#view').onclick = () => {
-    const pageNav = tokenView ? "WalletView" : "TokenView";
-    document.querySelector('#view').innerText = pageNav;
-    const displayWalletView = `display: ${tokenView ? "none" : "block"};`;
-    const displayTokenView = `display: ${tokenView ? "block" : "none"};`;
-    document.querySelector('#walletView').style = displayWalletView;
-    document.querySelector('#tokenView').style = displayTokenView;
-    tokenView = !tokenView;
-  };
+  let currentView = 0;
+  let otherViews = [1, 2];
+  document.querySelector('#view1').onclick = () => showCurrentView(otherViews[0]);
+  document.querySelector('#view2').onclick = () => showCurrentView(otherViews[1]);
+
+  function showCurrentView(newView) {
+    currentView = newView
+    const displayView0 = currentView == 0 ? "block" : "none";
+    const displayView1 = currentView == 1 ? "block" : "none";
+    const displayView2 = currentView == 2 ? "block" : "none";
+    document.querySelector('#WalletView').style = `display: ${displayView0};`;
+    document.querySelector('#tokenView').style = `display: ${displayView1};`;
+    document.querySelector('#createTokensView').style = `display: ${displayView2};`;
+    otherViews = [0, 1, 2].filter(view => view != currentView)
+    const nav = ["BchWallet", "MyTokens   ", "CreateTokens"]
+    document.querySelector('#view1').innerText = nav[otherViews[0]];
+    document.querySelector('#view2').innerText = nav[otherViews[1]];
+  }
 
   // initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
@@ -46,8 +54,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   const qr = await wallet.getTokenDepositQr();
   document.querySelector('#depositQr').src = qr.src;
-
   createListWithTemplate(arrayTokens);
+  if(!arrayTokens.length) {
+    const divNoTokens = document.querySelector('#noTokensFound');;
+    divNoTokens.textContent = "Currently there are no tokens in this wallet";
+  }
 
   document.querySelector('#send').addEventListener("click", async () => {
     try{
@@ -116,7 +127,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       };
       if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
-      tokenCard.querySelector("#tokenID").textContent = `TokenId: ${token.tokenId}`;
+      const displayId = `${token.tokenId.slice(0,20)}...${token.tokenId.slice(-10)}`;
+      tokenCard.querySelector("#tokenID").textContent = `TokenId: ${displayId}`;
       if (token.tokenData.commitment != "") {
         tokenCard.querySelector("#tokenCommitment").textContent = token.tokenData.commitment;
       }

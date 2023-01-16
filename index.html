@@ -1,15 +1,18 @@
 <html>
+
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
     <script defer src="https://cdn.mainnet.cash/mainnet-1.0.6.js"></script>
 </head>
+
 <body>
     <header>
         <h1>My CashTokens Webwallet</h1>
         <b>Connected to chipnet</b>
-        <div>Change to <span id="view" class="view">TokenView</span></div>
+        <div>Change to <span id="view1" class="view">MyTokens</span>, <span id="view2" class="view">CreateTokens</span>
+        </div>
     </header>
     <main>
         <div id="walletView">
@@ -28,19 +31,9 @@
                 <input type="button" id="sendMax" value="Send All Funds"></input>
             </div>
         </div>
-        
+
         <div id="tokenView" style="display: none;">
-            <div style="padding-left: 40px">
-                Create new fungible tokens
-                <input id="tokenAmount" placeholder="total supply"></input>
-                <input type="button" id="createTokens" value="Create"></input>
-                <br><br>
-                Create a new minting NFT
-                <input type="button" id="createMintingToken" value="Create"></input>
-                <hr style="margin: 15px">
-            </div>
-            
-            
+            <div id="noTokensFound"></div>
             <template id="token-template">
                 <div class="item">
                     <div id="tokenType"></div>
@@ -49,7 +42,7 @@
                     <div id="tokenAmount"></div>
                     <br>
                     <div id="tokenSend" style="display: none;">
-                        Send these tokens to 
+                        Send these tokens to
                         <input id="tokenAddress" placeholder="token address"></input>
                         <br>
                         <input id="sendTokenAmount" placeholder="amount tokens"></input>
@@ -58,20 +51,29 @@
                         <input type="button" id="sendAllButton" value="Send All Tokens"></input>
                     </div>
                     <div id="nftSend" style="display: none;">
-                      Send this NFT to 
-                      <input id="tokenAddress" placeholder="tokenAddress"></input>
-                      <input type="button" id="sendNFT" value="Send NFT"></input>
+                        Send this NFT to
+                        <input id="tokenAddress" placeholder="tokenAddress"></input>
+                        <input type="button" id="sendNFT" value="Send NFT"></input>
                     </div>
                     <div id="nftMint" style="display: none;">
                         Mint immutable NFT
                         <input id="commitmentInput" placeholder="commitment"></input>
                         <input type="button" id="mintNFT" value="Mint NFT"></input>
                     </div>
-                  <hr style="margin: 15px">
+                    <hr style="margin: 15px">
                 </div>
             </template>
 
             <div id="Placeholder"></div>
+        </div>
+
+        <div id="createTokensView" style="display: none;">
+            Create new fungible tokens
+            <input id="tokenAmount" placeholder="total supply"></input>
+            <input type="button" id="createTokens" value="Create"></input>
+            <br><br>
+            Create a new minting NFT
+            <input type="button" id="createMintingToken" value="Create"></input>
         </div>
     </main>
 </body>
@@ -83,5 +85,6 @@
         built with <a href="https://mainnet.cash/" target="_blanc">Mainnet.cash</a>
     </p>
 </footer>
+
 </html>
 <script type="module" src="./script.js"></script>
