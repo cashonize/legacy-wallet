@@ -5,32 +5,58 @@
     <title>My CashTokens Webwallet</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/chota.css">
+    <link rel="stylesheet" href="css/style.css">
     <script defer src="https://cdn.mainnet.cash/mainnet-1.0.9.js"></script>
 </head>
 
 <body>
+    <div>
     <header>
         <h1>My CashTokens Webwallet</h1>
         <b>Connected to chipnet</b>
-        <div>Change to <span id="view1" class="view">MyTokens</span>, <span id="view2" class="view">CreateTokens</span>
+        <div>
+        <nav class="nav">
+          <div class="nav-left">
+            <a class="brand" href="#">Wallet</a>
+            <div class="tabs">
+              <a id="view1" class="view">MyTokens</a>
+              <a id="view2" class="view">CreateTokens</a>
+            </div>
+          </div>
+        </nav>
         </div>
     </header>
+    </div>
     <main>
+        <div class="container">
         <div id="walletView">
-            <div>Wallet balance: <span id="balance"></span></div>
-            <div>Wallet token balance: <span id="tokenBalance"></span></div>
-            <div>Address: <span id="depositAddr" class="depositAddr"></span></div>
-            <div>Deposit QR: <img id="depositQr" class="depositQr"></div>
+
+            <fieldset>
+            <p class="grouped">
+            <div>Wallet balance:<span class="text-primary" id="balance"></span></div>
+            <div>Wallet token balance: <span class="text-primary" id="tokenBalance"></span></div>
+            <div>Address: <span class="depositAddr" id="depositAddr"></span>
+            <button type="button" style="background: none; padding: 0; " onclick="copyEvent('depositAddr')">📋</button></div>
+            <div class="is-center">Deposit QR</div>
+            <div><img id="depositQr" class="depositQr" src="./qrcode.jpg"/></div>
+            </p>
+            </fieldset>
+
+            <br>
             <div>
-                <br>
-                Send tBCH to
+
+                <fieldset>
+                <legend>Send tBCH to</legend>
+                <p class="grouped">
                 <input id="sendAddr" placeholder="address">
-                <br>
                 <input id="sendAmount" placeholder="amount satoshis">
+                </p>
+
                 <input type="button" id="send" value="Send">
-                or
                 <input type="button" id="sendMax" value="Send All Funds">
+                </fieldset>
+
             </div>
         </div>
 
@@ -38,6 +64,9 @@
             <div id="noTokensFound"></div>
             <template id="token-template">
                 <div class="item">
+
+                    <fieldset>
+                    <legend>Send Tokens</legend>
                     <div id="tokenType"></div>
                     <div id="tokenID" class="tokenID"></div>
                     <div id="tokenCommitment"></div>
@@ -45,17 +74,21 @@
                     <br>
                     <div id="tokenSend" style="display: none;">
                         Send these tokens to
+                        <p class="grouped">
                         <input id="tokenAddress" placeholder="token address">
-                        <br>
                         <input id="sendTokenAmount" placeholder="amount tokens">
+                        </p>
                         <input type="button" id="sendSomeButton" value="Send">
-                        or
                         <input type="button" id="sendAllButton" value="Send All Tokens">
                     </div>
+                    </fieldset>
+
                     <div id="nftSend" style="display: none;">
                         Send this NFT to
+                        <p class="grouped">
                         <input id="tokenAddress" placeholder="tokenAddress">
                         <input type="button" id="sendNFT" value="Send NFT">
+                        </p>
                     </div>
                     <div id="nftMint" style="display: none;">
                         Mint immutable NFT
@@ -70,23 +103,45 @@
         </div>
 
         <div id="createTokensView" style="display: none;">
-            Create new fungible tokens
+
+            <fieldset>
+            <legend>Create new fungible tokens</legend>
             <input id="tokenSupply" placeholder="total supply">
             <input type="button" id="createTokens" value="Create">
+            </fieldset>
             <br><br>
-            Create a new minting NFT
+
+            <fieldset>
+            <legend>Create a new minting NFT</legend>
             <input type="button" id="createMintingToken" value="Create">
+            </fieldset>
+
+        </div>
+        <footer>
+            <br>
+            <p>
+                built with <a href="https://mainnet.cash/" target="_blank">Mainnet.cash</a>
+            </p>
+            <div>
+            <a href="https://github.com/mr-zwets/mvp-cashtokens-webwallet" target="_blank">
+                <img class="githublogo" src="./github.png" alt="Github logo">
+            </a>
+            </div>
+        </footer>
         </div>
     </main>
-    <footer>
-        <a href="https://github.com/mr-zwets/mvp-cashtokens-webwallet" target="_blank">
-            <img class="githublogo" src="./github.png">
-        </a>
-        <p>
-            built with <a href="https://mainnet.cash/" target="_blank">Mainnet.cash</a>
-        </p>
-    </footer>
-    <script type="module" src="./script.js"></script>
-</body>
 
+
+
+<script type="module" src="./script.js"></script>
+<script>
+    function copyEvent(id)
+    {
+        var str = document.getElementById(id);
+        console.log(str)
+        window.getSelection().selectAllChildren(str);
+        document.execCommand("Copy")
+    }
+</script>
+</body>
 </html>
