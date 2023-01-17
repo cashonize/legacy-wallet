@@ -144,8 +144,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       tokenCard.querySelector("#tokenType").textContent = tokenType;
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = `TokenId: ${displayId}`;
-      if (token.tokenData.commitment != "") {
-        tokenCard.querySelector("#tokenCommitment").textContent = token.tokenData.commitment;
+      const tokenCommitment = token.tokenData.commitment || "";
+      if (tokenCommitment != "") {
+        const commitmentText = `NFT commitment: ${tokenCommitment}`;
+        tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
       }
       const textTokenAmount = `Token amount: ${token.amount}`
       // display fungible token amount & fungible token send
@@ -176,8 +178,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         if (tokenCapability == "minting") nftMint.style = "display:block;"
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
-          const tokenCommitment = nftMint.querySelector('#commitmentInput').value;
-          mintNft(token.tokenId, tokenCommitment)
+          const commitmentInput = nftMint.querySelector('#commitmentInput').value;
+          mintNft(token.tokenId, commitmentInput)
         }
       }
       ul.appendChild(tokenCard);
