@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
   console.log(wallet)
-  Config.ValidateTokenAddresses = true;
+  Config.EnforceCashTokenReceiptAddresses = true;
 
   // Display BCH balance and watch for changes
   const balance = await wallet.getBalance();
@@ -231,8 +231,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         ],
       );
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
-      alert(`Minted immutable NFT of category ${displayId}`);
-      console.log(`Minted immutable NFT of category ${displayId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      const commitmentText= tokenCommitment? `with commitment ${tokenCommitment}`: "";
+      alert(`Minted immutable NFT of category ${displayId} ${commitmentText}`);
+      console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
