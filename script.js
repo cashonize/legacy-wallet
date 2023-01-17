@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   document.querySelector('#view2').onclick = () => showCurrentView(otherViews[1]);
 
   function showCurrentView(newView) {
-    currentView = newView
+    currentView = newView;
     const displayView0 = currentView == 0 ? "block" : "none";
     const displayView1 = currentView == 1 ? "block" : "none";
     const displayView2 = currentView == 2 ? "block" : "none";
-    document.querySelector('#WalletView').style = `display: ${displayView0};`;
+    document.querySelector('#walletView').style = `display: ${displayView0};`;
     document.querySelector('#tokenView').style = `display: ${displayView1};`;
     document.querySelector('#createTokensView').style = `display: ${displayView2};`;
     otherViews = [0, 1, 2].filter(view => view != currentView)
