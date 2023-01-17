@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     arrayTokens = [];
     const getTokensResponse = await wallet.getAllTokenBalances();
     tokenCategories = Object.keys(getTokensResponse);
+    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
     for (const tokenId of tokenCategories) {
       const utxos = await wallet.getTokenUtxos(tokenId);
       for (const utxo of utxos) {
@@ -53,8 +54,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
       }
     }
-    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
-    // Eiyher display tokens in wallet or display there are no tokens
+    // Either display tokens in wallet or display there are no tokens
     if (arrayTokens.length) {
       createListWithTemplate(arrayTokens);
     } else {
@@ -94,17 +94,17 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   // Functionality buttons CreateTokens view
   document.querySelector('#createTokens').addEventListener("click", async () => {
     try {
-      const tokenAmount = document.querySelector('#tokenAmount').value;
+      const tokenSupply = document.querySelector('#tokenSupply').value;
       const genesisResponse = await wallet.tokenGenesis({
         cashaddr: tokenAddr,
-        amount: tokenAmount,            // fungible token amount
+        amount: tokenSupply,            // fungible token amount
         value: 1000,                    // Satoshi value
       });
       const tokenId = genesisResponse.tokenIds[0];
       const { txId } = genesisResponse;
 
-      alert(`Created ${tokenAmount} fungible tokens of category ${tokenId}`);
-      console.log(`Created ${tokenAmount} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
+      console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   });
 
