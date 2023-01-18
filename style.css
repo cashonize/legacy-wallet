@@ -1,3 +1,6 @@
+html {
+  overflow-y: scroll;
+}
 header {
   margin: 0px;
   display: flex;
@@ -38,11 +41,10 @@ main{
   margin: 0;
   padding: 0
 }
-input {
-  margin: 2px 0;
-}
 footer {
-    text-align:center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .githublogo {
   width: 64px;
@@ -50,12 +52,3 @@ footer {
   top: -5px;
   left: -5px;
 }
-
-/*
-@media screen and (max-height: 700px) {
-  footer {
-    position: inherit;
-    margin-top: 60px;
-  }
-}
-*/

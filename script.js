@@ -6,26 +6,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   var db = window.indexedDB.open('test');
   db.onerror = () => alert("Can't use indexedDB, might be because of private window.")
 
-  // Change view logic
-  let currentView = 0;
-  let otherViews = [1, 2];
-  document.querySelector('#view1').onclick = () => showCurrentView(otherViews[0]);
-  document.querySelector('#view2').onclick = () => showCurrentView(otherViews[1]);
-
-  function showCurrentView(newView) {
-    currentView = newView;
-    const displayView0 = currentView == 0 ? "block" : "none";
-    const displayView1 = currentView == 1 ? "block" : "none";
-    const displayView2 = currentView == 2 ? "block" : "none";
-    document.querySelector('#walletView').style = `display: ${displayView0};`;
-    document.querySelector('#tokenView').style = `display: ${displayView1};`;
-    document.querySelector('#createTokensView').style = `display: ${displayView2};`;
-    otherViews = [0, 1, 2].filter(view => view != currentView)
-    const nav = ["BchWallet", "MyTokens   ", "CreateTokens"]
-    document.querySelector('#view1').innerText = nav[otherViews[0]];
-    document.querySelector('#view2').innerText = nav[otherViews[1]];
-  }
-
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
@@ -143,7 +123,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       if (token.amount == 0) tokenType = nftTypes[tokenCapability];
       tokenCard.querySelector("#tokenType").textContent = tokenType;
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
-      tokenCard.querySelector("#tokenID").textContent = `TokenId: ${displayId}`;
+      tokenCard.querySelector("#tokenID").textContent = displayId;
+      tokenCard.querySelector("#tokenID").value = token.tokenId;
       const tokenCommitment = token.tokenData.commitment || "";
       if (tokenCommitment != "") {
         const commitmentText = `NFT commitment: ${tokenCommitment}`;
@@ -240,3 +221,26 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   }
 
 })
+
+// Logic for copy onclick
+window.copyTextContent = function copyTextContent(id) {
+  var element = document.getElementById(id);
+  navigator.clipboard.writeText(element.textContent);
+}
+window.copyTokenID = function copyTokenID(event) {
+  navigator.clipboard.writeText(event.currentTarget.parentElement.querySelector('#tokenID').value)
+}
+
+// Change view logic
+window.changeView =function changeView(newView) {
+  const displayView0 = newView == 0 ? "block" : "none";
+  const displayView1 = newView == 1 ? "block" : "none";
+  const displayView2 = newView == 2 ? "block" : "none";
+  document.querySelector('#walletView').style = `display: ${displayView0};`;
+  document.querySelector('#tokenView').style = `display: ${displayView1};`;
+  document.querySelector('#createTokensView').style = `display: ${displayView2};`;
+  [0, 1, 2].forEach( index => {
+    document.querySelector(`#view${index}`).classList = "view";
+  })
+  document.querySelector(`#view${newView}`).classList = "view active";
+}
