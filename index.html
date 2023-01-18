@@ -32,33 +32,28 @@
     <div class="container">
       <div id="walletView">
 
-        <fieldset>
+        <fieldset style="margin-top: 15px;">
           <p class="grouped">
           <div>Wallet balance: <span id="balance" class="text-primary"></span></div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
           <div>Address: <span class="depositAddr" id="depositAddr"></span>
-            <button type="button" style="background: none; padding: 0; " onclick="copyTextContent('depositAddr')">📋</button>
+            <button type="button" style="background: none; padding: 0; "
+              onclick="copyTextContent('depositAddr')">📋</button>
           </div>
           <div class="is-center">Deposit QR</div>
           <div><img id="depositQr" class="depositQr" src="./qrcode.jpg" /></div>
           </p>
         </fieldset>
+        <fieldset style="margin-top: 15px">
+          <legend>Send tBCH to</legend>
+          <p class="grouped">
+            <input id="sendAddr" placeholder="address">
+            <input id="sendAmount" placeholder="amount satoshis">
+          </p>
 
-        <br>
-        <div>
-
-          <fieldset>
-            <legend>Send tBCH to</legend>
-            <p class="grouped">
-              <input id="sendAddr" placeholder="address">
-              <input id="sendAmount" placeholder="amount satoshis">
-            </p>
-
-            <input type="button" id="send" value="Send">
-            <input type="button" id="sendMax" value="Send All Funds">
-          </fieldset>
-
-        </div>
+          <input type="button" id="send" value="Send">
+          <input type="button" id="sendMax" value="Send All Funds">
+        </fieldset>
       </div>
 
       <div id="tokenView" style="display: none;">
@@ -66,7 +61,7 @@
         <template id="token-template">
           <div class="item">
 
-            <fieldset>
+            <fieldset style="margin: 10px">
               <legend>
                 <div id="tokenType"></div>
               </legend>
@@ -99,8 +94,6 @@
                 </p>
               </div>
             </fieldset>
-
-            <hr style="margin: 15px">
           </div>
         </template>
 
@@ -108,15 +101,14 @@
       </div>
 
       <div id="createTokensView" style="display: none;">
-        <fieldset>
+        <fieldset style="margin: 10px">
           <legend>Create new fungible tokens</legend>
           <p class="grouped">
             <input id="tokenSupply" placeholder="total supply">
             <input type="button" id="createTokens" value="Create">
           </p>
         </fieldset>
-        <br><br>
-        <fieldset>
+        <fieldset style="margin: 20px 10px 10px 10px">
           <legend>Create a new minting NFT</legend>
           <input type="button" id="createMintingToken" value="Create">
         </fieldset>
