@@ -5,8 +5,8 @@
     <title>My CashTokens Webwallet</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/chota.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/chota@0.8.0/dist/chota.min.css">
+    <link rel="stylesheet" href="style.css">
     <script defer src="https://cdn.mainnet.cash/mainnet-1.0.9.js"></script>
 </head>
 
@@ -18,7 +18,6 @@
         <div>
         <nav class="nav">
           <div class="nav-left">
-            <a class="brand" href="#">Wallet</a>
             <div class="tabs">
               <a id="view1" class="view">MyTokens</a>
               <a id="view2" class="view">CreateTokens</a>
@@ -34,8 +33,8 @@
 
             <fieldset>
             <p class="grouped">
-            <div>Wallet balance:<span class="text-primary" id="balance"></span></div>
-            <div>Wallet token balance: <span class="text-primary" id="tokenBalance"></span></div>
+            <div>Wallet balance:<span id="balance"></span></div>
+            <div>Wallet token balance: <span id="tokenBalance"></span></div>
             <div>Address: <span class="depositAddr" id="depositAddr"></span>
             <button type="button" style="background: none; padding: 0; " onclick="copyEvent('depositAddr')">📋</button></div>
             <div class="is-center">Deposit QR</div>
@@ -66,8 +65,7 @@
                 <div class="item">
 
                     <fieldset>
-                    <legend>Send Tokens</legend>
-                    <div id="tokenType"></div>
+                    <legend><div id="tokenType"></div></legend>
                     <div id="tokenID" class="tokenID"></div>
                     <div id="tokenCommitment"></div>
                     <div id="tokenAmount"></div>
@@ -81,8 +79,6 @@
                         <input type="button" id="sendSomeButton" value="Send">
                         <input type="button" id="sendAllButton" value="Send All Tokens">
                     </div>
-                    </fieldset>
-
                     <div id="nftSend" style="display: none;">
                         Send this NFT to
                         <p class="grouped">
@@ -92,9 +88,13 @@
                     </div>
                     <div id="nftMint" style="display: none;">
                         Mint immutable NFT
+                        <p class="grouped">
                         <input id="commitmentInput" placeholder="commitment">
                         <input type="button" id="mintNFT" value="Mint NFT">
+                        </p>
                     </div>
+                    </fieldset>
+
                     <hr style="margin: 15px">
                 </div>
             </template>
@@ -106,8 +106,10 @@
 
             <fieldset>
             <legend>Create new fungible tokens</legend>
+            <p class="grouped">
             <input id="tokenSupply" placeholder="total supply">
             <input type="button" id="createTokens" value="Create">
+            </p>
             </fieldset>
             <br><br>
 
