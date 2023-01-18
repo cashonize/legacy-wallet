@@ -41,7 +41,10 @@ main{
   margin: 0;
   padding: 0
 }
-footer {
+#noTokensFound {
+  text-align: center;
+}
+#githubLink {
     display: flex;
     justify-content: center;
     align-items: center;
