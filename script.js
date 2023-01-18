@@ -75,6 +75,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   document.querySelector('#createTokens').addEventListener("click", async () => {
     try {
       const tokenSupply = document.querySelector('#tokenSupply').value;
+      const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
+      if(!validInput) throw(`Input total supply must be a valid integer`);
       const genesisResponse = await wallet.tokenGenesis({
         cashaddr: tokenAddr,
         amount: tokenSupply,            // fungible token amount
@@ -202,6 +204,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   async function mintNft(tokenId, tokenCommitment) {
     try {
+      const isHex = (str) => /^[A-F0-9]+$/i.test(str);
+      if(!isHex(tokenCommitment)) throw(`tokenCommitment ${tokenCommitment} must be a hexadecimal`);
       const { txId } = await wallet.tokenMint(
         tokenId,
         [
