@@ -1,3 +1,6 @@
+html {
+  overflow-y: scroll;
+}
 header {
   margin: 0px;
   display: flex;
@@ -10,6 +13,7 @@ body {
   margin: 0px;
   margin-top: 30px;
   display: block;
+  --grid-maxWidth: 75rem;
 }
 main{
   display: flex;
@@ -25,6 +29,7 @@ main{
 .depositAddr,
 .tokenID {
   overflow-wrap: anywhere;
+  color: var(--color-grey);
 }
 .depositQr {
   margin: auto;
@@ -36,26 +41,14 @@ main{
   margin: 0;
   padding: 0
 }
-input {
-  margin: 2px 0;
-}
 footer {
-  position: absolute;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .githublogo {
   width: 64px;
   position: relative;
   top: -5px;
   left: -5px;
-}
-
-@media screen and (max-height: 700px) {
-  footer {
-    position: inherit;
-    margin-top: 60px;
-  }
 }
