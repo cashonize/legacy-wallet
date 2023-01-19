@@ -28,10 +28,15 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     tokenCategories = Object.keys(getTokensResponse);
     document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
     for (const tokenId of tokenCategories) {
+      if(getTokensResponse[tokenId]){
+        arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId] });
+        continue;
+      }
+      // Otherwise tokenId has NFTs, so query utxos for tokenData
       const utxos = await wallet.getTokenUtxos(tokenId);
       for (const utxo of utxos) {
         const tokenData = utxo.token;
-        arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId], tokenData });
+        arrayTokens.push({ tokenId, tokenData });
       }
     }
     // Either display tokens in wallet or display there are no tokens
@@ -55,6 +60,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   document.querySelector('#send').addEventListener("click", async () => {
     try {
       const amount = document.querySelector('#sendAmount').value;
+      const validInput = Number.isInteger(+amount) && +amount > 0;
+      if(!validInput) throw(`Amount satoshis to send must be a valid integer`);
+      if(amount < 546) throw(`Must send atleast 546 satoshis`);
       const addr = document.querySelector('#sendAddr').value;
       const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
       alert(`Sent ${amount} sats to ${addr}`);
@@ -115,26 +123,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
-      const tokenCapability = token.tokenData.capability;
-      let tokenType = "Fungible Tokens";
-      const nftTypes = {
-        minting: "Minting NFT",
-        mutable: "Mutable NFT",
-        none: "Immutable NFT"
-      };
-      if (token.amount == 0) tokenType = nftTypes[tokenCapability];
-      tokenCard.querySelector("#tokenType").textContent = tokenType;
+      // Display tokenID for fungibles & NFTs
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = displayId;
       tokenCard.querySelector("#tokenID").value = token.tokenId;
-      const tokenCommitment = token.tokenData.commitment || "";
-      if (tokenCommitment != "") {
-        const commitmentText = `NFT commitment: ${tokenCommitment}`;
-        tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
-      }
-      const textTokenAmount = `Token amount: ${token.amount}`
-      // display fungible token amount & fungible token send
-      if (token.amount != 0) {
+      // Stuff specific for fungibles
+      if(token.amount){
+        tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
+        const textTokenAmount = `Token amount: ${token.amount}`;
         tokenCard.querySelector("#tokenAmount").textContent = textTokenAmount;
         const tokenSend = tokenCard.querySelector('#tokenSend');
         tokenSend.style = "display:block;"
@@ -142,14 +138,27 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         sendSomeButton.onclick = () => {
           const amount = tokenSend.querySelector('#sendTokenAmount').value;
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, amount, token.tokenId)
+          sendTokens(inputAddress, amount, token.tokenId);
         }
-        const sendAllButton = tokenSend.querySelector("#sendAllButton")
+        const sendAllButton = tokenSend.querySelector("#sendAllButton");
         sendAllButton.onclick = () => {
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
           sendTokens(inputAddress, token.amount, token.tokenId);
         }
-      } else {
+      } else{
+        // Stuff specific for NFTs
+        const tokenCapability = token.tokenData.capability;
+        const nftTypes = {
+          minting: "Minting NFT",
+          mutable: "Mutable NFT",
+          none: "Immutable NFT"
+        };
+        tokenCard.querySelector("#tokenType").textContent = nftTypes[tokenCapability];
+        const tokenCommitment = token.tokenData.commitment;
+        if (tokenCommitment != "") {
+          const commitmentText = `NFT commitment: ${tokenCommitment}`;
+          tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
+        }
         const nftSend = tokenCard.querySelector('#nftSend');
         nftSend.style = "display:block;";
         const sendNftButton = nftSend.querySelector("#sendNFT");
@@ -173,6 +182,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   // Functionality buttons MyTokens view
   async function sendTokens(address, amount, tokenId) {
     try {
+      const validInput = Number.isInteger(+amount) && +amount > 0;
+      if(!validInput) throw(`Amount tokens to send must be a valid integer`);
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
