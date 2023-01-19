@@ -81,25 +81,38 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   // Functionality buttons CreateTokens view
   document.querySelector('#createTokens').addEventListener("click", async () => {
-    try {
-      const tokenSupply = document.querySelector('#tokenSupply').value;
-      const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
-      if(!validInput) throw(`Input total supply must be a valid integer`);
-      const genesisResponse = await wallet.tokenGenesis({
-        cashaddr: tokenAddr,
-        amount: tokenSupply,            // fungible token amount
-        value: 1000,                    // Satoshi value
-      });
-      const tokenId = genesisResponse.tokenIds[0];
-      const { txId } = genesisResponse;
+    // Check inputField
+    const tokenSupply = document.querySelector('#tokenSupply').value;
+    const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
+    if(!validInput){alert(`Input total supply must be a valid integer`); return}
+    // CreateFungibleTokens returns false on error
+    async function createFungibleTokens(){
+      try {
+        const genesisResponse = await wallet.tokenGenesis({
+          cashaddr: tokenAddr,
+          amount: tokenSupply,            // fungible token amount
+          value: 1000,                    // Satoshi value
+        });
+        const tokenId = genesisResponse.tokenIds[0];
+        const { txId } = genesisResponse;
 
-      alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
-      console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-    } catch (error) { alert(error) }
+        alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
+        console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        return txId
+      } catch (error) { return false }
+    }
+    const success = await createFungibleTokens();
+    // If creation fails there is no output with vout zero
+    if(!success){
+      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 2000, unit: "sat" }]);
+      console.log("Created output with vout zero for token genesis");
+      createFungibleTokens();
+    }
   });
 
   document.querySelector('#createMintingToken').addEventListener("click", async () => {
-    try {
+    async function createMintingToken(){
+      try{
       const genesisResponse = await wallet.tokenGenesis({
         cashaddr: tokenAddr,
         commitment: "",             // NFT Commitment message
@@ -111,7 +124,15 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
       alert(`Created minting token for category ${tokenId}`);
       console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-    } catch (error) { alert(error) }
+      return txId
+      }catch (error) {return false}
+    }
+    const success = await createMintingToken();
+    if(!success){
+      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 2000, unit: "sat" }]);
+      console.log("Created output with vout zero for token genesis");
+      createMintingToken();
+    }
   });
 
   // Create tokenlist
