@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const sendNftButton = nftSend.querySelector("#sendNFT");
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
-          sendNft(inputAddress, token.tokenId)
+          sendNft(inputAddress, token.tokenId, tokenCapability)
         }
         const nftMint = tokenCard.querySelector('#nftMint');
         if (tokenCapability == "minting") nftMint.style = "display:block;"
@@ -218,14 +218,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     } catch (error) { alert(error) }
   }
 
-  async function sendNft(address, tokenId) {
+  async function sendNft(address, tokenId, tokenCapability) {
     try {
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
           tokenId: tokenId,
           commitment: "",
-          capability: NFTCapability.none,
+          capability: tokenCapability,
         }),
       ]);
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
