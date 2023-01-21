@@ -1,3 +1,6 @@
+:root {
+  --color-primary: #0ac18f;
+}
 html {
   overflow-y: scroll;
 }
