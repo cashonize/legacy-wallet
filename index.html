@@ -37,8 +37,9 @@
           <div>Wallet balance: <span id="balance" class="text-primary"></span></div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
           <div>Address: <span class="depositAddr" id="depositAddr"></span>
-            <button type="button" style="background: none; padding: 0; "
-              onclick="copyTextContent('depositAddr')">📋</button>
+            <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositAddr')">
+              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+            </button>
           </div>
           <div class="is-center">Deposit QR</div>
           <div><img id="depositQr" class="depositQr" src="./qrcode.jpg" /></div>
@@ -66,7 +67,9 @@
                 <div id="tokenType"></div>
               </legend>
               TokenId: <span id="tokenID" class="tokenID"></span>
-              <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">📋</button>
+              <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
+                <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+              </button>
               <div id="tokenCommitment"></div>
               <div id="tokenAmount"></div>
               <br>

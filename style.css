@@ -40,6 +40,9 @@ main{
   width: 70%;
   max-width: 250px;
 }
+.copyIcon{
+  margin-bottom: -3px;
+}
 #Placeholder {
   margin: 0;
   padding: 0
