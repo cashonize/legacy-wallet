@@ -50,10 +50,10 @@
           <p class="grouped">
             <input id="sendAddr" placeholder="address">
             <input id="sendAmount" placeholder="amount satoshis">
+            <span class="maxButton" onclick="maxBch(event)">max</span>
           </p>
 
           <input type="button" id="send" value="Send">
-          <input type="button" id="sendMax" value="Send All Funds">
         </fieldset>
       </div>
 
@@ -78,9 +78,9 @@
                 <p class="grouped">
                   <input id="tokenAddress" placeholder="token address">
                   <input id="sendTokenAmount" placeholder="amount tokens">
+                  <span class="maxButton" onclick="maxTokens(event)">max</span>
                 </p>
                 <input type="button" id="sendSomeButton" value="Send">
-                <input type="button" id="sendAllButton" value="Send All Tokens">
               </div>
               <div id="nftSend" style="display: none;">
                 Send this NFT to

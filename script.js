@@ -13,9 +13,12 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   Config.EnforceCashTokenReceiptAddresses = true;
 
   // Display BCH balance and watch for changes
-  const balance = await wallet.getBalance();
+  let balance = await wallet.getBalance();
+  let maxAmountToSend = await wallet.getMaxAmountToSend();
   document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
-  wallet.watchBalance((balance) => {
+  wallet.watchBalance(async (newBalance) => {
+    balance = newBalance;
+    maxAmountToSend = await wallet.getMaxAmountToSend();
     document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
   });
   // Display token categories, construct arrayTokens and watch for changes
@@ -57,6 +60,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   document.querySelector('#depositQr').src = qr.src;
 
   // Functionality buttons BchWallet view
+  window.maxBch = function maxBch(event) {
+    event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.sat;
+  }
   document.querySelector('#send').addEventListener("click", async () => {
     try {
       const amount = document.querySelector('#sendAmount').value;
@@ -67,15 +73,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
       alert(`Sent ${amount} sats to ${addr}`);
       console.log(`Sent ${amount} sats to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-    } catch (error) { alert(error) }
-  });
-
-  document.querySelector('#sendMax').addEventListener("click", async () => {
-    try {
-      const addr = document.querySelector('#sendAddr').value;
-      const { txId } = await wallet.sendMax(addr);
-      alert(`Sent all funds to ${addr}`);
-      console.log(`Sent all funds to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   });
 
@@ -161,10 +158,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
           sendTokens(inputAddress, amount, token.tokenId);
         }
-        const sendAllButton = tokenSend.querySelector("#sendAllButton");
-        sendAllButton.onclick = () => {
-          const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, token.amount, token.tokenId);
+        window.maxTokens = function maxTokens(event) {
+          event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = token.amount;
         }
       } else{
         // Stuff specific for NFTs
