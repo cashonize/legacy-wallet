@@ -12,6 +12,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   console.log(wallet)
   Config.EnforceCashTokenReceiptAddresses = true;
 
+  // Import BCMR
+  const url = "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
+  await BCMR.addMetadataRegistryFromUri(url);
+  function getTokenInfo(tokenId){
+    const tokenList = BCMR.getRegistries()[0].identities;
+    return tokenList[tokenId]? tokenList[tokenId][0] : undefined;
+  }
+
   // Display BCH balance and watch for changes
   let balance = await wallet.getBalance();
   let maxAmountToSend = await wallet.getMaxAmountToSend();
@@ -43,10 +51,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       }
     }
     // Either display tokens in wallet or display there are no tokens
+    const divNoTokens = document.querySelector('#noTokensFound');
     if (arrayTokens.length) {
+      divNoTokens.textContent = "";
       createListWithTemplate(arrayTokens);
     } else {
-      const divNoTokens = document.querySelector('#noTokensFound');;
       divNoTokens.textContent = "Currently there are no tokens in this wallet";
     }
   }
@@ -141,25 +150,35 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
+      const tokenInfo = getTokenInfo(token.tokenId);
+      let decimals = 0;
+      let symbol = "";
+      if(tokenInfo){
+        symbol = tokenInfo.token.symbol;
+        decimals = tokenInfo.token.decimals;
+      }
       // Display tokenID for fungibles & NFTs
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = displayId;
       tokenCard.querySelector("#tokenID").value = token.tokenId;
+      if(tokenInfo) tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
       // Stuff specific for fungibles
       if(token.amount){
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
-        const textTokenAmount = `Token amount: ${token.amount}`;
-        tokenCard.querySelector("#tokenAmount").textContent = textTokenAmount;
+        const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
+        tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
         const tokenSend = tokenCard.querySelector('#tokenSend');
         tokenSend.style = "display:block;"
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
         sendSomeButton.onclick = () => {
-          const amount = tokenSend.querySelector('#sendTokenAmount').value;
+          let tokenAmount = Number(tokenSend.querySelector('#sendTokenAmount').value);
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, amount, token.tokenId);
+          sendTokens(inputAddress, tokenAmount, token.tokenId, tokenInfo);
         }
         window.maxTokens = function maxTokens(event) {
-          event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = token.amount;
+          let tokenAmount = token.amount;
+          if(tokenInfo) tokenAmount = token.amount / (10 ** tokenInfo.token.decimals);
+          event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = tokenAmount;
         }
       } else{
         // Stuff specific for NFTs
@@ -196,20 +215,25 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   }
 
   // Functionality buttons MyTokens view
-  async function sendTokens(address, amount, tokenId) {
+  async function sendTokens(address, amountEntered, tokenId, tokenInfo) {
     try {
-      const validInput = Number.isInteger(+amount) && +amount > 0;
-      if(!validInput) throw(`Amount tokens to send must be a valid integer`);
+      const decimals = tokenInfo? tokenInfo.token.decimals : 0;
+      const amountTokens = decimals ? amountEntered * (10 ** decimals) : amountEntered;
+      const validInput = Number.isInteger(amountTokens) && amountTokens > 0;
+      if(!validInput && !decimals) throw(`Amount tokens to send must be a valid integer`);
+      if(!validInput && decimals) throw(`Amount tokens to send must only have ${decimals} decimal places`);
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
-          amount: amount,
+          amount: amountTokens,
           tokenId: tokenId,
         }),
       ]);
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
-      alert(`Sent ${amount} fungible tokens of category ${displayId}`);
-      console.log(`Sent ${amount} fungible tokens of category ${displayId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      let message = `Sent ${amountEntered} fungible tokens of category ${displayId} to ${address}`;
+      if(tokenInfo) message = `Sent ${amountEntered} ${tokenInfo.token.symbol} to ${address}`;
+      alert(message);
+      console.log(`${message} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
