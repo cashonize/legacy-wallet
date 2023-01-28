@@ -87,36 +87,30 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
   // Functionality buttons CreateTokens view
   document.querySelector('#createTokens').addEventListener("click", async () => {
-    // Check inputField
-    const tokenSupply = document.querySelector('#tokenSupply').value;
-    const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
-    if(!validInput){alert(`Input total supply must be a valid integer`); return}
-    // CreateFungibleTokens returns false on error
-    async function createFungibleTokens(){
-      try {
-        const genesisResponse = await wallet.tokenGenesis({
-          cashaddr: tokenAddr,
-          amount: tokenSupply,            // fungible token amount
-          value: 1000,                    // Satoshi value
-        });
-        const tokenId = genesisResponse.tokenIds[0];
-        const { txId } = genesisResponse;
+    // Check if fungibles are selected
+    if(document.querySelector('#newtokens').value === "fungibles"){
+      // Check inputField
+      const tokenSupply = document.querySelector('#tokenSupply').value;
+      const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
+      if(!validInput){alert(`Input total supply must be a valid integer`); return}
+      async function createFungibleTokens(){
+        try {
+          const genesisResponse = await wallet.tokenGenesis({
+            cashaddr: tokenAddr,
+            amount: tokenSupply,            // fungible token amount
+            value: 1000,                    // Satoshi value
+          });
+          const tokenId = genesisResponse.tokenIds[0];
+          const { txId } = genesisResponse;
 
-        alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
-        console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-        return txId
-      } catch (error) { return false }
+          alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
+          console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+          return txId
+        } catch (error) { console.log(error) }
+      }
+      await createFungibleTokens();
     }
-    const success = await createFungibleTokens();
-    // If creation fails there is no output with vout zero
-    if(!success){
-      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 2000, unit: "sat" }]);
-      console.log("Created output with vout zero for token genesis");
-      createFungibleTokens();
-    }
-  });
-
-  document.querySelector('#createMintingToken').addEventListener("click", async () => {
+    else{ // If minting NFT is selected
     async function createMintingToken(){
       try{
       const genesisResponse = await wallet.tokenGenesis({
@@ -131,14 +125,30 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       alert(`Created minting token for category ${tokenId}`);
       console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
       return txId
-      }catch (error) {return false}
+      }catch (error) { alert(error) }
     }
-    const success = await createMintingToken();
-    if(!success){
-      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 2000, unit: "sat" }]);
+    await createMintingToken();
+    }
+  });
+
+  document.querySelector('#view2').addEventListener("click", async () => {
+    async function getValidPreGensis() {
+      let walletUtxos = await wallet.getAddressUtxos();
+      return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
+    }
+    let validPreGenesis= await getValidPreGensis()
+    console.log(validPreGenesis)
+    if(validPreGenesis.length === 0){
+      document.querySelector("#plannedTokenId").textContent = 'loading...';
+      document.querySelector("#plannedTokenId").value = "";
+      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 10000, unit: "sat" }]);
       console.log("Created output with vout zero for token genesis");
-      createMintingToken();
+      validPreGenesis= await getValidPreGensis()
     }
+    const tokenId = validPreGenesis[0].txid;
+    const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+    document.querySelector("#plannedTokenId").textContent = displayId;
+    document.querySelector("#plannedTokenId").value = tokenId;
   });
 
   // Create tokenlist
@@ -282,12 +292,12 @@ window.copyTextContent = function copyTextContent(id) {
   var element = document.getElementById(id);
   navigator.clipboard.writeText(element.textContent);
 }
-window.copyTokenID = function copyTokenID(event) {
-  navigator.clipboard.writeText(event.currentTarget.parentElement.querySelector('#tokenID').value)
+window.copyTokenID = function copyTokenID(event, id='tokenID') {
+  navigator.clipboard.writeText(event.currentTarget.parentElement.querySelector(`#${id}`).value)
 }
 
 // Change view logic
-window.changeView =function changeView(newView) {
+window.changeView = function changeView(newView) {
   const displayView0 = newView == 0 ? "block" : "none";
   const displayView1 = newView == 1 ? "block" : "none";
   const displayView2 = newView == 2 ? "block" : "none";
@@ -298,4 +308,9 @@ window.changeView =function changeView(newView) {
     document.querySelector(`#view${index}`).classList = "view";
   })
   document.querySelector(`#view${newView}`).classList = "view active";
+}
+
+// Change create token view
+window.selectTokenType = function selectTokenType(){
+  document.querySelector('#tokenSupply').parentElement.classList.toggle("hide");
 }

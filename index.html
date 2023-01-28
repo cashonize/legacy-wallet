@@ -106,17 +106,26 @@
 
       <div id="createTokensView" style="display: none;">
         <fieldset style="margin: 10px">
-          <legend>Create new fungible tokens</legend>
-          Process might take a few seconds... <br>
-          <p class="grouped">
+          <legend>Create new tokens</legend>
+          <label for="newtokens">Select token-type:</label>
+          <select name="newtokens" id="newtokens" onchange="selectTokenType(event)">
+            <option value="fungibles">Fungible Tokens</option>
+            <option value="NFT">Minting NFT</option>
+          </select>
+          <br>
+          <div style="margin-bottom: 1em;">
+            Planned tokenId:
+            <span id="plannedTokenId">loading...</span>
+            <button type="button" style="background: none; padding: 0;" onclick="copyTokenID(event,'plannedTokenId')">
+              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+            </button>
+          </div>
+          <div style="margin-bottom: 1em;">
+            Choose the total supply of these fungible tokens
             <input id="tokenSupply" placeholder="total supply">
-            <input type="button" id="createTokens" value="Create">
-          </p>
-        </fieldset>
-        <fieldset style="margin: 20px 10px 10px 10px">
-          <legend>Create a new minting NFT</legend>
+          </div>
           Process might take a few seconds... 
-          <input type="button" id="createMintingToken" value="Create">
+          <input type="button" id="createTokens" value="Create">
         </fieldset>
       </div>
       <br>
