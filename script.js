@@ -185,11 +185,12 @@ document.addEventListener("DOMContentLoaded", async (event) => {
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
           sendTokens(inputAddress, tokenAmount, token.tokenId, tokenInfo);
         }
-        window.maxTokens = function maxTokens(event) {
+        function maxTokens(event) {
           let tokenAmount = token.amount;
           if(tokenInfo) tokenAmount = token.amount / (10 ** tokenInfo.token.decimals);
           event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = tokenAmount;
         }
+        tokenCard.getElementById("maxButton").onclick = (event) => maxTokens(event);
       } else{
         // Stuff specific for NFTs
         const tokenCapability = token.tokenData.capability;
