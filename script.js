@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     } catch (error) { alert(error) }
   });
 
-  // Functionality buttons CreateTokens view
+  // Functionality CreateTokens view depending on selected token-type
   document.querySelector('#createTokens').addEventListener("click", async () => {
     // Check if fungibles are selected
     if(document.querySelector('#newtokens').value === "fungibles"){
@@ -93,25 +93,23 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const tokenSupply = document.querySelector('#tokenSupply').value;
       const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
       if(!validInput){alert(`Input total supply must be a valid integer`); return}
-      async function createFungibleTokens(){
-        try {
-          const genesisResponse = await wallet.tokenGenesis({
-            cashaddr: tokenAddr,
-            amount: tokenSupply,            // fungible token amount
-            value: 1000,                    // Satoshi value
-          });
-          const tokenId = genesisResponse.tokenIds[0];
-          const { txId } = genesisResponse;
-
-          alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
-          console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
-          return txId
-        } catch (error) { console.log(error) }
-      }
-      await createFungibleTokens();
+      // Create fungible tokens
+      try {
+        const genesisResponse = await wallet.tokenGenesis({
+          cashaddr: tokenAddr,
+          amount: tokenSupply,            // fungible token amount
+          value: 1000,                    // Satoshi value
+        });
+        const tokenId = genesisResponse.tokenIds[0];
+        const { txId } = genesisResponse;
+        alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
+        console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        return txId
+      } catch (error) { console.log(error) }
     }
-    else{ // If minting NFT is selected
-    async function createMintingToken(){
+    // If minting NFT is selected
+    if(document.querySelector('#newtokens').value === "mintingNFT"){
+    // Create minting token
       try{
       const genesisResponse = await wallet.tokenGenesis({
         cashaddr: tokenAddr,
@@ -122,13 +120,30 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const tokenId = genesisResponse.tokenIds[0];
       const { txId } = genesisResponse;
 
-      alert(`Created minting token for category ${tokenId}`);
-      console.log(`Created minting token for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      alert(`Created minting NFT for category ${tokenId}`);
+      console.log(`Created minting NFT for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
       return txId
       }catch (error) { alert(error) }
     }
-    await createMintingToken();
-    }
+    // If immutable NFT is selected
+    if(document.querySelector('#newtokens').value === "immutableNFT"){
+      // Create an immutable NFT
+        try{
+        const commitmentInput = document.querySelector('#inputNftCommitment').value;
+        const genesisResponse = await wallet.tokenGenesis({
+          cashaddr: tokenAddr,
+          commitment: commitmentInput,    // NFT Commitment message
+          capability: NFTCapability.none, // NFT capability
+          value: 1000,                    // Satoshi value
+        });
+        const tokenId = genesisResponse.tokenIds[0];
+        const { txId } = genesisResponse;
+  
+        alert(`Created an immutable NFT for category ${tokenId}`);
+        console.log(`Created an immutable NFT for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        return txId
+        }catch (error) { alert(error) }
+      }
   });
 
   document.querySelector('#view2').addEventListener("click", async () => {
@@ -312,6 +327,11 @@ window.changeView = function changeView(newView) {
 }
 
 // Change create token view
-window.selectTokenType = function selectTokenType(){
-  document.querySelector('#tokenSupply').parentElement.classList.toggle("hide");
+window.selectTokenType = function selectTokenType(event){
+  const tokenSupply = document.querySelector('#tokenSupply').parentElement;
+  const tokenCommitment = document.querySelector('#inputNftCommitment').parentElement;
+  tokenSupply.classList.add("hide");
+  tokenCommitment.classList.add("hide");
+  if(event.target.value === "fungibles") tokenSupply.classList.remove("hide");
+  if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide")
 }

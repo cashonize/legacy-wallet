@@ -110,7 +110,8 @@
           <label for="newtokens">Select token-type:</label>
           <select name="newtokens" id="newtokens" onchange="selectTokenType(event)">
             <option value="fungibles">Fungible Tokens</option>
-            <option value="NFT">Minting NFT</option>
+            <option value="mintingNFT">Minting NFT</option>
+            <option value="immutableNFT">Immutable NFT</option>
           </select>
           <br>
           <div style="margin-bottom: 1em;">
@@ -123,6 +124,10 @@
           <div style="margin-bottom: 1em;">
             Choose the total supply of these fungible tokens
             <input id="tokenSupply" placeholder="total supply">
+          </div>
+          <div class="hide" style="margin-bottom: 1em;">
+            Add immutable commitment data to add to this NFT (hexadecimals only)
+            <input id="inputNftCommitment" placeholder="commitment">
           </div>
           Process might take a few seconds... 
           <input type="button" id="createTokens" value="Create">
