@@ -59,6 +59,9 @@ main{
 .hide {
   display: none;
 }
+.item {
+  margin: 10px;
+}
 #githubLink {
     display: flex;
     justify-content: center;
@@ -69,4 +72,9 @@ main{
   position: relative;
   top: -5px;
   left: -5px;
+}
+@media only screen and (max-width: 570px) {
+  .item {
+    margin: 10px 0;
+  }
 }
