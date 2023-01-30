@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="https://unpkg.com/chota@0.8.0/dist/chota.min.css">
   <link rel="stylesheet" href="style.css">
   <script defer src="https://cdn.mainnet.cash/mainnet-1.0.9.js"></script>
+  <script>window.exports = {}</script>
+  <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
 </head>
 
 <body>
@@ -66,12 +68,16 @@
               <legend>
                 <div id="tokenType"></div>
               </legend>
-              <div id="tokenName"></div>
-              <span id="tokenIcon" class="tokenIcon"></span>
-              TokenId: <span id="tokenID" class="tokenID"></span>
-              <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
-                <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
-              </button>
+              <div class="tokenInfo">
+                <div id="tokenIcon" class="tokenIcon"></div>
+                <div id="tokenName"></div>
+                <div>
+                  TokenId: <span id="tokenID" class="tokenID"></span>
+                </div>
+                <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
+                  <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+                </button>
+              </div>
               <div id="tokenCommitment"></div>
               <div id="tokenAmount"></div>
               <br>

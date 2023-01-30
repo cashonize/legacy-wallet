@@ -47,6 +47,18 @@ main{
   margin: 0;
   padding: 0
 }
+.tokenInfo {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.tokenIcon {
+  margin-right: 10px;
+}
+.tokenIcon canvas {
+  display: block;
+  border-radius: 50%;
+}
 .maxButton{
   margin: 5px 0px 0px -65px;
   padding-right: 20px;

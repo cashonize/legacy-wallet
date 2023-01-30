@@ -187,6 +187,16 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       tokenCard.querySelector("#tokenID").textContent = displayId;
       tokenCard.querySelector("#tokenID").value = token.tokenId;
       if(tokenInfo) tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
+      
+      // Display tokenIcon
+      const icon = createIcon({
+        seed: token.tokenId,
+        size: 12,
+        scale: 4,
+        spotcolor: '#000'
+      });
+      const tokenIcon = tokenCard.querySelector("#tokenIcon");
+      tokenIcon.appendChild(icon);
       // Stuff specific for fungibles
       if(token.amount){
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
