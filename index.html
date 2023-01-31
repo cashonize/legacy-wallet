@@ -70,13 +70,15 @@
               </legend>
               <div class="tokenInfo">
                 <div id="tokenIcon" class="tokenIcon"></div>
-                <div id="tokenName"></div>
                 <div>
-                  TokenId: <span id="tokenID" class="tokenID"></span>
+                  <div id="tokenName"></div>
+                  <div>
+                    TokenId: <span id="tokenID" class="tokenID"></span>
+                    <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
+                      <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+                    </button>
+                  </div>
                 </div>
-                <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
-                  <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
-                </button>
               </div>
               <div id="tokenCommitment"></div>
               <div id="tokenAmount"></div>

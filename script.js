@@ -188,13 +188,18 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       tokenCard.querySelector("#tokenID").value = token.tokenId;
       if(tokenInfo) tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
       
-      // Display tokenIcon
-      const icon = createIcon({
+      // Display tokenIcon whether generated or costum
+      let icon = createIcon({
         seed: token.tokenId,
         size: 12,
         scale: 4,
         spotcolor: '#000'
       });
+      if(tokenInfo && tokenInfo.uris.icon){
+        icon = document.createElement("img");
+        icon.src = tokenInfo.uris.icon;
+        icon.style = "width:48px";
+      }
       const tokenIcon = tokenCard.querySelector("#tokenIcon");
       tokenIcon.appendChild(icon);
       // Stuff specific for fungibles
