@@ -7,12 +7,13 @@ It started as a minimum viable product but has grown quite a bit.
 ### Details
 
 The Webwallet creates a single address chipnet wallet which is persisted in between sessions in indexedDb. <br>
+The webwallet uses [example_bcmr](https://github.com/mr-zwets/example_bcmr) as a hardcoded metadata registry for tokenmetadata. <br>
 The Webwallet uses the new token-aware cashaddress-type which means other software might not recognize it yet.
 
 ### Faucet
 
-To fund the wallet you can copy the regular (non-token-aware) cashaddress from the console (by hitting F12) and navigating to the [chipnet faucet](https://tbch.googol.cash/). <br>
-This is because the faucet does not yet support token-aware cashaddresses.
+To get started with the webwallet and create your own CashTokens on chipnet, get a tBCH balance from the [chipnet faucet](https://tbch.googol.cash/)! <br>
+
 
 ### How it was made
 
