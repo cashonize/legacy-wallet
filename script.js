@@ -1,3 +1,5 @@
+const explorerUrl = "https://chipnet.chaingraph.cash";
+
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
@@ -81,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const addr = document.querySelector('#sendAddr').value;
       const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
       alert(`Sent ${amount} sats to ${addr}`);
-      console.log(`Sent ${amount} sats to ${addr} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      console.log(`Sent ${amount} sats to ${addr} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   });
 
@@ -103,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const tokenId = genesisResponse.tokenIds[0];
         const { txId } = genesisResponse;
         alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
-        console.log(`Created ${tokenSupply} fungible tokens \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        console.log(`Created ${tokenSupply} fungible tokens \n${explorerUrl}/tx/${txId}`);
         return txId
       } catch (error) { console.log(error) }
     }
@@ -121,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const { txId } = genesisResponse;
 
       alert(`Created minting NFT for category ${tokenId}`);
-      console.log(`Created minting NFT for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      console.log(`Created minting NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
       return txId
       }catch (error) { alert(error) }
     }
@@ -140,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const { txId } = genesisResponse;
   
         alert(`Created an immutable NFT for category ${tokenId}`);
-        console.log(`Created an immutable NFT for category ${tokenId} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+        console.log(`Created an immutable NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
         return txId
         }catch (error) { alert(error) }
       }
@@ -274,7 +276,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       let message = `Sent ${amountEntered} fungible tokens of category ${displayId} to ${address}`;
       if(tokenInfo) message = `Sent ${amountEntered} ${tokenInfo.token.symbol} to ${address}`;
       alert(message);
-      console.log(`${message} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      console.log(`${message} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
@@ -290,7 +292,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       ]);
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
       alert(`Sent NFT of category ${displayId} to ${address}`);
-      console.log(`Sent NFT of category ${displayId} to ${address} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      console.log(`Sent NFT of category ${displayId} to ${address} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
@@ -312,7 +314,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
       const commitmentText= tokenCommitment? `with commitment ${tokenCommitment}`: "";
       alert(`Minted immutable NFT of category ${displayId} ${commitmentText}`);
-      console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \nhttps://chipnet.imaginary.cash/tx/${txId}`);
+      console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 
