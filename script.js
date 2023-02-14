@@ -1,12 +1,49 @@
 const explorerUrl = "https://chipnet.chaingraph.cash";
 
+const newWalletView = document.querySelector('#newWalletView');
+const footer = document.querySelector('.footer');
+
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
 
   // Test that indexedDB is available
   var db = window.indexedDB.open('test');
-  db.onerror = () => alert("Can't use indexedDB, might be because of private window.")
+  db.onerror = () => {
+    footer.classList.remove("hide");
+    newWalletView.classList.remove("hide");
+    setTimeout(() => alert("Can't create a persistent wallet because indexedDb is unavailable, might be because of private window."), 100);
+  }
+
+  const walletExists = await TestNetWallet.namedExists('mywallet');
+  footer.classList.remove("hide");
+  if(!walletExists) newWalletView.classList.remove("hide");
+  else{loadWalletInfo()};
+})
+
+window.createNewWallet = async function createNewWallet() {
+  // Initialize wallet
+  DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
+  await TestNetWallet.named("mywallet");
+  loadWalletInfo()
+}
+
+window.importWallet = async function importWallet() {
+  // Initialize wallet
+  DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
+  const seedphrase = document.querySelector('#enterSeedphrase').value;
+  const derivationPath = "m/44'/0'/0'/0/0";
+  const walletId = `seed:testnet:${seedphrase}:${derivationPath}`;
+  await TestNetWallet.replaceNamed('mywallet', walletId);
+  loadWalletInfo()
+}
+
+async function loadWalletInfo() {
+  // Show My Wallet View
+  changeView(0);
+  const nav = document.querySelector('.nav');
+  nav.classList.remove("hide");
+  newWalletView.classList.add("hide");
 
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
@@ -317,8 +354,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
       console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
-
-})
+}
 
 // Logic for copy onclick
 window.copyTextContent = function copyTextContent(id) {

@@ -23,7 +23,7 @@
       </h1>
       <b>Connected to chipnet</b>
       <div>
-        <nav class="nav">
+        <nav class="nav hide">
           <div class="nav-left">
             <div class="tabs">
               <a id="view0" class="view active" onclick="changeView(0)">BchWallet</a>
@@ -37,7 +37,23 @@
   </div>
   <main>
     <div class="container">
-      <div id="walletView">
+      <br>
+      <div id="newWalletView" class="hide">
+        <fieldset style="margin-top: 15px;">
+            <h4><img src="https://icongr.am/feather/plus-square.svg?size=24&color=currentColor" style="vertical-align: text-bottom;"> Create new wallet</h4>
+            <input class="button primary" type="button" value="Create" onclick="createNewWallet()">
+            <br><br>
+            <hr>
+            <br>
+            <h4><img src="https://icongr.am/feather/log-in.svg?size=24&color=currentColor" style="vertical-align: text-bottom;"> Import existing wallet</h4> 
+            <div>Enter mnemonic seed phrase</div>
+            <textarea style="resize: none;" id="enterSeedphrase"rows="3" cols="50" placeholder="word1 word2 ..."></textarea>
+            <input class="button primary" type="button" style="margin-top:15px" value="Import" onclick="importWallet()">
+            <br><br>
+        </fieldset>
+      </div>
+
+      <div id="walletView" class="hide">
 
         <fieldset style="margin-top: 15px;">
           <p class="grouped">
@@ -64,7 +80,7 @@
         </fieldset>
       </div>
 
-      <div id="tokenView" style="display: none;">
+      <div id="tokenView" class="hide">
         <div id="noTokensFound"></div>
         <template id="token-template">
           <div class="item">
@@ -117,7 +133,7 @@
         <div id="Placeholder"></div>
       </div>
 
-      <div id="createTokensView" style="display: none;">
+      <div id="createTokensView" class="hide">
         <fieldset class="item">
           <legend>Create new tokens</legend>
           <label for="newtokens">Select token-type:</label>
@@ -147,7 +163,7 @@
         </fieldset>
       </div>
       <br>
-      <footer>
+      <footer class="footer hide">
         <a href="https://github.com/mr-zwets/my-cashtokens-webwallet" target="_blank" id="githubLink">
           <div style="display: inline-block;">
             <img class="githublogo" src="./images/github.png" alt="Github logo">
