@@ -54,10 +54,6 @@ async function loadWalletInfo() {
   // Import BCMR
   const url = "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
   await BCMR.addMetadataRegistryFromUri(url);
-  function getTokenInfo(tokenId){
-    const tokenList = BCMR.getRegistries()[0].identities;
-    return tokenList[tokenId]? tokenList[tokenId][0] : undefined;
-  }
 
   // Display BCH balance and watch for changes
   let balance = await wallet.getBalance();
@@ -214,7 +210,7 @@ async function loadWalletInfo() {
 
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
-      const tokenInfo = getTokenInfo(token.tokenId);
+      const tokenInfo = BCMR.getTokenInfo(token.tokenId);
       let decimals = 0;
       let symbol = "";
       if(tokenInfo){
