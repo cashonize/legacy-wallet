@@ -126,9 +126,17 @@ async function loadWalletInfo() {
     const url = document.querySelector('#bcmrUrl').value;
     let opreturnData
     if(url){
-      const hash_url = binToHex(Mainnet.sha256.hash(url));
-      const chunks = ["BCMR", hash_url, url];
-      opreturnData = OpReturnData.fromArray(chunks);
+      try{
+        const reponse = await fetch(url);
+        const bcmr = await reponse.json();
+        const hashContent = binToHex(Mainnet.sha256.hash(bcmr));
+        const chunks = ["BCMR", hashContent, url];
+        opreturnData = OpReturnData.fromArray(chunks);
+      } catch (error) {
+        alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
+        console.log(error);
+        return
+      }
     }
     // Check if fungibles are selected
     if(document.querySelector('#newtokens').value === "fungibles"){
