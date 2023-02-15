@@ -86,9 +86,9 @@ main{
 }
 .githublogo {
   width: 64px;
-  position: relative;
-  top: -5px;
-  left: -5px;
+}
+footer{
+  padding-bottom: 20px;
 }
 @media only screen and (max-width: 570px) {
   .item {
