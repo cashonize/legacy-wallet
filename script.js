@@ -122,6 +122,14 @@ async function loadWalletInfo() {
 
   // Functionality CreateTokens view depending on selected token-type
   document.querySelector('#createTokens').addEventListener("click", async () => {
+    // Check if metadata url is added
+    const url = document.querySelector('#bcmrUrl').value;
+    let opreturnData
+    if(url){
+      const hash_url = binToHex(Mainnet.sha256.hash(url));
+      const chunks = ["BCMR", hash_url, url];
+      opreturnData = OpReturnData.fromArray(chunks);
+    }
     // Check if fungibles are selected
     if(document.querySelector('#newtokens').value === "fungibles"){
       // Check inputField
@@ -130,11 +138,14 @@ async function loadWalletInfo() {
       if(!validInput){alert(`Input total supply must be a valid integer`); return}
       // Create fungible tokens
       try {
-        const genesisResponse = await wallet.tokenGenesis({
-          cashaddr: tokenAddr,
-          amount: tokenSupply,            // fungible token amount
-          value: 1000,                    // Satoshi value
-        });
+        const genesisResponse = await wallet.tokenGenesis(
+          {
+            cashaddr: tokenAddr,
+            amount: tokenSupply,            // fungible token amount
+            value: 1000,                    // Satoshi value
+          }, 
+          opreturnData 
+        );
         const tokenId = genesisResponse.tokenIds[0];
         const { txId } = genesisResponse;
         alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
@@ -146,39 +157,45 @@ async function loadWalletInfo() {
     if(document.querySelector('#newtokens').value === "mintingNFT"){
     // Create minting token
       try{
-      const genesisResponse = await wallet.tokenGenesis({
-        cashaddr: tokenAddr,
-        commitment: "",             // NFT Commitment message
-        capability: NFTCapability.minting, // NFT capability
-        value: 1000,                    // Satoshi value
-      });
-      const tokenId = genesisResponse.tokenIds[0];
-      const { txId } = genesisResponse;
+        const genesisResponse = await wallet.tokenGenesis(
+          {
+            cashaddr: tokenAddr,
+            commitment: "",             // NFT Commitment message
+            capability: NFTCapability.minting, // NFT capability
+            value: 1000,                    // Satoshi value
+          },
+          opreturnData 
+        );
+        const tokenId = genesisResponse.tokenIds[0];
+        const { txId } = genesisResponse;
 
-      alert(`Created minting NFT for category ${tokenId}`);
-      console.log(`Created minting NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
-      return txId
+        alert(`Created minting NFT for category ${tokenId}`);
+        console.log(`Created minting NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
+        return txId
       }catch (error) { alert(error) }
     }
     // If immutable NFT is selected
     if(document.querySelector('#newtokens').value === "immutableNFT"){
       // Create an immutable NFT
-        try{
+      try{
         const commitmentInput = document.querySelector('#inputNftCommitment').value;
-        const genesisResponse = await wallet.tokenGenesis({
-          cashaddr: tokenAddr,
-          commitment: commitmentInput,    // NFT Commitment message
-          capability: NFTCapability.none, // NFT capability
-          value: 1000,                    // Satoshi value
-        });
+        const genesisResponse = await wallet.tokenGenesis(
+          {
+            cashaddr: tokenAddr,
+            commitment: commitmentInput,    // NFT Commitment message
+            capability: NFTCapability.none, // NFT capability
+            value: 1000,                    // Satoshi value
+          },
+          opreturnData 
+        );
         const tokenId = genesisResponse.tokenIds[0];
         const { txId } = genesisResponse;
   
         alert(`Created an immutable NFT for category ${tokenId}`);
         console.log(`Created an immutable NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
         return txId
-        }catch (error) { alert(error) }
-      }
+      }catch (error) { alert(error) }
+    }
   });
 
   document.querySelector('#view2').addEventListener("click", async () => {

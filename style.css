@@ -52,6 +52,11 @@ main{
   align-items: center;
   margin-top: 10px;
 }
+#bcmrUrl{
+  width: -moz-available;          /* WebKit-based browsers will ignore this. */
+  width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+  width: fill-available;
+}
 .tokenIcon {
   margin-right: 10px;
 }
