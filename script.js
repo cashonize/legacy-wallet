@@ -132,6 +132,7 @@ async function loadWalletInfo() {
         const hashContent = sha256.hash(utf8ToBin(bcmr)).reverse();
         const chunks = ["BCMR", hashContent, url];
         opreturnData = OpReturnData.fromArray(chunks);
+        if(binToHex(opreturnData.buffer).length > 228) alert("url too long, can't fit into opreturn")
       } catch (error) {
         alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
         console.log(error);
