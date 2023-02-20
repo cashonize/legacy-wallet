@@ -18,7 +18,7 @@
   <div>
     <header>
       <h1>
-        <img style="width: 40px; vertical-align: text-bottom;" src="/images/favicon.png">
+        <img class="icon" style="width: 40px;" src="/images/favicon.png">
         CashTokens Webwallet
       </h1>
       <b>Connected to chipnet</b>
@@ -30,7 +30,7 @@
               <a id="view1" class="view" onclick="changeView(1)">MyTokens</a>
               <a id="view2" class="view" onclick="changeView(2)">CreateTokens</a>
               <a id="view3" class="view" onclick="changeView(3)">
-                <div><img id="settingsIcon" src="https://icongr.am/clarity/cog.svg?size=16"></div>
+                <div><img class="icon settingsIcon" src="https://icongr.am/clarity/cog.svg?size=16"></div>
               </a>
             </div>
           </div>
@@ -42,12 +42,12 @@
     <div class="container">
       <div id="newWalletView" class="hide">
         <fieldset style="margin-top: 15px;">
-            <h4><img src="https://icongr.am/feather/plus-square.svg?size=24&color=currentColor" style="vertical-align: text-bottom;"> Create new wallet</h4>
+            <h4><img class="icon plusIcon" src="https://icongr.am/feather/plus-square.svg?size=24"> Create new wallet</h4>
             <input class="button primary" type="button" value="Create" onclick="createNewWallet()">
             <br><br>
             <hr>
             <br>
-            <h4><img src="https://icongr.am/feather/log-in.svg?size=24&color=currentColor" style="vertical-align: text-bottom;"> Import existing wallet</h4> 
+            <h4><img class="icon importIcon" src="https://icongr.am/feather/log-in.svg?size=24"> Import existing wallet</h4> 
             <div>Enter mnemonic seed phrase</div>
             <div>Derivation path used is m/44'/0'/0'/0/0</div>
             <textarea style="resize: none;" id="enterSeedphrase"rows="3" cols="50" placeholder="word1 word2 ..."></textarea>

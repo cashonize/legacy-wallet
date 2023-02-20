@@ -8,7 +8,9 @@ const readDarkMode = localStorage.getItem("darkMode");
 window.toggleDarkmode = function toggleDarkmode() {
   darkMode = !darkMode;
   document.body.classList= darkMode? "dark" : "";
-  document.querySelector('#settingsIcon').classList= darkMode? "dark" : "";
+  const icons = document.querySelectorAll('.icon');
+  if(darkMode) icons.forEach(icon => icon.classList.add("dark"));
+  else icons.forEach(icon => icon.classList.remove("dark"));
   localStorage.setItem("darkMode", `${darkMode}`);
   document.querySelector('#darkmode').checked = darkMode;
 }

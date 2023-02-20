@@ -15,11 +15,17 @@ header {
 .tabs a{
   padding: 1rem 1.8rem;
 }
-#settingsIcon{
+.icon{
   vertical-align: text-bottom;
 }
-#settingsIcon.dark{
+.settingsIcon.dark{
   content:url("https://icongr.am/clarity/cog.svg?size=16&color=777777");
+}
+.plusIcon.dark{
+  content:url("https://icongr.am/feather/plus-square.svg?size=24&color=777777");
+}
+.importIcon.dark{
+  content:url("https://icongr.am/feather/log-in.svg?size=24&color=777777");
 }
 body {
   margin: 0px;
