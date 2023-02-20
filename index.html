@@ -29,6 +29,9 @@
               <a id="view0" class="view active" onclick="changeView(0)">BchWallet</a>
               <a id="view1" class="view" onclick="changeView(1)">MyTokens</a>
               <a id="view2" class="view" onclick="changeView(2)">CreateTokens</a>
+              <a id="view3" class="view" onclick="changeView(3)">
+                <div><img id="settingsIcon" src="https://icongr.am/clarity/cog.svg?size=16"></div>
+              </a>
             </div>
           </div>
         </nav>
@@ -37,7 +40,6 @@
   </div>
   <main>
     <div class="container">
-      <br>
       <div id="newWalletView" class="hide">
         <fieldset style="margin-top: 15px;">
             <h4><img src="https://icongr.am/feather/plus-square.svg?size=24&color=currentColor" style="vertical-align: text-bottom;"> Create new wallet</h4>
@@ -57,8 +59,7 @@
       <div id="walletView" class="hide">
 
         <fieldset style="margin-top: 15px;">
-          <p class="grouped">
-          <div>Wallet balance: <span id="balance" class="text-primary"></span></div>
+          <div style="margin-top: 15px;">Wallet balance: <span id="balance" class="text-primary"></span></div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
           <div>Address: <span class="depositAddr" id="depositAddr"></span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositAddr')">
@@ -173,6 +174,15 @@
           <input type="button" id="createTokens" value="Create">
         </fieldset>
       </div>
+
+      <div id="settingsView" class="hide">
+        <fieldset class="item">
+          <legend>Settings</legend>
+          <span style="margin-top: 15px;">Dark mode </span>
+          <input type="checkbox" id="darkmode" style="margin: 0; vertical-align: text-bottom;" onclick="toggleDarkmode()">
+        </fieldset>
+      </div>
+
       <br>
       <footer class="footer hide" id="githubLink">
         <a href="https://github.com/mr-zwets/my-cashtokens-webwallet" target="_blank" >

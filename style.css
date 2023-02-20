@@ -9,8 +9,17 @@ header {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   text-align: center;
+}
+.tabs a{
+  padding: 1rem 1.8rem;
+}
+#settingsIcon{
+  vertical-align: text-bottom;
+}
+#settingsIcon.dark{
+  content:url("https://icongr.am/clarity/cog.svg?size=16&color=777777");
 }
 body {
   margin: 0px;
@@ -95,3 +104,10 @@ footer{
     margin: 10px 0;
   }
 }
+body.dark {
+      --bg-color: #000;
+      --bg-secondary-color: #131316;
+      --font-color: #f5f5f5;
+      --color-grey: #ccc;
+      --color-darkGrey: #777;
+    }

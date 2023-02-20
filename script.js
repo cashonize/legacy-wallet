@@ -2,6 +2,21 @@ const explorerUrl = "https://chipnet.chaingraph.cash";
 
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
+// Logic dark mode
+let darkMode = false;
+const readDarkMode = localStorage.getItem("darkMode");
+window.toggleDarkmode = function toggleDarkmode() {
+  darkMode = !darkMode;
+  document.body.classList= darkMode? "dark" : "";
+  document.querySelector('#settingsIcon').classList= darkMode? "dark" : "";
+  localStorage.setItem("darkMode", `${darkMode}`);
+  document.querySelector('#darkmode').checked = darkMode;
+}
+if (readDarkMode === "true") window.toggleDarkmode();
+if (readDarkMode == undefined && window.matchMedia &&
+window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    window.toggleDarkmode();
+}
 
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
@@ -389,15 +404,14 @@ window.copyTokenID = function copyTokenID(event, id='tokenID') {
 
 // Change view logic
 window.changeView = function changeView(newView) {
-  const displayView0 = newView == 0 ? "block" : "none";
-  const displayView1 = newView == 1 ? "block" : "none";
-  const displayView2 = newView == 2 ? "block" : "none";
-  document.querySelector('#walletView').style = `display: ${displayView0};`;
-  document.querySelector('#tokenView').style = `display: ${displayView1};`;
-  document.querySelector('#createTokensView').style = `display: ${displayView2};`;
-  [0, 1, 2].forEach( index => {
+  const views = ['walletView','tokenView','createTokensView','settingsView'];
+  // First hide all views
+  views.forEach((view, index) => {
+    document.querySelector(`#${view}`).classList.add("hide");
     document.querySelector(`#view${index}`).classList = "view";
   })
+  // Show selected view & highlight in nav
+  document.querySelector(`#${views[newView]}`).classList.remove("hide");
   document.querySelector(`#view${newView}`).classList = "view active";
 }
 
@@ -408,5 +422,5 @@ window.selectTokenType = function selectTokenType(event){
   tokenSupply.classList.add("hide");
   tokenCommitment.classList.add("hide");
   if(event.target.value === "fungibles") tokenSupply.classList.remove("hide");
-  if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide")
+  if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide");
 }
