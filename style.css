@@ -21,7 +21,7 @@ header {
 #settingsIcon.dark{
   content:url("https://icongr.am/clarity/cog.svg?size=16&color=777777");
 }
-.active .settingsIcon{
+.active #settingsIcon{
   content:url("https://icongr.am/clarity/cog.svg?size=16&color=0ac18f");
 }
 .plusIcon.dark{
