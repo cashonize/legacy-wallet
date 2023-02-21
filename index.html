@@ -30,7 +30,7 @@
               <a id="view1" class="view" onclick="changeView(1)">MyTokens</a>
               <a id="view2" class="view" onclick="changeView(2)">CreateTokens</a>
               <a id="view3" class="view" onclick="changeView(3)">
-                <div><img class="icon settingsIcon" src="https://icongr.am/clarity/cog.svg?size=16"></div>
+                <div><img id="settingsIcon" class="icon" src="https://icongr.am/clarity/cog.svg?size=16"></div>
               </a>
             </div>
           </div>
@@ -63,7 +63,7 @@
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
           <div>Address: <span class="depositAddr" id="depositAddr"></span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositAddr')">
-              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16">
             </button>
           </div>
           <div class="is-center">Deposit QR</div>
@@ -92,41 +92,51 @@
               </legend>
               <div class="tokenInfo">
                 <div id="tokenIcon" class="tokenIcon"></div>
-                <div>
-                  <div id="tokenName"></div>
-                  <div>
-                    TokenId: <span id="tokenID" class="tokenID"></span>
-                    <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
-                      <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
-                    </button>
+                <div style="width: 100%; display: flex;align-items: center;">
+                  <div style="width: 400px; display: block;">
+                    <div id="tokenName"></div>
+                    <div>
+                      TokenId: <span id="tokenID" class="tokenID"></span>
+                      <button type="button" style="background: none; padding: 0; " onclick="copyTokenID(event)">
+                        <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16">
+                      </button>
+                    </div>
                   </div>
+                  <div class="tokenAmount" id="tokenAmount"></div>
                 </div>
               </div>
-              <div id="tokenCommitment"></div>
-              <div id="tokenAmount"></div>
-              <br>
-              <div id="tokenSend" style="display: none;">
-                Send these tokens to
-                <p class="grouped">
-                  <input id="tokenAddress" placeholder="token address">
-                  <input id="sendTokenAmount" placeholder="amount tokens">
-                  <span id="maxButton" class="maxButton">max</span>
-                </p>
-                <input type="button" id="sendSomeButton" value="Send">
-              </div>
-              <div id="nftSend" style="display: none;">
-                Send this NFT to
-                <p class="grouped">
-                  <input id="tokenAddress" placeholder="tokenAddress">
-                  <input type="button" id="sendNFT" value="Send NFT">
-                </p>
-              </div>
-              <div id="nftMint" style="display: none;">
-                Mint immutable NFT
-                <p class="grouped">
-                  <input id="commitmentInput" placeholder="commitment">
-                  <input type="button" id="mintNFT" value="Mint NFT">
-                </p>
+              <div class="actionBar">
+                <span style="margin-left: 10px;" class="tokenButton" id="sendButton">
+                  <img id="sendIcon" class="icon" src="https://icongr.am/feather/send.svg?size=18"> send </span>
+                <span class="tokenButton hide" id="infoButton">
+                  <img id="infoIcon" class="icon" src="https://icongr.am/feather/info.svg?size=18"> info 
+                </span>
+                <span class="tokenButton hide" id="mintButton">
+                  <img id="mintIcon" class="icon" src="https://icongr.am/material/hammer.svg?size=18"> mint NFT 
+                </span>
+                <div id="tokenCommitment"  class="hide"></div>
+                <div id="tokenSend" class="hide">
+                  Send these tokens to
+                  <p class="grouped">
+                    <input id="tokenAddress" placeholder="token address">
+                    <input id="sendTokenAmount" placeholder="amount tokens">
+                    <span id="maxButton" class="maxButton">max</span>
+                  </p>
+                  <input type="button" id="sendSomeButton" value="Send">
+                </div>
+                <div id="nftSend"  class="hide">
+                  Send this NFT to
+                  <p class="grouped">
+                    <input id="tokenAddress" placeholder="tokenAddress">
+                    <input type="button" id="sendNFT" value="Send NFT">
+                  </p>
+                </div>
+                <div id="nftMint"  class="hide">
+                  Mint immutable NFT
+                  <p class="grouped">
+                    <input id="commitmentInput" placeholder="commitment">
+                    <input type="button" id="mintNFT" value="Mint NFT">
+                  </p>
               </div>
             </fieldset>
           </div>
@@ -149,7 +159,7 @@
             Planned tokenId:
             <span id="plannedTokenId">loading...</span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTokenID(event,'plannedTokenId')">
-              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16&color=currentColor">
+              <img class="copyIcon" src="https://icongr.am/clarity/copy.svg?size=16">
             </button>
           </div>
           <div style="margin-bottom: 1em;">

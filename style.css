@@ -18,7 +18,7 @@ header {
 .icon{
   vertical-align: text-bottom;
 }
-.settingsIcon.dark{
+#settingsIcon.dark{
   content:url("https://icongr.am/clarity/cog.svg?size=16&color=777777");
 }
 .active .settingsIcon{
@@ -29,6 +29,15 @@ header {
 }
 .importIcon.dark{
   content:url("https://icongr.am/feather/log-in.svg?size=24&color=777777");
+}
+#sendIcon.dark{
+  content:url("https://icongr.am/feather/send.svg?size=18&color=777777");
+}
+#infoIcon.dark{
+  content:url("https://icongr.am/feather/info.svg?size=18&color=777777");
+}
+#mintIcon.dark{
+  content:url("https://icongr.am/material/hammer.svg?size=18&color=777777");
 }
 body {
   margin: 0px;
@@ -75,12 +84,20 @@ main{
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
   width: fill-available;
 }
+.actionBar{
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
 .tokenIcon {
   margin-right: 10px;
 }
 .tokenIcon canvas {
   display: block;
   border-radius: 50%;
+}
+.tokenButton {
+  margin-left: 40px;
+  cursor: pointer;
 }
 .maxButton{
   margin: 5px 0px 0px -65px;

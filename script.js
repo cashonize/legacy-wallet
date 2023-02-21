@@ -278,7 +278,7 @@ async function loadWalletInfo() {
       if(tokenInfo && tokenInfo.uris.icon){
         icon = document.createElement("img");
         icon.src = tokenInfo.uris.icon;
-        icon.style = "width:48px";
+        icon.style = "width:48px; max-width: inherit;";
       }
       const tokenIcon = tokenCard.querySelector("#tokenIcon");
       tokenIcon.appendChild(icon);
@@ -288,7 +288,7 @@ async function loadWalletInfo() {
         const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
         const tokenSend = tokenCard.querySelector('#tokenSend');
-        tokenSend.style = "display:block;"
+        tokenCard.getElementById("sendButton").onclick = () => tokenSend.classList.toggle("hide");
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
         sendSomeButton.onclick = () => {
           let tokenAmount = Number(tokenSend.querySelector('#sendTokenAmount').value);
@@ -312,18 +312,26 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenType").textContent = nftTypes[tokenCapability];
         const tokenCommitment = token.tokenData.commitment;
         if (tokenCommitment != "") {
+          const infoButton = tokenCard.querySelector('#infoButton');
+          infoButton.classList.remove("hide");
+          const tokenInfo = tokenCard.querySelector("#tokenCommitment")
+          infoButton.onclick = () => tokenInfo.classList.toggle("hide");
           const commitmentText = `NFT commitment: ${tokenCommitment}`;
           tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
         }
         const nftSend = tokenCard.querySelector('#nftSend');
-        nftSend.style = "display:block;";
+        tokenCard.getElementById("sendButton").onclick = () => nftSend.classList.toggle("hide");
         const sendNftButton = nftSend.querySelector("#sendNFT");
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
           sendNft(inputAddress, token.tokenId, tokenCapability)
         }
         const nftMint = tokenCard.querySelector('#nftMint');
-        if (tokenCapability == "minting") nftMint.style = "display:block;"
+        if (tokenCapability == "minting"){ 
+          const mintButton = tokenCard.querySelector('#mintButton');
+          mintButton.classList.remove("hide");
+          mintButton.onclick = () => nftMint.classList.toggle("hide");
+        }
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
           const commitmentInput = nftMint.querySelector('#commitmentInput').value;
