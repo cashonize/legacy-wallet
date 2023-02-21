@@ -2,6 +2,7 @@ const explorerUrl = "https://chipnet.chaingraph.cash";
 
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
+const seedphrase = document.getElementById("seedphrase");
 // Logic dark mode
 let darkMode = false;
 const readDarkMode = localStorage.getItem("darkMode");
@@ -65,6 +66,7 @@ async function loadWalletInfo() {
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const wallet = await TestNetWallet.named("mywallet");
+  seedphrase.textContent = wallet.mnemonic;
   console.log(wallet)
   Config.EnforceCashTokenReceiptAddresses = true;
 
@@ -425,4 +427,10 @@ window.selectTokenType = function selectTokenType(event){
   tokenCommitment.classList.add("hide");
   if(event.target.value === "fungibles") tokenSupply.classList.remove("hide");
   if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide");
+}
+
+window.toggleSeedphrase = (event) => {
+  seedphrase.classList.toggle("hide");
+  const isHidden = seedphrase.classList.contains("hide");
+  event.srcElement.value = isHidden ? "Show seed phrase" : "Hide seed phrase";
 }

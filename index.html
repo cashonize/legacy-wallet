@@ -180,6 +180,10 @@
           <legend>Settings</legend>
           <span style="margin-top: 15px;">Dark mode </span>
           <input type="checkbox" id="darkmode" style="margin: 0; vertical-align: text-bottom;" onclick="toggleDarkmode()">
+          <div style="margin-top:15px">Make backup of seed phrase (mnemonic)</div>
+          <input class="button primary" type="button" value="Show seed phrase" onclick="toggleSeedphrase(event)">
+          <div id="seedphrase" class="hide"></div>
+          <div style="margin-top:15px">Derivation path used is m/44'/0'/0'/0/0</div>
         </fieldset>
       </div>
 
