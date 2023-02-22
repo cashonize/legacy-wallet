@@ -79,6 +79,9 @@ main{
   align-items: center;
   margin-top: 10px;
 }
+.tokenAmount {
+  margin-left: 50px;
+}
 #bcmrUrl{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
@@ -94,6 +97,11 @@ main{
 .tokenIcon canvas {
   display: block;
   border-radius: 50%;
+}
+.tokenBaseInfo {
+  width: 100%; 
+  display: flex;
+  align-items: center
 }
 .tokenButton {
   margin-left: 40px;
@@ -126,7 +134,18 @@ main{
 footer{
   padding-bottom: 20px;
 }
+@media only screen and (max-width: 850px) {
+  .tokenBaseInfo {
+    display: block;
+  }
+  .tokenAmount {
+    margin-left: 0px;
+  }
+}
 @media only screen and (max-width: 570px) {
+  main{
+    margin: 0;
+  }
   .item {
     margin: 10px 0;
   }
