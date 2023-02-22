@@ -20,6 +20,10 @@ if (readDarkMode == undefined && window.matchMedia &&
 window.matchMedia('(prefers-color-scheme: dark)').matches) {
     window.toggleDarkmode();
 }
+// Logic default unit
+const readUnit = localStorage.getItem("unit");
+if(readUnit) document.querySelector('#selectUnit').value = readUnit;
+let unit = readUnit || 'tBCH';
 
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
@@ -77,11 +81,25 @@ async function loadWalletInfo() {
   // Display BCH balance and watch for changes
   let balance = await wallet.getBalance();
   let maxAmountToSend = await wallet.getMaxAmountToSend();
-  document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
+  if(unit == "tBCH"){
+    const tbch = balance.sat / 100_000_000;
+    document.querySelector('#balance').innerText = tbch;
+    document.querySelector('#balanceUnit').innerText = ' tBCH';
+  } else if(unit == "satoshis"){
+    document.querySelector('#balance').innerText = balance.sat;
+    document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+  }
   wallet.watchBalance(async (newBalance) => {
     balance = newBalance;
     maxAmountToSend = await wallet.getMaxAmountToSend();
-    document.querySelector('#balance').innerText = `${balance.sat} testnet satoshis`;
+    if(unit == "tBCH"){
+      const tbch = balance.sat / 100_000_000
+      document.querySelector('#balance').innerText = tbch;
+      document.querySelector('#balanceUnit').innerText = ' tBCH';
+    } else if(unit == "satoshis"){
+      document.querySelector('#balance').innerText = balance.sat;
+      document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+    }
   });
   // Display token categories, construct arrayTokens and watch for changes
   let arrayTokens = [];
@@ -124,16 +142,21 @@ async function loadWalletInfo() {
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
-    event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.sat;
+    if(unit == "tBCH"){
+      event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.bch;
+    } else if(unit == "satoshis"){
+      event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.sat;
+    }
   }
   document.querySelector('#send').addEventListener("click", async () => {
     try {
       const amount = document.querySelector('#sendAmount').value;
       const validInput = Number.isInteger(+amount) && +amount > 0;
-      if(!validInput) throw(`Amount satoshis to send must be a valid integer`);
-      if(amount < 546) throw(`Must send atleast 546 satoshis`);
+      if(!validInput && unit=="satoshis") throw(`Amount satoshis to send must be a valid integer`);
+      if(amount < 546 && unit=="satoshis") throw(`Must send atleast 546 satoshis`);
       const addr = document.querySelector('#sendAddr').value;
-      const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: "sat" }]);
+      const unitToSend = (unit == "tBCH")? "bch" : "sat";
+      const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: unitToSend }]);
       alert(`Sent ${amount} sats to ${addr}`);
       console.log(`Sent ${amount} sats to ${addr} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
@@ -447,6 +470,26 @@ window.selectTokenType = function selectTokenType(event){
   tokenCommitment.classList.add("hide");
   if(event.target.value === "fungibles") tokenSupply.classList.remove("hide");
   if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide");
+}
+
+// Change default unit
+window.selectUnit = function selectUnit(event){
+  const oldUnit = unit
+  if(oldUnit == "tBCH"){
+    const tbch = document.querySelector('#balance').innerText;
+    const balanceSatoshis = tbch * 100_000_000;
+    document.querySelector('#balance').innerText = balanceSatoshis;
+    document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+    document.querySelector('#sendAmount').placeholder = ' amount satoshis';
+  } else if(oldUnit == "satoshis"){
+  const balanceSatoshis = document.querySelector('#balance').innerText;
+    const tbch = balanceSatoshis / 100_000_000;
+    document.querySelector('#balance').innerText = tbch;
+    document.querySelector('#balanceUnit').innerText = ' tBCH';
+    document.querySelector('#sendAmount').placeholder = ' tBCH amount';
+  }
+  localStorage.setItem("unit", `${event.target.value}`);
+  unit = event.target.value;
 }
 
 window.toggleSeedphrase = (event) => {

@@ -59,7 +59,10 @@
       <div id="walletView" class="hide">
 
         <fieldset style="margin-top: 15px;">
-          <div style="margin-top: 15px;">Wallet balance: <span id="balance" class="text-primary"></span></div>
+          <div style="margin-top: 15px;">
+            Wallet balance: <span id="balance" class="text-primary"></span>
+            <span id="balanceUnit" class="text-primary unit"></span>
+          </div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
           <div>Address: <span class="depositAddr" id="depositAddr"></span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositAddr')">
@@ -74,7 +77,7 @@
           <legend>Send tBCH to</legend>
           <p class="grouped">
             <input id="sendAddr" placeholder="address">
-            <input id="sendAmount" placeholder="amount satoshis">
+            <input id="sendAmount" placeholder="tBCH amount">
             <span class="maxButton" onclick="maxBch(event)">max</span>
           </p>
 
@@ -195,8 +198,15 @@
           <legend>Settings</legend>
           <span style="margin-top: 15px;">Dark mode </span>
           <input type="checkbox" id="darkmode" style="margin: 0; vertical-align: text-bottom;" onclick="toggleDarkmode()">
+          <div style="margin-top:15px">
+            <label for="selectUnit">Select default unit:</label>
+            <select name="selectUnit" id="selectUnit" onchange="selectUnit(event)" style="display: inline; width: 100px; padding: 0.4rem 1rem">
+              <option value="tBCH">tBCH</option>
+              <option value="satoshis">satoshis</option>
+            </select>
+          </div>
           <div style="margin-top:15px">Make backup of seed phrase (mnemonic)</div>
-          <input class="button primary" type="button" value="Show seed phrase" onclick="toggleSeedphrase(event)">
+          <input class="button primary" type="button" style="padding: 1rem 1.5rem;" value="Show seed phrase" onclick="toggleSeedphrase(event)">
           <div id="seedphrase" class="hide"></div>
           <div style="margin-top:15px">Derivation path used is m/44'/0'/0'/0/0</div>
         </fieldset>
