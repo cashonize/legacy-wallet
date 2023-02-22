@@ -266,7 +266,16 @@ async function loadWalletInfo() {
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = displayId;
       tokenCard.querySelector("#tokenID").value = token.tokenId;
-      if(tokenInfo) tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
+      if(tokenInfo){
+        tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
+        tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
+        tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
+        tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
+        const infoButton = tokenCard.querySelector('#infoButton');
+        infoButton.classList.remove("hide");
+        const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay")
+        infoButton.onclick = () => tokenInfoDisplay.classList.toggle("hide");
+      }
       
       // Display tokenIcon whether generated or costum
       let icon = createIcon({
@@ -314,8 +323,8 @@ async function loadWalletInfo() {
         if (tokenCommitment != "") {
           const infoButton = tokenCard.querySelector('#infoButton');
           infoButton.classList.remove("hide");
-          const tokenInfo = tokenCard.querySelector("#tokenCommitment")
-          infoButton.onclick = () => tokenInfo.classList.toggle("hide");
+          const tokenCommitmentInfo = tokenCard.querySelector("#tokenCommitment")
+          infoButton.onclick = () => tokenCommitmentInfo.classList.toggle("hide");
           const commitmentText = `NFT commitment: ${tokenCommitment}`;
           tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
         }

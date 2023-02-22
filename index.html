@@ -114,8 +114,13 @@
                 <span class="tokenButton hide" id="mintButton">
                   <img id="mintIcon" class="icon" src="https://icongr.am/material/hammer.svg?size=18"> mint NFT 
                 </span>
-                <div id="tokenCommitment"  class="hide"></div>
-                <div id="tokenSend" class="hide">
+                <div id="tokenCommitment" class="hide"  style="margin-top: 10px;"></div>
+                <div id="tokenInfoDisplay" class="hide" style="margin-top: 10px;">
+                  <div id="tokenBegin"></div>
+                  <div id="tokenDescription"></div>
+                  <div id="tokenDecimals"></div>
+                </div>
+                <div id="tokenSend" class="hide"  style="margin-top: 10px;">
                   Send these tokens to
                   <p class="grouped">
                     <input id="tokenAddress" placeholder="token address">
@@ -124,14 +129,14 @@
                   </p>
                   <input type="button" id="sendSomeButton" value="Send">
                 </div>
-                <div id="nftSend"  class="hide">
+                <div id="nftSend"  class="hide"  style="margin-top: 10px;">
                   Send this NFT to
                   <p class="grouped">
                     <input id="tokenAddress" placeholder="tokenAddress">
                     <input type="button" id="sendNFT" value="Send NFT">
                   </p>
                 </div>
-                <div id="nftMint"  class="hide">
+                <div id="nftMint"  class="hide"  style="margin-top: 10px;">
                   Mint immutable NFT
                   <p class="grouped">
                     <input id="commitmentInput" placeholder="commitment">
