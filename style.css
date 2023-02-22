@@ -30,6 +30,9 @@ header {
 .importIcon.dark{
   content:url("https://icongr.am/feather/log-in.svg?size=24&color=777777");
 }
+.copyIcon{
+  content:url("https://icongr.am/clarity/copy.svg?size=16&color=777777");
+}
 #sendIcon.dark{
   content:url("https://icongr.am/feather/send.svg?size=18&color=777777");
 }
@@ -68,7 +71,7 @@ main{
   max-width: 250px;
 }
 .copyIcon{
-  margin-bottom: -3px;
+  margin-bottom: 1px;
 }
 #Placeholder {
   margin: 0;
@@ -80,7 +83,7 @@ main{
   margin-top: 10px;
 }
 .tokenAmount {
-  margin-left: 50px;
+  margin-left: 30px;
 }
 #bcmrUrl{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
