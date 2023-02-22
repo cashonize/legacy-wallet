@@ -106,6 +106,10 @@ main{
   display: flex;
   align-items: center
 }
+.tokenBaseInfo1{
+  width: 370px;
+  display: block;
+}
 .tokenButton {
   margin-left: 40px;
   cursor: pointer;
@@ -140,6 +144,9 @@ footer{
 @media only screen and (max-width: 850px) {
   .tokenBaseInfo {
     display: block;
+  }
+  .tokenBaseInfo1{
+    width: 100%;
   }
   .tokenAmount {
     margin-left: 0px;
