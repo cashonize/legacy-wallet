@@ -266,6 +266,9 @@ async function loadWalletInfo() {
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = displayId;
       tokenCard.querySelector("#tokenID").value = token.tokenId;
+      // Correct colors icons token-actionbar
+      const actionbarIcons = tokenCard.querySelectorAll('.icon');
+      if(darkMode) actionbarIcons.forEach(icon => icon.classList.add("dark"));
       if(tokenInfo){
         tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
         tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
