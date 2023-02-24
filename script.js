@@ -203,7 +203,7 @@ async function loadWalletInfo() {
         const { txId } = genesisResponse;
         alert(`Created ${tokenSupply} fungible tokens of category ${tokenId}`);
         console.log(`Created ${tokenSupply} fungible tokens \n${explorerUrl}/tx/${txId}`);
-        document.querySelector('#createTokensView').querySelectorAll('input').forEach(input => input.value = ""); 
+        document.querySelector('#createTokensView').querySelectorAll('input:not([type=button])').forEach(input => input.value = ""); 
         return txId
       } catch (error) { console.log(error) }
     }
@@ -225,7 +225,7 @@ async function loadWalletInfo() {
 
         alert(`Created minting NFT for category ${tokenId}`);
         console.log(`Created minting NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
-        document.querySelector('#createTokensView').querySelectorAll('input').forEach(input => input.value = "");
+        document.querySelector('#createTokensView').querySelectorAll('input:not([type=button])').forEach(input => input.value = "");
         return txId
       }catch (error) { alert(error) }
     }
@@ -248,7 +248,7 @@ async function loadWalletInfo() {
   
         alert(`Created an immutable NFT for category ${tokenId}`);
         console.log(`Created an immutable NFT for category ${tokenId} \n${explorerUrl}/tx/${txId}`);
-        document.querySelector('#createTokensView').querySelectorAll('input').forEach(input => input.value = "");
+        document.querySelector('#createTokensView').querySelectorAll('input:not([type=button])').forEach(input => input.value = "");
         return txId
       }catch (error) { alert(error) }
     }
