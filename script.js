@@ -377,6 +377,11 @@ async function loadWalletInfo() {
           const commitmentInput = nftMint.querySelector('#commitmentInput').value;
           mintNft(token.tokenId, commitmentInput);
         }
+        const mintNftsButton = nftMint.querySelector("#mintNFTs");
+        mintNftsButton.onclick = () => {
+          const amountNFTs = nftMint.querySelector('#amountNFTs').value;
+          mintNft(token.tokenId, "", amountNFTs);
+        }
       }
       ul.appendChild(tokenCard);
     });
@@ -422,26 +427,33 @@ async function loadWalletInfo() {
     } catch (error) { alert(error) }
   }
 
-  async function mintNft(tokenId, tokenCommitment) {
+  async function mintNft(tokenId, tokenCommitment, amount=1) {
     try {
       const isHex = (str) => /^[A-F0-9]+$/i.test(str);
       const validCommitment = (isHex(tokenCommitment) || tokenCommitment == "")
       if(!validCommitment) throw(`tokenCommitment '${tokenCommitment}' must be a hexadecimal`);
+      const mintRequest = new TokenMintRequest({
+        cashaddr: tokenAddr,
+        commitment: tokenCommitment,
+        capability: NFTCapability.none,
+        value: 1000,
+      })
+      const arraySendrequests = [];
+      for (let i = 0; i < amount; i++) arraySendrequests.push(mintRequest);
       const { txId } = await wallet.tokenMint(
         tokenId,
-        [
-          new TokenMintRequest({
-            cashaddr: tokenAddr,
-            commitment: tokenCommitment,
-            capability: NFTCapability.none,
-            value: 1000,
-          })
-        ],
+        arraySendrequests
       );
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
       const commitmentText= tokenCommitment? `with commitment ${tokenCommitment}`: "";
-      alert(`Minted immutable NFT of category ${displayId} ${commitmentText}`);
-      console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \n${explorerUrl}/tx/${txId}`);
+      if(amount == 1){
+        alert(`Minted immutable NFT of category ${displayId} ${commitmentText}`);
+        console.log(`Minted immutable NFT of category ${displayId} ${commitmentText} \n${explorerUrl}/tx/${txId}`);
+      } else {
+        alert(`Minted ${amount} NFTs of category ${displayId}`);
+        console.log(`Minted ${amount} immutable NFT of category ${displayId} \n${explorerUrl}/tx/${txId}`);
+      }
+      
     } catch (error) { alert(error) }
   }
 }
