@@ -375,7 +375,7 @@ async function loadWalletInfo() {
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
           const commitmentInput = nftMint.querySelector('#commitmentInput').value;
-          mintNft(token.tokenId, commitmentInput)
+          mintNft(token.tokenId, commitmentInput);
         }
       }
       ul.appendChild(tokenCard);
@@ -425,7 +425,8 @@ async function loadWalletInfo() {
   async function mintNft(tokenId, tokenCommitment) {
     try {
       const isHex = (str) => /^[A-F0-9]+$/i.test(str);
-      if(!isHex(tokenCommitment)) throw(`tokenCommitment ${tokenCommitment} must be a hexadecimal`);
+      const validCommitment = (isHex(tokenCommitment) || tokenCommitment == "")
+      if(!validCommitment) throw(`tokenCommitment '${tokenCommitment}' must be a hexadecimal`);
       const { txId } = await wallet.tokenMint(
         tokenId,
         [
