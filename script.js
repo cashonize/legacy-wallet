@@ -367,15 +367,23 @@ async function loadWalletInfo() {
           sendNft(inputAddress, token.tokenId, tokenCapability)
         }
         const nftMint = tokenCard.querySelector('#nftMint');
+        const nftBurn = tokenCard.querySelector('#nftBurn');
         if (tokenCapability == "minting"){ 
           const mintButton = tokenCard.querySelector('#mintButton');
+          const burnButton = tokenCard.querySelector('#burnButton');
           mintButton.classList.remove("hide");
           mintButton.onclick = () => nftMint.classList.toggle("hide");
+          burnButton.classList.remove("hide");
+          burnButton.onclick = () => nftBurn.classList.toggle("hide");
         }
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
           const commitmentInput = nftMint.querySelector('#commitmentInput').value;
           mintNft(token.tokenId, commitmentInput);
+        }
+        const burnNftButton = nftBurn.querySelector("#burnNFT");
+        burnNftButton.onclick = () => {
+          burnNft(token.tokenId, tokenCommitment);
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
@@ -453,7 +461,22 @@ async function loadWalletInfo() {
         alert(`Minted ${amount} NFTs of category ${displayId}`);
         console.log(`Minted ${amount} immutable NFT of category ${displayId} \n${explorerUrl}/tx/${txId}`);
       }
-      
+    } catch (error) { alert(error) }
+  }
+
+  async function burnNft(tokenId, tokenCommitment) {
+    try {
+      const { txId } = await wallet.tokenBurn(
+        {
+          tokenId: tokenId,
+          capability: NFTCapability.minting,
+          commitment: tokenCommitment,
+        },
+        "burn", // optional OP_RETURN message
+      );
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      alert(`Burned minting NFT of category ${displayId}`);
+      console.log(`Burned minting NFT of category ${displayId} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
 }

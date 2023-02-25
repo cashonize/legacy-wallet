@@ -117,6 +117,9 @@
                 <span class="tokenButton hide" id="mintButton">
                   <img id="mintIcon" class="icon" src="https://icongr.am/material/hammer.svg?size=18"> mint NFT 
                 </span>
+                <span class="tokenButton hide" id="burnButton">
+                  <img id="burnIcon" class="icon" src="https://icongr.am/material/fire.svg?size=18"> burn NFT 
+                </span>
                 <div id="tokenCommitment" class="hide"  style="margin-top: 10px;"></div>
                 <div id="tokenInfoDisplay" class="hide" style="margin-top: 10px;">
                   <div id="tokenBegin"></div>
@@ -151,6 +154,12 @@
                     <input id="amountNFTs" type="number" style="width: 160px;" placeholder="number of NFTs">
                     <input type="button" id="mintNFTs" value="Mint NFTs">
                   </p>
+                </div>
+                <div id="nftBurn"  class="hide"  style="margin-top: 10px;">
+                  Burn this NFT so no new NFTs of this category can be minted
+                  <br>
+                  <input type="button" id="burnNFT" value="burn NFT" class="button error">
+                </div>
               </div>
             </fieldset>
           </div>

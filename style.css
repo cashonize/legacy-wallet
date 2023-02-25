@@ -42,6 +42,9 @@ header {
 #mintIcon.dark{
   content:url("https://icongr.am/material/hammer.svg?size=18&color=777777");
 }
+#burnIcon.dark{
+  content:url("https://icongr.am/material/fire.svg?size=18&color=777777");
+}
 body {
   margin: 0px;
   margin-top: 25px;
