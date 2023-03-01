@@ -143,7 +143,6 @@ async function loadWalletInfo() {
   document.querySelector('#qr2').contents = tokenAddr;
   document.querySelector('#placeholderQr').classList.add("hide");
   document.querySelector('#qr1').classList.remove("hide");
-  currentQrCode = "qr1";
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
