@@ -75,10 +75,13 @@ main{
 }
 #switchAddress {
   position: relative;
-  top: -20px;
+  top: -10px;
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
+}
+#switchAddress.dark {
+  top: 0px;
 }
 .copyIcon{
   margin-bottom: 1px;
