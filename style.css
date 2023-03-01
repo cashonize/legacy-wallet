@@ -67,11 +67,19 @@ main{
   overflow-wrap: anywhere;
   color: var(--color-grey);
 }
-.depositQr {
+.placeholderQr {
   margin: auto;
   display: block;
   width: 70%;
-  max-width: 250px;
+  max-width: 240px;
+}
+#switchAddress {
+  position: relative;
+  top: -20px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
 }
 .copyIcon{
   margin-bottom: 1px;
@@ -158,6 +166,9 @@ footer{
 @media only screen and (max-width: 570px) {
   main{
     margin: 0;
+  }
+  h1 {
+    font-size: 1.7em;
   }
   .item {
     margin: 10px 0;

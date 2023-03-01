@@ -135,10 +135,15 @@ async function loadWalletInfo() {
   wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
 
   // Initilize address and display QR code
+  const regularAddr = await wallet.getDepositAddress();
   const tokenAddr = await wallet.getTokenDepositAddress();
-  document.querySelector('#depositAddr').innerText = tokenAddr;
-  const qr = await wallet.getTokenDepositQr();
-  document.querySelector('#depositQr').src = qr.src;
+  document.querySelector('#depositAddr').innerText = regularAddr;
+  document.querySelector('#depositTokenAddr').innerText = tokenAddr;
+  document.querySelector('#qr1').contents = regularAddr;
+  document.querySelector('#qr2').contents = tokenAddr;
+  document.querySelector('#placeholderQr').classList.add("hide");
+  document.querySelector('#qr1').classList.remove("hide");
+  currentQrCode = "qr1";
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
@@ -537,4 +542,11 @@ window.toggleSeedphrase = (event) => {
   seedphrase.classList.toggle("hide");
   const isHidden = seedphrase.classList.contains("hide");
   event.srcElement.value = isHidden ? "Show seed phrase" : "Hide seed phrase";
+}
+
+window.switchAddressType = () => {
+  const currentQrCode = document.querySelector('qr-code:not(.hide)');
+  const otherQrCode = document.querySelector('qr-code.hide');
+  currentQrCode.classList.add("hide");
+  otherQrCode.classList.remove("hide");
 }

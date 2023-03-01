@@ -12,6 +12,7 @@
   <script defer src="https://cdn.mainnet.cash/mainnet-1.0.12.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
+  <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
 </head>
 
 <body>
@@ -64,14 +65,46 @@
             <span id="balanceUnit" class="text-primary unit"></span>
           </div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>
-          <div>Address: <span class="depositAddr" id="depositAddr"></span>
+          <div>BCH address: <span class="depositAddr" id="depositAddr"></span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositAddr')">
               <img class="copyIcon icon" src="https://icongr.am/clarity/copy.svg?size=16">
             </button>
           </div>
-          <div class="is-center">Deposit QR</div>
-          <div><img id="depositQr" class="depositQr" src="./images/qrcode.jpg" /></div>
-          </p>
+          <div>Token address: <span class="depositAddr" id="depositTokenAddr"></span>
+            <button type="button" style="background: none; padding: 0;" onclick="copyTextContent('depositTokenAddr')">
+              <img class="copyIcon icon" src="https://icongr.am/clarity/copy.svg?size=16">
+            </button>
+          </div>
+          <div><img id="placeholderQr" class="placeholderQr" src="./images/qrcode.jpg" /></div>
+          <qr-code
+            id="qr1"
+            contents="loading..."
+            class="hide"
+            style="
+              width: 240px;
+              height: 240px;
+              margin: 0 auto;
+              background-color: #fff;
+            "
+          >
+            <img src="/images/favicon.png" slot="icon" />
+          </qr-code>
+
+          <qr-code
+                      id="qr2"
+                      contents="loading.."
+                      class="hide"
+                      style="
+                        width: 240px;
+                        height: 240px;
+                        margin: 0 auto;
+                        background-color: #fff;
+                      "
+                    >
+            <img src="/images/tokenicon.png" slot="icon" />
+          </qr-code>
+
+          <div id="switchAddress" onclick="switchAddressType()">⇄</div>
         </fieldset>
         <fieldset style="margin-top: 15px">
           <legend>Send tBCH to</legend>
@@ -248,6 +281,11 @@
   </main>
 
   <script type="module" src="./script.js"></script>
+  <script>
+    document.getElementById('qr1').addEventListener('codeRendered', () => {
+      document.getElementById('qr1').animateQRCode('MaterializeIn');
+    });
+  </script>
 </body>
 
 </html>
