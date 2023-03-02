@@ -19,31 +19,31 @@ header {
   vertical-align: text-bottom;
 }
 #settingsIcon.dark{
-  content:url("https://icongr.am/clarity/cog.svg?size=16&color=777777");
+  content:url("images/cogGrey.svg");
 }
 .active #settingsIcon{
-  content:url("https://icongr.am/clarity/cog.svg?size=16&color=0ac18f");
+  content:url("/images/cogGreen.svg");
 }
 .plusIcon.dark{
-  content:url("https://icongr.am/feather/plus-square.svg?size=24&color=777777");
+  content:url("images/plus-squareGrey.svg");
 }
 .importIcon.dark{
-  content:url("https://icongr.am/feather/log-in.svg?size=24&color=777777");
+  content:url("images/log-inGrey.svg");
 }
 .copyIcon{
-  content:url("https://icongr.am/clarity/copy.svg?size=16&color=777777");
+  content:url("images/copyGrey.svg");
 }
 #sendIcon.dark{
-  content:url("https://icongr.am/feather/send.svg?size=18&color=777777");
+  content:url("images/sendGrey.svg");
 }
 #infoIcon.dark{
-  content:url("https://icongr.am/feather/info.svg?size=18&color=777777");
+  content:url("images/infoGrey.svg");
 }
 #mintIcon.dark{
-  content:url("https://icongr.am/material/hammer.svg?size=18&color=777777");
+  content:url("images/hammerGrey.svg");
 }
 #burnIcon.dark{
-  content:url("https://icongr.am/material/fire.svg?size=18&color=777777");
+  content:url("images/fireGrey.svg");
 }
 body {
   margin: 0px;
