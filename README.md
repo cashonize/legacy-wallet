@@ -12,6 +12,7 @@ The Webwallet creates a single address chipnet wallet which is persisted in betw
 The Webwallet uses m/44'/0'/0'/0/0 as derivation path for seedphrases, this is the mainnet-js default. <br>
 You can back-up the wallet by getting the seed phrase from the settings view. <br>
 The webwallet uses [example_bcmr](https://github.com/mr-zwets/example_bcmr) as a hardcoded metadata registry for tokenmetadata. <br>
+After making a transaction a link to a chipnet blockexplorer is logged in the console (press F12 to access). <br>
 
 ### Faucet
 
@@ -30,6 +31,10 @@ Since the way to import it had been changes with version 1.0.0 as can be read [o
 [Chota](https://jenil.github.io/chota/) has been added along the way for styling. <br>
 For icons the webwallet uses [icongr.am](https://icongr.am). <br>
 [blockies](https://github.com/download13/blockies) is used to generate blocky identicons for tokens. <br>
+The [chaingraph demo instance](https://chipnet.chaingraph.cash) is used to query on-chain tokeen info about gensis supply and minting UTXOs. <br>
 Finally, [bitjson/qr-code](https://github.com/bitjson/qr-code) is used to generate the qr-codes.
 
 Netlify automatically publishes the latest version of this repo: [My CashTokens Webwallet](https://my-cashtokens-webwallet.netlify.app/).
+
+### Special thanks to
+bitcoincashautist, pat from mainnet-js, damascene & bitjson
