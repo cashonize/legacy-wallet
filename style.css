@@ -127,6 +127,9 @@ main{
   margin-left: 40px;
   cursor: pointer;
 }
+.showmobile {
+  display: none;
+}
 .maxButton{
   margin: 5px 0px 0px -65px;
   padding-right: 20px;
@@ -174,6 +177,15 @@ footer{
   }
   .item {
     margin: 10px 0;
+  }
+  .tokenButton {
+    margin-left: 20px;
+  }
+  .showmobile {
+    display: inline-block;
+  }
+  .hidemobile {
+    display: none;
   }
 }
 body.dark {
