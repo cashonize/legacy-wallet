@@ -548,4 +548,5 @@ window.switchAddressType = () => {
   const otherQrCode = document.querySelector('qr-code.hide');
   currentQrCode.classList.add("hide");
   otherQrCode.classList.remove("hide");
+  otherQrCode.animateQRCode('MaterializeIn');
 }
