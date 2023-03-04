@@ -91,16 +91,16 @@
           </qr-code>
 
           <qr-code
-                      id="qr2"
-                      contents="loading.."
-                      class="hide"
-                      style="
-                        width: 240px;
-                        height: 240px;
-                        margin: 5px auto 0 auto;
-                        background-color: #fff;
-                      "
-                    >
+            id="qr2"
+            contents="loading.."
+            class="hide"
+            style="
+              width: 240px;
+              height: 240px;
+              margin: 5px auto 0 auto;
+              background-color: #fff;
+            "
+          >
             <img src="/images/tokenicon.png" slot="icon" />
           </qr-code>
 
@@ -108,13 +108,17 @@
         </fieldset>
         <fieldset style="margin-top: 15px">
           <legend>Send tBCH to</legend>
-          <p class="grouped" style="margin: 0px 0 10px 0;">
+          <p id="inputGroup">
             <input id="sendAddr" placeholder="address">
-            <input id="sendAmount" placeholder="tBCH amount">
-            <span class="maxButton" onclick="maxBch(event)">max</span>
+            <span id="sendAmountGroup">
+              <span style="width: 100%;" class="input-icon input-icon-right">
+                <input id="sendAmount" type="text"placeholder="amount">
+                <i id="sendUnit" style="color: black;">tBCH</i>
+              </span>
+              <button onclick="maxBch(event)" style="color: black;">max</button>
+            </span>
           </p>
-
-          <input type="button" id="send" value="Send">
+          <input type="button" style="background-color: var(--color-primary); color: white;" id="send" value="Send">
         </fieldset>
       </div>
 

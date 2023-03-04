@@ -90,6 +90,18 @@ main{
   margin: 0;
   padding: 0
 }
+#sendAddr {
+  margin-right: 14px;
+  width: 50%;
+}
+#inputGroup {
+  margin: 0px 0 10px 0;
+  display: flex;
+}
+#sendAmountGroup {
+  display: flex;
+  width: 50%;
+}
 .tokenInfo {
   display: flex;
   align-items: center;
@@ -130,13 +142,6 @@ main{
 .showmobile {
   display: none;
 }
-.maxButton{
-  margin: 5px 0px 0px -65px;
-  padding-right: 20px;
-  text-decoration: underline;
-  cursor: pointer;
-  color: black;
-}
 #noTokensFound {
   text-align: center;
 }
@@ -168,6 +173,18 @@ footer{
     margin-left: 0px;
   }
 }
+@media only screen and (max-width: 650px) {
+  #inputGroup {
+    display: block;
+  }
+  #sendAddr {
+    width: 100%;
+  }
+  #sendAmountGroup {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
 @media only screen and (max-width: 570px) {
   main{
     margin: 0;
@@ -189,9 +206,30 @@ footer{
   }
 }
 body.dark {
-      --bg-color: #000;
-      --bg-secondary-color: #131316;
-      --font-color: #f5f5f5;
-      --color-grey: #ccc;
-      --color-darkGrey: #777;
-    }
+  --bg-color: #000;
+  --bg-secondary-color: #131316;
+  --font-color: #f5f5f5;
+  --color-grey: #ccc;
+  --color-darkGrey: #777;
+  }
+.input-icon {
+  position: relative;
+}
+.input-icon > i {
+  position: absolute;
+  display: block;
+  transform: translate(0, -50%);
+  top: 50%;
+  pointer-events: none;
+  width: 55px;
+  text-align: center;
+  font-style: normal;
+}
+.input-icon-right > i {
+  right: 0;
+}
+
+.input-icon-right > input {
+  padding-left: 0;
+  padding-right: 25px;
+}

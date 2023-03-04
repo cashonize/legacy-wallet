@@ -87,9 +87,11 @@ async function loadWalletInfo() {
     const tbch = balance.sat / 100_000_000;
     document.querySelector('#balance').innerText = tbch;
     document.querySelector('#balanceUnit').innerText = ' tBCH';
+    document.querySelector('#sendUnit').innerText = ' tBCH';
   } else if(unit == "satoshis"){
     document.querySelector('#balance').innerText = balance.sat;
     document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+    document.querySelector('#sendUnit').innerText = ' sats';
   }
   wallet.watchBalance(async (newBalance) => {
     balance = newBalance;
@@ -542,13 +544,13 @@ window.selectUnit = function selectUnit(event){
     const balanceSatoshis = tbch * 100_000_000;
     document.querySelector('#balance').innerText = balanceSatoshis;
     document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
-    document.querySelector('#sendAmount').placeholder = ' amount satoshis';
+    document.querySelector('#sendUnit').innerText = ' sats';
   } else if(oldUnit == "satoshis"){
   const balanceSatoshis = document.querySelector('#balance').innerText;
     const tbch = balanceSatoshis / 100_000_000;
     document.querySelector('#balance').innerText = tbch;
     document.querySelector('#balanceUnit').innerText = ' tBCH';
-    document.querySelector('#sendAmount').placeholder = ' tBCH amount';
+    document.querySelector('#sendUnit').innerText = ' tBCH';
   }
   localStorage.setItem("unit", `${event.target.value}`);
   unit = event.target.value;
