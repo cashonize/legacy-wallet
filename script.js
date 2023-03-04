@@ -1,5 +1,6 @@
+import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './queryChainGraph.js';
+
 const explorerUrl = "https://chipnet.chaingraph.cash";
-const chaingraphUrl = "https://demo.chaingraph.cash/v1/graphql";
 
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
@@ -313,57 +314,23 @@ async function loadWalletInfo() {
       const infoButton = tokenCard.querySelector('#infoButton');
       const onchainTokenInfo = tokenCard.querySelector('#onchainTokenInfo')
       infoButton.onclick = async () => {
-        tokenInfoDisplay.classList.toggle("hide");
         const alreadyLoaded = onchainTokenInfo.textContent;
         if(token.amount && !alreadyLoaded){
           // Fetch total token supply
-          const queryReq = `query { transaction( where: { block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } } } inputs: { outpoint_transaction_hash: {_eq: "\\\\x${token.tokenId}" }outpoint_index: { _eq: 0 } } }) { outputs ( where: { token_category: {_eq: "\\\\x${token.tokenId}" } } ) { fungible_token_amount } } }`;
-          const jsonObj = {
-            "operationName": null,
-            "variables": {},
-            "query": queryReq
-          };
-          const response = await fetch(chaingraphUrl, {
-            method: "POST",
-            mode: "cors", // no-cors, *cors, same-origin
-            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: "same-origin", // include, *same-origin, omit
-            headers: {
-              "Content-Type": "application/json",
-            },
-            redirect: "follow", // manual, *follow, error
-            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
-            });
-          const responseJson = await response.json();
+          const responseJson = await queryTotalSupplyFT(token.tokenId);
           const totalAmount = responseJson.data.transaction[0].outputs.reduce((total, output) => total +  parseInt(output.fungible_token_amount),0);
           onchainTokenInfo.textContent = `Genesis supply: ${totalAmount} tokens`;
           console.log(`Fetched genesis supply from chaingraph demo instance`);
         } else if(!alreadyLoaded){
-            // Has active minting NFT
-          const queryReq = `query {output(where: {token_category: {_eq:"\\\\x${token.tokenId}"}_and: { nonfungible_token_capability: { _eq: "minting" } }_not: { spent_by: {} }transaction: {block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } }}}}) {locking_bytecode}}`;
-          const jsonObj = {
-            "operationName": null,
-            "variables": {},
-            "query": queryReq
-          };
-          const response = await fetch(chaingraphUrl, {
-            method: "POST",
-            mode: "cors", // no-cors, *cors, same-origin
-            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: "same-origin", // include, *same-origin, omit
-            headers: {
-              "Content-Type": "application/json",
-            },
-            redirect: "follow", // manual, *follow, error
-            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
-            });
-          const responseJson = await response.json();
-          const doesMintingTokenExist = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
-          onchainTokenInfo.textContent = doesMintingTokenExist;
+          // Has active minting NFT
+          const responseJson = await queryActiveMinting(token.tokenId);
+          let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT \r\n":"Does not have an active minting NFT";
+          const responseJson2 = await querySupplyNFTs(token.tokenId);
+          textOnchainTokenInfo += `Total supply: ${responseJson2.data.output.length} NFTs`;
+          onchainTokenInfo.textContent = textOnchainTokenInfo;
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
         }
+        tokenInfoDisplay.classList.toggle("hide");
       }
       
       // Display tokenIcon whether generated or costum
