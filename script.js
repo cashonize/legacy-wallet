@@ -308,9 +308,63 @@ async function loadWalletInfo() {
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
       }
+      // TokenInfo display with queries onclick
       const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay");
       const infoButton = tokenCard.querySelector('#infoButton');
-      infoButton.onclick = () => tokenInfoDisplay.classList.toggle("hide");
+      const onchainTokenInfo = tokenCard.querySelector('#onchainTokenInfo')
+      infoButton.onclick = async () => {
+        tokenInfoDisplay.classList.toggle("hide");
+        const alreadyLoaded = onchainTokenInfo.textContent;
+        if(token.amount && !alreadyLoaded){
+          // Fetch total token supply
+          const queryReq = `query { transaction( where: { block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } } } inputs: { outpoint_transaction_hash: {_eq: "\\\\x${token.tokenId}" }outpoint_index: { _eq: 0 } } }) { outputs ( where: { token_category: {_eq: "\\\\x${token.tokenId}" } } ) { fungible_token_amount } } }`;
+          const jsonObj = {
+            "operationName": null,
+            "variables": {},
+            "query": queryReq
+          };
+          const response = await fetch(chaingraphUrl, {
+            method: "POST",
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: "same-origin", // include, *same-origin, omit
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow", // manual, *follow, error
+            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
+            });
+          const responseJson = await response.json();
+          const totalAmount = responseJson.data.transaction[0].outputs.reduce((total, output) => total +  parseInt(output.fungible_token_amount),0);
+          onchainTokenInfo.textContent = `Genesis supply: ${totalAmount} tokens`;
+          console.log(`Fetched genesis supply from chaingraph demo instance`);
+        } else if(!alreadyLoaded){
+            // Has active minting NFT
+          const queryReq = `query {output(where: {token_category: {_eq:"\\\\x${token.tokenId}"}_and: { nonfungible_token_capability: { _eq: "minting" } }_not: { spent_by: {} }transaction: {block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } }}}}) {locking_bytecode}}`;
+          const jsonObj = {
+            "operationName": null,
+            "variables": {},
+            "query": queryReq
+          };
+          const response = await fetch(chaingraphUrl, {
+            method: "POST",
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: "same-origin", // include, *same-origin, omit
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow", // manual, *follow, error
+            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
+            });
+          const responseJson = await response.json();
+          const doesMintingTokenExist = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
+          onchainTokenInfo.textContent = doesMintingTokenExist;
+          console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
+        }
+      }
       
       // Display tokenIcon whether generated or costum
       let icon = createIcon({
@@ -331,30 +385,6 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
         const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
-        // Total Supply
-        const queryReq = `query { transaction( where: { block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } } } inputs: { outpoint_transaction_hash: {_eq: "\\\\x${token.tokenId}" }outpoint_index: { _eq: 0 } } }) { outputs ( where: { token_category: {_eq: "\\\\x${token.tokenId}" } } ) { fungible_token_amount } } }`
-        const jsonObj = {
-          "operationName": null,
-          "variables": {},
-          "query": queryReq
-        };
-
-        const response = await fetch(chaingraphUrl, {
-          method: "POST",
-          mode: "cors", // no-cors, *cors, same-origin
-          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-          credentials: "same-origin", // include, *same-origin, omit
-          headers: {
-            "Content-Type": "application/json",
-          },
-          redirect: "follow", // manual, *follow, error
-          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-          body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
-          });
-        const responseJson = await response.json();
-        const totalAmount = responseJson.data.transaction[0].outputs.reduce((total, output) => total +  parseInt(output.fungible_token_amount),0);
-        tokenCard.querySelector('#mintingTokenExists').textContent = `Genesis supply: ${totalAmount} tokens`;
-
         const tokenSend = tokenCard.querySelector('#tokenSend');
         tokenCard.getElementById("sendButton").onclick = () => tokenSend.classList.toggle("hide");
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
@@ -383,29 +413,6 @@ async function loadWalletInfo() {
           const commitmentText = `NFT commitment: ${tokenCommitment}`;
           tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
         }
-        // Has active minting NFT
-        const queryReq = `query {output(where: {token_category: {_eq:"\\\\x${token.tokenId}"}_and: { nonfungible_token_capability: { _eq: "minting" } }_not: { spent_by: {} }transaction: {block_inclusions: { block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } }}}}) {locking_bytecode}}`
-        const jsonObj = {
-          "operationName": null,
-          "variables": {},
-          "query": queryReq
-        };
-
-        const response = await fetch(chaingraphUrl, {
-          method: "POST",
-          mode: "cors", // no-cors, *cors, same-origin
-          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-          credentials: "same-origin", // include, *same-origin, omit
-          headers: {
-            "Content-Type": "application/json",
-          },
-          redirect: "follow", // manual, *follow, error
-          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-          body: JSON.stringify(jsonObj), // body data type must match "Content-Type" header
-          });
-        const responseJson = await response.json();
-        const doesMintingTokenExist = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
-        tokenCard.querySelector('#mintingTokenExists').textContent = doesMintingTokenExist;
         const nftSend = tokenCard.querySelector('#nftSend');
         tokenCard.getElementById("sendButton").onclick = () => nftSend.classList.toggle("hide");
         const sendNftButton = nftSend.querySelector("#sendNFT");
