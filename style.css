@@ -90,17 +90,21 @@ main{
   margin: 0;
   padding: 0
 }
-#sendAddr {
+.addressInput {
   margin-right: 14px;
   width: 50%;
 }
-#inputGroup {
+.inputGroup {
   margin: 0px 0 10px 0;
   display: flex;
 }
-#sendAmountGroup {
+.sendAmountGroup {
   display: flex;
   width: 50%;
+}
+.sendButton {
+  background-color: var(--color-primary); 
+  color: white;
 }
 .tokenInfo {
   display: flex;
@@ -174,13 +178,14 @@ footer{
   }
 }
 @media only screen and (max-width: 650px) {
-  #inputGroup {
+  .inputGroup {
     display: block;
   }
-  #sendAddr {
+  .addressInput {
     width: 100%;
+    margin: 0px;
   }
-  #sendAmountGroup {
+  .sendAmountGroup {
     width: 100%;
     margin-top: 10px;
   }
