@@ -310,6 +310,7 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
+        tokenCard.querySelector("#sendUnit").textContent = symbol;
       }
       // TokenInfo display with queries onclick
       const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay");
@@ -538,7 +539,7 @@ window.selectTokenType = function selectTokenType(event){
 
 // Change default unit
 window.selectUnit = function selectUnit(event){
-  const oldUnit = unit
+  const oldUnit = unit;
   if(oldUnit == "tBCH"){
     const tbch = document.querySelector('#balance').innerText;
     const balanceSatoshis = tbch * 100_000_000;
@@ -554,6 +555,7 @@ window.selectUnit = function selectUnit(event){
   }
   localStorage.setItem("unit", `${event.target.value}`);
   unit = event.target.value;
+  document.querySelector('#sendAmount').value = "";
 }
 
 window.toggleSeedphrase = (event) => {
