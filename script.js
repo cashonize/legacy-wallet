@@ -108,7 +108,7 @@ async function loadWalletInfo() {
   // Display token categories, construct arrayTokens and watch for changes
   let arrayTokens = [];
   let tokenCategories = [];
-  fetchTokens()
+  fetchTokens();
   async function fetchTokens() {
     arrayTokens = [];
     const getTokensResponse = await wallet.getAllTokenBalances();
@@ -131,6 +131,7 @@ async function loadWalletInfo() {
     if (arrayTokens.length) {
       divNoTokens.textContent = "";
       createListWithTemplate(arrayTokens);
+      importRegistries(arrayTokens);
     } else {
       divNoTokens.textContent = "Currently there are no tokens in this wallet";
     }
@@ -282,7 +283,24 @@ async function loadWalletInfo() {
     document.querySelector("#plannedTokenId").value = tokenId;
   });
 
-  // Create tokenlist
+  // Import onchain resolved BCMRs
+  async function importRegistries(tokens) {
+    tokens.forEach(async (token, index) => {
+      try{
+        const authChain = await BCMR.addMetadataRegistryAuthChain({
+          transactionHash: token.tokenId,
+          followToHead: true,
+          network: Network.TESTNET
+        });
+        if(authChain){
+          console.log("Importing an on-chain resolved BCMR!")
+          await BCMR.addMetadataRegistryFromUri(authChain[0].uri);
+          createListWithTemplate(arrayTokens)
+        }
+      } catch(error){ }
+    })
+  }
+    // Create tokenlist
   function createListWithTemplate(tokens) {
     const Placeholder = document.getElementById("Placeholder");
     const ul = document.createElement("ul");
@@ -315,7 +333,7 @@ async function loadWalletInfo() {
       // TokenInfo display with queries onclick
       const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay");
       const infoButton = tokenCard.querySelector('#infoButton');
-      const onchainTokenInfo = tokenCard.querySelector('#onchainTokenInfo')
+      const onchainTokenInfo = tokenCard.querySelector('#onchainTokenInfo');
       infoButton.onclick = async () => {
         const alreadyLoaded = onchainTokenInfo.textContent;
         if(token.amount && !alreadyLoaded){
@@ -343,7 +361,7 @@ async function loadWalletInfo() {
         scale: 4,
         spotcolor: '#000'
       });
-      if(tokenInfo && tokenInfo.uris.icon){
+      if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
         icon = document.createElement("img");
         icon.src = tokenInfo.uris.icon;
         icon.style = "width:48px; max-width: inherit;";
