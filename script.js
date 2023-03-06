@@ -333,7 +333,10 @@ async function loadWalletInfo() {
         const hardCodedBCMR = BCMRs[0];
         const isVerified = hardCodedBCMR.identities[token.tokenId];
         tokenCard.querySelector("#verified").classList.remove("hide");
-        if(!isVerified) tokenCard.querySelector("#verified").childNodes[1].src = "./images/exclamation-circle.svg";
+        if(!isVerified){
+          tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
+          tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
+        } 
       }
       // TokenInfo display with queries onclick
       const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay");
