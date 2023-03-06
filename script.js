@@ -293,9 +293,9 @@ async function loadWalletInfo() {
           network: Network.TESTNET
         });
         if(authChain){
-          console.log("Importing an on-chain resolved BCMR!")
+          console.log("Importing an on-chain resolved BCMR!");
           await BCMR.addMetadataRegistryFromUri(authChain[0].uri);
-          createListWithTemplate(arrayTokens)
+          createListWithTemplate(arrayTokens);
         }
       } catch(error){ }
     })
@@ -329,6 +329,11 @@ async function loadWalletInfo() {
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
         tokenCard.querySelector("#sendUnit").textContent = symbol;
+        const BCMRs = BCMR.getRegistries();
+        const hardCodedBCMR = BCMRs[0];
+        const isVerified = hardCodedBCMR.identities[token.tokenId];
+        tokenCard.querySelector("#verified").classList.remove("hide");
+        if(!isVerified) tokenCard.querySelector("#verified").childNodes[1].src = "./images/exclamation-circle.svg";
       }
       // TokenInfo display with queries onclick
       const tokenInfoDisplay = tokenCard.querySelector("#tokenInfoDisplay");
