@@ -105,7 +105,7 @@ main{
   display: flex;
   width: 50%;
 }
-.sendButton {
+.primaryButton {
   background-color: var(--color-primary); 
   color: white;
 }
