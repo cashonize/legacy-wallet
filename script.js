@@ -373,6 +373,7 @@ async function loadWalletInfo() {
       const infoButton = tokenCard.querySelector('#infoButton');
       const onchainTokenInfo = tokenCard.querySelector('#onchainTokenInfo');
       infoButton.onclick = async () => {
+        tokenInfoDisplay.classList.toggle("hide");
         const alreadyLoaded = onchainTokenInfo.textContent;
         if(token.amount && !alreadyLoaded){
           // Fetch total token supply
@@ -383,13 +384,12 @@ async function loadWalletInfo() {
         } else if(!alreadyLoaded){
           // Has active minting NFT
           const responseJson = await queryActiveMinting(token.tokenId);
-          let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT \r\n":"Does not have an active minting NFT";
+          let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
           const responseJson2 = await querySupplyNFTs(token.tokenId);
-          textOnchainTokenInfo += `Total supply: ${responseJson2.data.output.length} NFTs`;
+          textOnchainTokenInfo += ` \r\n Total supply: ${responseJson2.data.output.length} NFTs`;
           onchainTokenInfo.textContent = textOnchainTokenInfo;
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
         }
-        tokenInfoDisplay.classList.toggle("hide");
       }
       
       // Display tokenIcon whether generated or costum
