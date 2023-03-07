@@ -131,7 +131,7 @@ async function loadWalletInfo() {
     if (arrayTokens.length) {
       divNoTokens.textContent = "";
       createListWithTemplate(arrayTokens);
-      importRegistries(arrayTokens);
+      //importRegistries(arrayTokens);
     } else {
       divNoTokens.textContent = "Currently there are no tokens in this wallet";
     }
@@ -180,7 +180,7 @@ async function loadWalletInfo() {
     let opreturnData
     if(url){
       try{
-        const reponse = await fetch(url);
+        const reponse = await fetch("https://" + url);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent)).reverse();
         const chunks = ["BCMR", hashContent, url];
