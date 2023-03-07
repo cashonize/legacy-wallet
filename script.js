@@ -306,15 +306,18 @@ async function loadWalletInfo() {
   function reRenderToken(token, index) {
     const tokenCard = document.querySelectorAll(".item")[index];
     const tokenInfo = BCMR.getTokenInfo(token.tokenId);
-    console.log("re-rendering token with new tokenInfo")
+    console.log("re-rendering token with new tokenInfo");
     if(tokenInfo){
-      symbol = tokenInfo.token.symbol;
-      decimals = tokenInfo.token.decimals;
+      const symbol = tokenInfo.token.symbol || "";
+      const decimals = tokenInfo.token.decimals || 0;
       tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
       tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
       if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
       tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
       tokenCard.querySelector("#sendUnit").textContent = symbol;
+      const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
+      tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
+      const BCMRs = BCMR.getRegistries();
       const hardCodedBCMR = BCMRs[0];
       const isVerified = hardCodedBCMR.identities[token.tokenId];
       tokenCard.querySelector("#verified").classList.remove("hide");
