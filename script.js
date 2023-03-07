@@ -105,6 +105,17 @@ async function loadWalletInfo() {
       document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
     }
   });
+
+  // Initilize address and display QR code
+  const regularAddr = await wallet.getDepositAddress();
+  const tokenAddr = await wallet.getTokenDepositAddress();
+  document.querySelector('#depositAddr').innerText = regularAddr;
+  document.querySelector('#depositTokenAddr').innerText = tokenAddr;
+  document.querySelector('#qr1').contents = regularAddr;
+  document.querySelector('#qr2').contents = tokenAddr;
+  document.querySelector('#placeholderQr').classList.add("hide");
+  document.querySelector('#qr1').classList.remove("hide");
+
   // Display token categories, construct arrayTokens and watch for changes
   let arrayTokens = [];
   let tokenCategories = [];
@@ -131,23 +142,13 @@ async function loadWalletInfo() {
     if (arrayTokens.length) {
       divNoTokens.textContent = "";
       createListWithTemplate(arrayTokens);
-      //importRegistries(arrayTokens);
+      importRegistries(arrayTokens);
     } else {
       divNoTokens.textContent = "Currently there are no tokens in this wallet";
     }
   }
 
   wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
-
-  // Initilize address and display QR code
-  const regularAddr = await wallet.getDepositAddress();
-  const tokenAddr = await wallet.getTokenDepositAddress();
-  document.querySelector('#depositAddr').innerText = regularAddr;
-  document.querySelector('#depositTokenAddr').innerText = tokenAddr;
-  document.querySelector('#qr1').contents = regularAddr;
-  document.querySelector('#qr2').contents = tokenAddr;
-  document.querySelector('#placeholderQr').classList.add("hide");
-  document.querySelector('#qr1').classList.remove("hide");
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
@@ -295,12 +296,41 @@ async function loadWalletInfo() {
         if(authChain){
           console.log("Importing an on-chain resolved BCMR!");
           await BCMR.addMetadataRegistryFromUri(authChain[0].uri);
-          createListWithTemplate(arrayTokens);
+          reRenderToken(token, index);
         }
       } catch(error){ }
     })
   }
-    // Create tokenlist
+  
+  // Rerender token after new tokenInfo
+  function reRenderToken(token, index) {
+    const tokenCard = document.querySelectorAll(".item")[index];
+    const tokenInfo = BCMR.getTokenInfo(token.tokenId);
+    console.log("re-rendering token with new tokenInfo")
+    if(tokenInfo){
+      symbol = tokenInfo.token.symbol;
+      decimals = tokenInfo.token.decimals;
+      tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
+      tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
+      if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
+      tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
+      tokenCard.querySelector("#sendUnit").textContent = symbol;
+      const hardCodedBCMR = BCMRs[0];
+      const isVerified = hardCodedBCMR.identities[token.tokenId];
+      tokenCard.querySelector("#verified").classList.remove("hide");
+      if(!isVerified){
+        tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
+        tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
+      } 
+    }
+    if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
+      icon = document.createElement("img");
+      icon.src = tokenInfo.uris.icon;
+      icon.style = "width:48px; max-width: inherit;";
+    }
+  }
+
+  // Create tokenlist
   function createListWithTemplate(tokens) {
     const Placeholder = document.getElementById("Placeholder");
     const ul = document.createElement("ul");
