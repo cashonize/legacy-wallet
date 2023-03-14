@@ -355,9 +355,12 @@ async function loadWalletInfo() {
       } 
     }
     if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
-      icon = document.createElement("img");
+      const icon = document.createElement("img");
       icon.src = tokenInfo.uris.icon;
       icon.style = "width:48px; max-width: inherit;";
+      const tokenIcon = tokenCard.querySelector("#tokenIcon");
+      tokenIcon.removeChild(tokenIcon.lastChild);
+      tokenIcon.appendChild(icon);
     }
   }
 
