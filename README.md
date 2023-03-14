@@ -28,7 +28,7 @@ Currently not planning on adding transaction history to the webwallet.
 
 The project was started with the help of [this getting-started blogpost](https://read.cash/@pat/mainnetcash-getting-started-a75b2fc6) for mainnet-js. <br>
 Since the way to import it had been changes with version 1.0.0 as can be read [on its github release page](https://github.com/mainnet-cash/mainnet-js/releases/tag/1.0.0). <br>
-[Chota](https://jenil.github.io/chota/) has been added along the way for styling. <br>
+[Chota](https://jenil.github.io/chota/) as a styling library and [Switchery](https://github.com/abpetkov/switchery) for toggle switches. <br>
 For icons the webwallet uses [icongr.am](https://icongr.am). <br>
 [blockies](https://github.com/download13/blockies) is used to generate blocky identicons for tokens. <br>
 The [chaingraph demo instance](https://chipnet.chaingraph.cash) is used to query on-chain tokeen info about gensis supply and minting UTXOs. <br>
