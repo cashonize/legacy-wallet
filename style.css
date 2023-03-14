@@ -155,10 +155,11 @@ main{
 #noTokensFound {
   text-align: center;
 }
-#slecturi{
-  width:70px;
+#selectUnit, #selectUri{
+  box-sizing: content-box;
+  width:80px;
   display: inline-block;
-  padding: 5px;
+  padding: 0.4rem 1rem
 }
 .hide {
   display: none;

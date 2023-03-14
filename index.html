@@ -248,8 +248,8 @@
           </div>
           <details>
             <summary>Optionally link metadata to this token</summary>
-            <label for="slecturi">Upload the metadata to</label>
-            <select name="slecturi" id="slecturi" onchange="selectUri(event)">
+            <label for="selectUri">Upload the metadata to</label>
+            <select name="selectUri" id="selectUri" onchange="selectUri(event)">
               <option value="HTTPS">HTTPS</option>
               <option value="IPFS">IPFS</option>
             </select><br>
@@ -279,7 +279,7 @@
           <input type="checkbox" class="js-switch js-check-change" id="darkmode">
           <div style="margin-top:15px">
             <label for="selectUnit">Select default unit:</label>
-            <select name="selectUnit" id="selectUnit" onchange="selectUnit(event)" style="display: inline; width: 100px; padding: 0.4rem 1rem">
+            <select name="selectUnit" id="selectUnit" onchange="selectUnit(event)">
               <option value="tBCH">tBCH</option>
               <option value="satoshis">satoshis</option>
             </select>
