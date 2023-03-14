@@ -120,7 +120,7 @@ main{
 .tokenAmount {
   margin-left: 30px;
 }
-#bcmrUrl{
+#bcmrUrl, #bcmrIpfs{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
   width: fill-available;
@@ -154,6 +154,11 @@ main{
 }
 #noTokensFound {
   text-align: center;
+}
+#slecturi{
+  width:70px;
+  display: inline-block;
+  padding: 5px;
 }
 .hide {
   display: none;

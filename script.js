@@ -2,13 +2,30 @@ import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './query
 
 const explorerUrl = "https://chipnet.chaingraph.cash";
 
+
+
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
 const seedphrase = document.getElementById("seedphrase");
+
 // Logic dark mode
 let darkMode = false;
 const readDarkMode = localStorage.getItem("darkMode");
-window.toggleDarkmode = function toggleDarkmode() {
+if (readDarkMode === "true") {
+  document.querySelector('.js-switch').checked = true;
+  toggleDarkmode();
+}
+if (readDarkMode == undefined && matchMedia &&
+window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.querySelector('.js-switch').checked = true;
+  toggleDarkmode();
+}
+// see switchery docs
+const elem = document.querySelector('.js-switch');
+const init = new Switchery(elem, { size: 'small', color:"#0ac18f"});
+const changeCheckbox = document.querySelector('.js-check-change');
+changeCheckbox.onchange = () => toggleDarkmode();
+function toggleDarkmode() {
   darkMode = !darkMode;
   document.body.classList= darkMode? "dark" : "";
   const icons = document.querySelectorAll('.icon');
@@ -17,11 +34,7 @@ window.toggleDarkmode = function toggleDarkmode() {
   localStorage.setItem("darkMode", `${darkMode}`);
   document.querySelector('#darkmode').checked = darkMode;
 }
-if (readDarkMode === "true") window.toggleDarkmode();
-if (readDarkMode == undefined && window.matchMedia &&
-window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    window.toggleDarkmode();
-}
+
 // Logic default unit
 const readUnit = localStorage.getItem("unit");
 if(readUnit) document.querySelector('#selectUnit').value = readUnit;
@@ -177,14 +190,29 @@ async function loadWalletInfo() {
   // Functionality CreateTokens view depending on selected token-type
   document.querySelector('#createTokens').addEventListener("click", async () => {
     // Check if metadata url is added
+    const httpsSelected = document.querySelector('#ipfsInfo').classList.contains("hide");
     const url = document.querySelector('#bcmrUrl').value;
+    const bcmrIpfs = document.querySelector('#bcmrIpfs').value;
     let opreturnData
-    if(url){
+    if(httpsSelected & url){
       try{
         const reponse = await fetch("https://" + url);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent)).reverse();
         const chunks = ["BCMR", hashContent, url];
+        opreturnData = OpReturnData.fromArray(chunks);
+        if(binToHex(opreturnData.buffer).length > 228) alert("url too long, can't fit into opreturn")
+      } catch (error) {
+        alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
+        console.log(error);
+        return
+      }
+    }
+    console.log(!httpsSelected && bcmrIpfs)
+    if(!httpsSelected && bcmrIpfs){
+      try{
+        console.log("TEST")
+        const chunks = ["BCMR", bcmrIpfs];
         opreturnData = OpReturnData.fromArray(chunks);
         if(binToHex(opreturnData.buffer).length > 228) alert("url too long, can't fit into opreturn")
       } catch (error) {
@@ -594,6 +622,15 @@ window.selectTokenType = function selectTokenType(event){
   tokenCommitment.classList.add("hide");
   if(event.target.value === "fungibles") tokenSupply.classList.remove("hide");
   if(event.target.value === "immutableNFT") tokenCommitment.classList.remove("hide");
+}
+
+window.selectUri = function selectUri(event){
+  const httpsInfo = document.querySelector('#httpsInfo');
+  const ipfsInfo = document.querySelector('#ipfsInfo');
+  httpsInfo.classList.add("hide");
+  ipfsInfo.classList.add("hide");
+  if(event.target.value === "HTTPS") httpsInfo.classList.remove("hide");
+  if(event.target.value === "IPFS") ipfsInfo.classList.remove("hide");
 }
 
 // Change default unit

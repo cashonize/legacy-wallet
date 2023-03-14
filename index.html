@@ -9,6 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/chota@0.8.0/dist/chota.min.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="switchery/switchery.css" />
+  <script src="switchery/switchery.js"></script>
   <script defer src="https://cdn.mainnet.cash/mainnet-1.0.15.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
@@ -245,13 +247,24 @@
             <input id="inputNftCommitment" placeholder="commitment">
           </div>
           <details>
-            <summary>Optionally add a URL for the metadata registry of this token</summary>
-            You can easily create this with Github Gist similar to 
+            <summary>Optionally link metadata to this token</summary>
+            <label for="slecturi">Upload the metadata to</label>
+            <select name="slecturi" id="slecturi" onchange="selectUri(event)">
+              <option value="HTTPS">HTTPS</option>
+              <option value="IPFS">IPFS</option>
+            </select><br>
+            <div id="httpsInfo">              
+              You can easily create a https url to host your BCMR with Github Gist, similar to 
               <a href="https://gist.github.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c" target="_blank">this example</a>. <br>
-            Press "raw" button to get the url to the json object. <br>
-            Copy this url without the 'https://'' prefix and everything after '/raw'. <br>
-            This url together with the hash of its content will be stored on the blockchain.
-            <input id="bcmrUrl" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+              Then on Github Gists, press "raw" button to get the url to the json object. <br>
+              Copy this url without the 'https://'' prefix and everything after '/raw'. <br>
+              Your BCMR url together with the hash of its content will be stored on the blockchain.
+              <input id="bcmrUrl" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+            </div>
+            <div id="ipfsInfo" class="hide">
+              For IPFS only the Content Identifier (CID) will be added on-chain, because it is a hash of the BCMR content already.
+              <input id="bcmrIpfs" placeholder="QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR">
+            </div>
           </details>
           <br>
           Process might take a few seconds... 
@@ -263,7 +276,7 @@
         <fieldset class="item">
           <legend>Settings</legend>
           <span style="margin-top: 15px;">Dark mode </span>
-          <input type="checkbox" id="darkmode" style="margin: 0; vertical-align: text-bottom;" onclick="toggleDarkmode()">
+          <input type="checkbox" class="js-switch js-check-change" id="darkmode">
           <div style="margin-top:15px">
             <label for="selectUnit">Select default unit:</label>
             <select name="selectUnit" id="selectUnit" onchange="selectUnit(event)" style="display: inline; width: 100px; padding: 0.4rem 1rem">
