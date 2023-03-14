@@ -188,6 +188,10 @@ footer{
   .tokenAmount {
     margin-left: 0px;
   }
+  .tooltiptext{
+    top: -30px;
+    left: -115px;
+  }
 }
 @media only screen and (max-width: 650px) {
   .inputGroup {
