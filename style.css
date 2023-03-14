@@ -71,10 +71,10 @@ main{
   color: var(--color-grey);
 }
 .placeholderQr {
-  margin: auto;
+  margin: 5px auto 0 auto;
   display: block;
-  width: 70%;
-  max-width: 240px;
+  margin-top: 5px;
+  width: 240px;
 }
 #switchAddress {
   position: relative;
