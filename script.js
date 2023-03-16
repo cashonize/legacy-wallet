@@ -194,27 +194,23 @@ async function loadWalletInfo() {
     const url = document.querySelector('#bcmrUrl').value;
     const bcmrIpfs = document.querySelector('#bcmrIpfs').value;
     let opreturnData
-    if(httpsSelected & url){
+    if(httpsSelected && url){
       try{
         const reponse = await fetch("https://" + url);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent)).reverse();
         const chunks = ["BCMR", hashContent, url];
         opreturnData = OpReturnData.fromArray(chunks);
-        if(binToHex(opreturnData.buffer).length > 228) alert("url too long, can't fit into opreturn")
       } catch (error) {
         alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
         console.log(error);
         return
       }
     }
-    console.log(!httpsSelected && bcmrIpfs)
     if(!httpsSelected && bcmrIpfs){
       try{
-        console.log("TEST")
         const chunks = ["BCMR", bcmrIpfs];
         opreturnData = OpReturnData.fromArray(chunks);
-        if(binToHex(opreturnData.buffer).length > 228) alert("url too long, can't fit into opreturn")
       } catch (error) {
         alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
         console.log(error);
