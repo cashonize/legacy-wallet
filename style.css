@@ -65,6 +65,10 @@ main{
   cursor: pointer;
   width: fit-content;
 }
+.tokenView {
+  display: contents;
+  min-height: 10px;
+}
 .depositAddr,
 .tokenID {
   overflow-wrap: anywhere;
@@ -109,6 +113,10 @@ main{
   background-color: var(--color-primary); 
   color: white;
 }
+#verifiedOnly {
+  float: right;
+  padding-right: 20px;
+}
 .verified {
   float: right;
 }
@@ -152,7 +160,7 @@ main{
 .showmobile {
   display: none;
 }
-#noTokensFound {
+#noTokensFound, #noVerifiedTokens, #loadingTokenData {
   text-align: center;
 }
 #selectUnit, #selectUri{

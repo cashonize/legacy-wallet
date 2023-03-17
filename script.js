@@ -2,8 +2,6 @@ import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './query
 
 const explorerUrl = "https://chipnet.chaingraph.cash";
 
-
-
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
 const seedphrase = document.getElementById("seedphrase");
@@ -12,19 +10,21 @@ const seedphrase = document.getElementById("seedphrase");
 let darkMode = false;
 const readDarkMode = localStorage.getItem("darkMode");
 if (readDarkMode === "true") {
-  document.querySelector('.js-switch').checked = true;
+  document.querySelector('#darkmode').checked = true;
   toggleDarkmode();
 }
 if (readDarkMode == undefined && matchMedia &&
 window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  document.querySelector('.js-switch').checked = true;
+  document.querySelector('#darkmode').checked = true;
   toggleDarkmode();
 }
 // see switchery docs
-const elem = document.querySelector('.js-switch');
-const init = new Switchery(elem, { size: 'small', color:"#0ac18f"});
-const changeCheckbox = document.querySelector('.js-check-change');
-changeCheckbox.onchange = () => toggleDarkmode();
+let elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+elems.forEach(elem => {
+  const switchery = new Switchery(elem, { size: 'small', color:"#0ac18f"});
+});
+const changeDarkMode = document.querySelector('#darkmode');
+changeDarkMode.onchange = () => toggleDarkmode();
 function toggleDarkmode() {
   darkMode = !darkMode;
   document.body.classList= darkMode? "dark" : "";
@@ -153,13 +153,17 @@ async function loadWalletInfo() {
     }
     // Either display tokens in wallet or display there are no tokens
     const divNoTokens = document.querySelector('#noTokensFound');
+    document.querySelector('#loadingTokenData').classList.add("hide");
+    const divVerifiedOnly = document.querySelector('#verifiedOnly');
     if (arrayTokens.length) {
-      divNoTokens.textContent = "";
+      divNoTokens.classList.add("hide");
+      divVerifiedOnly.classList.remove("hide");
       createListWithTemplate(arrayTokens);
       if(!importedRegistries) importRegistries(arrayTokens);
       importedRegistries = true;
     } else {
-      divNoTokens.textContent = "Currently there are no tokens in this wallet";
+      divNoTokens.classList.remove("hide");
+      divVerifiedOnly.classList.add("hide");
     }
   }
 
@@ -595,6 +599,29 @@ async function loadWalletInfo() {
       console.log(`Burned minting NFT of category ${displayId} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
   }
+}
+
+// Verified only switch
+let displayVerifiedOnly = false;
+const changeVerifiedOnly = document.querySelector('#verifiedOnlySwitch');
+changeVerifiedOnly.onchange = () => toggleVerifiedOnly();
+function toggleVerifiedOnly() {
+  displayVerifiedOnly = !displayVerifiedOnly;
+  document.querySelector('#noVerifiedTokens').classList.add("hide");
+  const tokenCards = document.querySelectorAll(".wallet");
+  if(displayVerifiedOnly){
+    for(const tokenCard of tokenCards){
+        tokenCard.classList.add("hide");
+        const isVerified = tokenCard.querySelector('.verifiedIcon') && !tokenCard.querySelector('#verified').classList.contains("hide");
+        if(isVerified) tokenCard.classList.remove("hide");
+      }
+      const shownTokenCards = document.querySelectorAll(".wallet:not(.hide)");
+      if(!shownTokenCards[0]) document.querySelector('#noVerifiedTokens').classList.remove("hide");
+  } else {
+    for(const tokenCard of tokenCards){
+      tokenCard.classList.remove("hide");
+    }
+  } 
 }
 
 // Logic for copy onclick

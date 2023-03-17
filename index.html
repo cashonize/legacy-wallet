@@ -124,10 +124,16 @@
         </fieldset>
       </div>
 
-      <div id="tokenView" class="hide">
-        <div id="noTokensFound"></div>
+      <div id="tokenView" class="hide tokenView">
+        <div id="loadingTokenData">Loading token data...</div>
+        <div id="noTokensFound" class="hide">Currently there are no tokens in this wallet...</div>
+        <div id="verifiedOnly" class="hide">
+          <span>Show verified tokens only </span>
+          <input type="checkbox" class="js-switch js-check-change" id="verifiedOnlySwitch">
+        </div>
+        <div id="noVerifiedTokens" class="hide" style="margin: 50px 0 250px 0;">No verified tokens in this wallet...</div>
         <template id="token-template">
-          <div class="item">
+          <div class="item wallet">
             <fieldset>
               <legend>
                 <div id="tokenType"></div>
