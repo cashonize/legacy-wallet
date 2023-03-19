@@ -52,8 +52,12 @@
             <br>
             <h4><img class="icon importIcon" src="/images/log-in.svg"> Import existing wallet</h4> 
             <div>Enter mnemonic seed phrase</div>
-            <div>Derivation path used is m/44'/0'/0'/0/0</div>
             <textarea style="resize: none;" id="enterSeedphrase"rows="3" cols="50" placeholder="word1 word2 ..."></textarea>
+            <span>Derivation path: </span>
+            <select name="derivationPath" id="derivationPath" onchange="selectTokenType(event)">
+              <option value="standard">m/44’/145’/0’ (standard)</option>
+              <option value="bitcoinfotcom">m/44’/0’/0’ (bitcoin.com wallet)</option>
+            </select> <br>
             <input class="button primary" type="button" style="margin-top:15px" value="Import" onclick="importWallet()">
             <br><br>
         </fieldset>
@@ -291,9 +295,9 @@
             </select>
           </div>
           <div style="margin-top:15px">Make backup of seed phrase (mnemonic)</div>
-          <input class="button primary" type="button" style="padding: 1rem 1.5rem;" value="Show seed phrase" onclick="toggleSeedphrase(event)">
+          <input class="button primary" type="button" style="padding: 1rem 1.5rem; display: block;" value="Show seed phrase" onclick="toggleSeedphrase(event)">
           <div id="seedphrase" class="hide"></div>
-          <div style="margin-top:15px">Derivation path used is m/44'/0'/0'/0/0</div>
+          <span style="margin-top:15px">Derivation path of this wallet is</span> <span id="walletDerivationPath"></span>
         </fieldset>
       </div>
 
