@@ -346,14 +346,16 @@ async function loadWalletInfo() {
     console.log("re-rendering token with new tokenInfo");
     if(tokenInfo){
       const symbol = tokenInfo.token.symbol || "";
-      const decimals = tokenInfo.token.decimals || 0;
       tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
       tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
       if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
-      tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
-      tokenCard.querySelector("#sendUnit").textContent = symbol;
-      const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
-      tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
+      if(token.amount){
+        tokenCard.querySelector("#sendUnit").textContent = symbol;
+        const decimals = tokenInfo.token.decimals || 0;
+        const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
+        tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
+        tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${decimals}`;
+      }
       const BCMRs = BCMR.getRegistries();
       const hardCodedBCMR = BCMRs[0];
       const isVerified = hardCodedBCMR.identities[token.tokenId];
@@ -361,15 +363,26 @@ async function loadWalletInfo() {
       if(!isVerified){
         tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
         tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
-      } 
-    }
-    if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
-      const icon = document.createElement("img");
-      icon.src = tokenInfo.uris.icon;
-      icon.style = "width:48px; max-width: inherit;";
-      const tokenIcon = tokenCard.querySelector("#tokenIcon");
-      tokenIcon.removeChild(tokenIcon.lastChild);
-      tokenIcon.appendChild(icon);
+      }
+      if(tokenInfo.uris && tokenInfo.uris.icon){
+        const icon = document.createElement("img");
+        icon.src = tokenInfo.uris.icon;
+        icon.style = "width:48px; max-width: inherit;";
+        const tokenIcon = tokenCard.querySelector("#tokenIcon");
+        tokenIcon.removeChild(tokenIcon.lastChild);
+        tokenIcon.appendChild(icon);
+      }
+      if(token.tokenData){
+        const NFTmetadata = tokenInfo.token.nfts.parse.types[(token.tokenData.commitment)];
+        if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+          const icon = document.createElement("img");
+          icon.src = NFTmetadata.uris.icon;
+          icon.style = "width: 48px; max-width: inherit;";
+          const tokenIcon = tokenCard.querySelector("#tokenIcon");
+          tokenIcon.removeChild(tokenIcon.lastChild);
+          tokenIcon.appendChild(icon);
+        }
+      }
     }
   }
 
