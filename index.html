@@ -20,11 +20,10 @@
 <body>
   <div>
     <header>
-      <h1>
+      <h1 style="margin: 0.35em 0 0.35em">
         <img class="icon" style="width: 40px;" src="/images/favicon.png">
         CashTokens Webwallet
       </h1>
-      <b>Connected to chipnet</b>
       <div>
         <nav class="nav hide">
           <div class="nav-left">
@@ -66,8 +65,12 @@
       <div id="walletView" class="hide">
 
         <fieldset style="margin-top: 20px;">
-          <div style="margin-top: 15px;">
-            Wallet balance: <span id="balance" class="text-primary"></span>
+          <div style="margin-top: 15px; font-size: 1.2em;">
+            <span>USD balance: </span>
+            <span id="balanceUsd" class="text-primary"></span>
+          </div>
+          <div>
+            BCH balance: <span id="balance" class="text-primary"></span>
             <span id="balanceUnit" class="text-primary unit"></span>
           </div>
           <div>Wallet token balance: <span id="tokenBalance" class="text-primary"></span></div>

@@ -109,6 +109,7 @@ async function loadWalletInfo() {
     document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
     document.querySelector('#sendUnit').innerText = ' sats';
   }
+  document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
   wallet.watchBalance(async (newBalance) => {
     balance = newBalance;
     maxAmountToSend = await wallet.getMaxAmountToSend();
