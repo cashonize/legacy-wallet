@@ -502,7 +502,7 @@ async function loadWalletInfo() {
         const sendNftButton = nftSend.querySelector("#sendNFT");
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
-          sendNft(inputAddress, token.tokenId, tokenCapability)
+          sendNft(inputAddress, token.tokenId, tokenCapability, tokenCommitment)
         }
         const nftMint = tokenCard.querySelector('#nftMint');
         const nftBurn = tokenCard.querySelector('#nftBurn');
@@ -554,23 +554,30 @@ async function loadWalletInfo() {
       if(tokenInfo) message = `Sent ${amountEntered} ${tokenInfo.token.symbol} to ${address}`;
       alert(message);
       console.log(`${message} \n${explorerUrl}/tx/${txId}`);
-    } catch (error) { alert(error) }
+    } catch (error) { 
+      alert(error);
+      console.log(error);
+    }
   }
 
-  async function sendNft(address, tokenId, tokenCapability) {
+  async function sendNft(address, tokenId, tokenCapability, tokenCommitment) {
     try {
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
           tokenId: tokenId,
-          commitment: "",
+          commitment: tokenCommitment,
           capability: tokenCapability,
         }),
       ]);
+      console.log(tokenCommitment, tokenCapability)
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
       alert(`Sent NFT of category ${displayId} to ${address}`);
       console.log(`Sent NFT of category ${displayId} to ${address} \n${explorerUrl}/tx/${txId}`);
-    } catch (error) { alert(error) }
+    } catch (error) { 
+      alert(error);
+      console.log(error);
+    }
   }
 
   async function mintNft(tokenId, tokenCommitment, amount=1) {
