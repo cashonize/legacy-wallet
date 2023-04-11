@@ -151,9 +151,17 @@ async function loadWalletInfo() {
       }
       // Otherwise tokenId has NFTs, so query utxos for tokenData
       const utxos = await wallet.getTokenUtxos(tokenId);
-      for (const utxo of utxos) {
+      if(utxos.length == 1){
         const tokenData = utxo.token;
         arrayTokens.push({ tokenId, tokenData });
+        continue;
+      } else {
+        const nfts = [];
+        for (const utxo of utxos) {
+          const tokenData = utxo.token;
+          nfts.push({ tokenId, tokenData });
+        }
+        arrayTokens.push({ tokenId, nfts });
       }
     }
     // Either display tokens in wallet or display there are no tokens
@@ -343,7 +351,7 @@ async function loadWalletInfo() {
   
   // Rerender token after new tokenInfo
   function reRenderToken(token, index) {
-    const tokenCard = document.querySelectorAll(".item")[index];
+    const tokenCard = document.querySelector("#Placeholder").children[index];
     const tokenInfo = BCMR.getTokenInfo(token.tokenId);
     console.log("re-rendering token with new tokenInfo");
     if(tokenInfo){
@@ -483,7 +491,8 @@ async function loadWalletInfo() {
           event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = tokenAmount;
         }
         tokenCard.getElementById("maxButton").onclick = (event) => maxTokens(event);
-      } else{
+      } 
+      if(token.tokenData){
         // Stuff specific for NFTs
         const tokenCapability = token.tokenData.capability;
         const nftTypes = {
@@ -528,6 +537,26 @@ async function loadWalletInfo() {
           const amountNFTs = nftMint.querySelector('#amountNFTs').value;
           mintNft(token.tokenId, "", amountNFTs);
         }
+      } if(token.nfts){
+        tokenCard.querySelector("#tokenType").textContent = "NFT group";
+        tokenCard.querySelector("#nrChildNfts").textContent = `Number NFTs: ${token.nfts.length}`;
+        tokenCard.querySelector('#sendButton').classList.add("hide");
+        tokenCard.querySelector("#showMore").classList.remove("hide");
+
+        for(let i=0; i< token.nfts.length; i++){
+          const childNft = document.importNode(template.content, true);
+          childNft.querySelector(".item").style.marginLeft = "25px";
+          childNft.querySelector(".item").classList.add("hide");
+          tokenCard.querySelector(".item").appendChild(childNft);
+        }
+        const showIcon = tokenCard.querySelector("#showIcon")
+        function toggleChildNfts() {
+          const group = document.querySelector("#Placeholder").children[index];
+          showIcon.classList.toggle("less");
+          const children = group.querySelectorAll(".item");
+          children.forEach(child => child.classList.toggle("hide"));
+        }
+        tokenCard.querySelector("#childNfts").onclick = toggleChildNfts;
       }
       ul.appendChild(tokenCard);
     });
@@ -633,14 +662,14 @@ changeVerifiedOnly.onchange = () => toggleVerifiedOnly();
 function toggleVerifiedOnly() {
   displayVerifiedOnly = !displayVerifiedOnly;
   document.querySelector('#noVerifiedTokens').classList.add("hide");
-  const tokenCards = document.querySelectorAll(".wallet");
+  const tokenCards = document.querySelector("#Placeholder").children;
   if(displayVerifiedOnly){
     for(const tokenCard of tokenCards){
         tokenCard.classList.add("hide");
         const isVerified = tokenCard.querySelector('.verifiedIcon') && !tokenCard.querySelector('#verified').classList.contains("hide");
         if(isVerified) tokenCard.classList.remove("hide");
       }
-      const shownTokenCards = document.querySelectorAll(".wallet:not(.hide)");
+      const shownTokenCards = document.querySelectorAll(".item:not(.hide)");
       if(!shownTokenCards[0]) document.querySelector('#noVerifiedTokens').classList.remove("hide");
   } else {
     for(const tokenCard of tokenCards){

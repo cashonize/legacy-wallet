@@ -140,7 +140,7 @@
         </div>
         <div id="noVerifiedTokens" class="hide" style="margin: 50px 0 250px 0;">No verified tokens in this wallet...</div>
         <template id="token-template">
-          <div class="item wallet">
+          <div class="item">
             <fieldset>
               <legend>
                 <div id="tokenType"></div>
@@ -164,6 +164,13 @@
                     </div>
                   </div>
                   <div class="tokenAmount" id="tokenAmount"></div>
+                  <div class="childNfts" id="childNfts" style=" cursor: pointer;">
+                    <span class="nrChildNfts" id="nrChildNfts"></span>
+                    <span class="hide" id="showMore" style="margin-left: 10px;">
+                      <img id="showIcon" class="icon" style="vertical-align: text-bottom;" src="/images/chevron-square-down.svg">
+                    </span>
+                  </div>
+                  
                 </div>
               </div>
               <div class="actionBar">

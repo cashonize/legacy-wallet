@@ -45,6 +45,15 @@ header {
 #burnIcon.dark{
   content:url("images/fireGrey.svg");
 }
+#showIcon.dark{
+  content:url("images/chevron-square-downGrey.svg");
+}
+#showIcon.less{
+  content:url("images/chevron-square-up.svg");
+}
+#showIcon.less.dark{
+  content:url("images/chevron-square-upGrey.svg");
+}
 .unverifiedIcon{
   content:url("images/exclamation-circle.svg");
 }
