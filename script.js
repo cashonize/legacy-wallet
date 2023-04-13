@@ -397,6 +397,7 @@ async function loadWalletInfo() {
           const nftCard = children[i];
           const nft = token.nfts[i-1];
           const NFTmetadata = tokenInfo.token.nfts.parse.types[(nft.tokenData.commitment)];
+          if(NFTmetadata) nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
           if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
             newIcon(nftCard, NFTmetadata.uris.icon);
           }
