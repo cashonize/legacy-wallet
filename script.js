@@ -71,7 +71,7 @@ window.importWallet = async function importWallet() {
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const seedphrase = document.querySelector('#enterSeedphrase').value;
   const selectedDerivationPath = document.querySelector('#derivationPath').value;
-  const derivationPath = selectedDerivationPath == "standard"? "m/44'/0'/145'/0/0" : "m/44'/0'/0'/0/0";
+  const derivationPath = selectedDerivationPath == "standard"? "m/44'/145'/0'/0/0" : "m/44'/0'/0'/0/0";
   const walletId = `seed:testnet:${seedphrase}:${derivationPath}`;
   await TestNetWallet.replaceNamed(nameWallet, walletId);
   loadWalletInfo()
