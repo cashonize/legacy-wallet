@@ -152,7 +152,7 @@ async function loadWalletInfo() {
       // Otherwise tokenId has NFTs, so query utxos for tokenData
       const utxos = await wallet.getTokenUtxos(tokenId);
       if(utxos.length == 1){
-        const tokenData = utxo.token;
+        const tokenData = utxos[0].token;
         arrayTokens.push({ tokenId, tokenData });
         continue;
       } else {
@@ -374,23 +374,30 @@ async function loadWalletInfo() {
         tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
         tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
       }
-      if(tokenInfo.uris && tokenInfo.uris.icon){
+      function newIcon(element, iconSrc){
         const icon = document.createElement("img");
-        icon.src = tokenInfo.uris.icon;
+        icon.src = iconSrc;
         icon.style = "width:48px; max-width: inherit;";
-        const tokenIcon = tokenCard.querySelector("#tokenIcon");
+        const tokenIcon = element.querySelector("#tokenIcon");
         tokenIcon.removeChild(tokenIcon.lastChild);
         tokenIcon.appendChild(icon);
       }
+      if(tokenInfo.uris && tokenInfo.uris.icon) newIcon(tokenCard, tokenInfo.uris.icon);
       if(token.tokenData){
         const NFTmetadata = tokenInfo.token.nfts.parse.types[(token.tokenData.commitment)];
         if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
-          const icon = document.createElement("img");
-          icon.src = NFTmetadata.uris.icon;
-          icon.style = "width: 48px; max-width: inherit;";
-          const tokenIcon = tokenCard.querySelector("#tokenIcon");
-          tokenIcon.removeChild(tokenIcon.lastChild);
-          tokenIcon.appendChild(icon);
+          newIcon(tokenCard, NFTmetadata.uris.icon)
+        }
+      }
+      if(token.nfts){
+        const children = tokenCard.children;
+        for(let i=1; i<children.length; i++){
+          const nftCard = children[i];
+          const nft = token.nfts[i-1];
+          const NFTmetadata = tokenInfo.token.nfts.parse.types[(nft.tokenData.commitment)];
+          if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+            newIcon(nftCard, NFTmetadata.uris.icon);
+          }
         }
       }
     }
@@ -457,21 +464,24 @@ async function loadWalletInfo() {
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
         }
       }
-      
-      // Display tokenIcon whether generated or costum
-      let icon = createIcon({
-        seed: token.tokenId,
-        size: 12,
-        scale: 4,
-        spotcolor: '#000'
-      });
-      if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
-        icon = document.createElement("img");
-        icon.src = tokenInfo.uris.icon;
-        icon.style = "width:48px; max-width: inherit;";
+      // Reusable function so it can also render icons for child nfts
+      function generateIcon(element){
+        // Display tokenIcon whether generated or costum
+        let icon = createIcon({
+          seed: token.tokenId,
+          size: 12,
+          scale: 4,
+          spotcolor: '#000'
+        });
+        if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
+          icon = document.createElement("img");
+          icon.src = tokenInfo.uris.icon;
+          icon.style = "width:48px; max-width: inherit;";
+        }
+        const tokenIcon = element.querySelector("#tokenIcon");
+        tokenIcon.appendChild(icon);
       }
-      const tokenIcon = tokenCard.querySelector("#tokenIcon");
-      tokenIcon.appendChild(icon);
+      generateIcon(tokenCard)
       // Stuff specific for fungibles
       if(token.amount){
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
@@ -492,32 +502,34 @@ async function loadWalletInfo() {
         }
         tokenCard.getElementById("maxButton").onclick = (event) => maxTokens(event);
       } 
-      if(token.tokenData){
+      if(token.tokenData) renderNft(token, tokenCard)
+      // Reusable function so it can also render child nfts
+      function renderNft(nft, element){
         // Stuff specific for NFTs
-        const tokenCapability = token.tokenData.capability;
+        const tokenCapability = nft.tokenData.capability;
         const nftTypes = {
           minting: "Minting NFT",
           mutable: "Mutable NFT",
           none: "Immutable NFT"
         };
-        tokenCard.querySelector("#tokenType").textContent = nftTypes[tokenCapability];
-        const tokenCommitment = token.tokenData.commitment;
+        element.querySelector("#tokenType").textContent = nftTypes[tokenCapability];
+        const tokenCommitment = nft.tokenData.commitment;
         if (tokenCommitment != "") {
           const commitmentText = `NFT commitment: ${tokenCommitment}`;
-          tokenCard.querySelector("#tokenCommitment").textContent = commitmentText;
+          element.querySelector("#tokenCommitment").textContent = commitmentText;
         }
-        const nftSend = tokenCard.querySelector('#nftSend');
-        tokenCard.getElementById("sendButton").onclick = () => nftSend.classList.toggle("hide");
+        const nftSend = element.querySelector('#nftSend');
+        element.getElementById("sendButton").onclick = () => nftSend.classList.toggle("hide");
         const sendNftButton = nftSend.querySelector("#sendNFT");
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
-          sendNft(inputAddress, token.tokenId, tokenCapability, tokenCommitment)
+          sendNft(inputAddress, nft.tokenId, tokenCapability, tokenCommitment)
         }
-        const nftMint = tokenCard.querySelector('#nftMint');
-        const nftBurn = tokenCard.querySelector('#nftBurn');
+        const nftMint = element.querySelector('#nftMint');
+        const nftBurn = element.querySelector('#nftBurn');
         if (tokenCapability == "minting"){ 
-          const mintButton = tokenCard.querySelector('#mintButton');
-          const burnButton = tokenCard.querySelector('#burnButton');
+          const mintButton = element.querySelector('#mintButton');
+          const burnButton = element.querySelector('#burnButton');
           mintButton.classList.remove("hide");
           mintButton.onclick = () => nftMint.classList.toggle("hide");
           burnButton.classList.remove("hide");
@@ -526,16 +538,16 @@ async function loadWalletInfo() {
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
           const commitmentInput = nftMint.querySelector('#commitmentInput').value;
-          mintNft(token.tokenId, commitmentInput);
+          mintNft(nft.tokenId, commitmentInput);
         }
         const burnNftButton = nftBurn.querySelector("#burnNFT");
         burnNftButton.onclick = () => {
-          burnNft(token.tokenId, tokenCommitment);
+          burnNft(nft.tokenId, tokenCommitment);
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
           const amountNFTs = nftMint.querySelector('#amountNFTs').value;
-          mintNft(token.tokenId, "", amountNFTs);
+          mintNft(nft.tokenId, "", amountNFTs);
         }
       } if(token.nfts){
         tokenCard.querySelector("#tokenType").textContent = "NFT group";
@@ -547,9 +559,18 @@ async function loadWalletInfo() {
           const childNft = document.importNode(template.content, true);
           childNft.querySelector(".item").style.marginLeft = "25px";
           childNft.querySelector(".item").classList.add("hide");
+          generateIcon(childNft);
+          renderNft(token.nfts[i],childNft);
+          childNft.querySelector("#tokenIdBox").classList.add("hide");
+          childNft.querySelector("#infoButton").classList.add("hide");
+          childNft.querySelector("#childNftCommitment").classList.remove("hide");
+          const childNftCommitment = token.nfts[i].tokenData.commitment || 'none'
+          childNft.querySelector("#childNftCommitment").textContent = `Commitment: ${childNftCommitment}`
+
           tokenCard.querySelector(".item").appendChild(childNft);
         }
-        const showIcon = tokenCard.querySelector("#showIcon")
+        // use the querySelector outside the function
+        const showIcon = tokenCard.querySelector("#showIcon");
         function toggleChildNfts() {
           const group = document.querySelector("#Placeholder").children[index];
           showIcon.classList.toggle("less");
