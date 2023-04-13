@@ -1,6 +1,7 @@
 import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './queryChainGraph.js';
 
 const explorerUrl = "https://chipnet.chaingraph.cash";
+const trustedTokenLists = ["https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"]
 const nameWallet = "mywallet";
 
 const newWalletView = document.querySelector('#newWalletView');
@@ -92,9 +93,10 @@ async function loadWalletInfo() {
   console.log(wallet);
   Config.EnforceCashTokenReceiptAddresses = true;
 
-  // Import BCMR
-  const url = "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
-  await BCMR.addMetadataRegistryFromUri(url);
+  // Import BCMRs in the trusted tokenlists
+  for await(const tokenListUrl of trustedTokenLists){
+    await BCMR.addMetadataRegistryFromUri(tokenListUrl);
+  }
 
   // Display USD & BC balance and watch for changes
   let balance = await wallet.getBalance();
@@ -377,7 +379,7 @@ async function loadWalletInfo() {
       function newIcon(element, iconSrc){
         const icon = document.createElement("img");
         icon.src = iconSrc;
-        icon.style = "width:48px; max-width: inherit;";
+        icon.style = "width:48px; max-width:inherit; border-radius:50%;";
         const tokenIcon = element.querySelector("#tokenIcon");
         tokenIcon.removeChild(tokenIcon.lastChild);
         tokenIcon.appendChild(icon);
@@ -459,7 +461,7 @@ async function loadWalletInfo() {
           const responseJson = await queryActiveMinting(token.tokenId);
           let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
           const responseJson2 = await querySupplyNFTs(token.tokenId);
-          textOnchainTokenInfo += ` \r\n Total supply: ${responseJson2.data.output.length} NFTs`;
+          textOnchainTokenInfo += ` \r\n Total supply: ${responseJson2.data.output.length} immutable NFTs`;
           onchainTokenInfo.textContent = textOnchainTokenInfo;
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
         }
