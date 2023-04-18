@@ -143,15 +143,14 @@ async function loadWalletInfo() {
   fetchTokens();
   async function fetchTokens() {
     arrayTokens = [];
-    const getTokensResponse = await wallet.getAllTokenBalances();
-    tokenCategories = Object.keys(getTokensResponse);
+    const getFungibleTokensResponse = await wallet.getAllTokenBalances();
+    const getNFTsResponse = await wallet.getAllNftTokenBalances();
+    tokenCategories = Object.keys({...getFungibleTokensResponse, ...getNFTsResponse})
     document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
-    for (const tokenId of tokenCategories) {
-      if(getTokensResponse[tokenId]){
-        arrayTokens.push({ tokenId, amount: getTokensResponse[tokenId] });
-        continue;
-      }
-      // Otherwise tokenId has NFTs, so query utxos for tokenData
+    for (const tokenId of Object.keys(getFungibleTokensResponse)) {
+      arrayTokens.push({ tokenId, amount: getFungibleTokensResponse[tokenId] });
+    }
+    for (const tokenId of Object.keys(getNFTsResponse)) {
       const utxos = await wallet.getTokenUtxos(tokenId);
       if(utxos.length == 1){
         const tokenData = utxos[0].token;
@@ -161,7 +160,7 @@ async function loadWalletInfo() {
         const nfts = [];
         for (const utxo of utxos) {
           const tokenData = utxo.token;
-          nfts.push({ tokenId, tokenData });
+          if(tokenData.capability) nfts.push({ tokenId, tokenData });
         }
         arrayTokens.push({ tokenId, nfts });
       }
