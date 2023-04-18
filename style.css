@@ -135,7 +135,8 @@ main{
   margin-bottom: -10px;
 }
 .verified {
-  float: right;
+  position: absolute;
+  right: 20px;
 }
 .tokenInfo {
   display: flex;
