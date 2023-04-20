@@ -145,6 +145,7 @@ main{
 }
 .tokenAmount {
   margin-left: 30px;
+  max-width: 225px;
 }
 #bcmrUrl, #bcmrIpfs{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
