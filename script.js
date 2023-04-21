@@ -20,6 +20,7 @@ window.matchMedia('(prefers-color-scheme: dark)').matches) {
   document.querySelector('#darkmode').checked = true;
   toggleDarkmode();
 }
+document.querySelector('#verifiedOnlySwitch').checked = false;
 // see switchery docs
 let elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
 elems.forEach(elem => {
