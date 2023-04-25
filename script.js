@@ -147,7 +147,7 @@ async function loadWalletInfo() {
     const getFungibleTokensResponse = await wallet.getAllTokenBalances();
     const getNFTsResponse = await wallet.getAllNftTokenBalances();
     tokenCategories = Object.keys({...getFungibleTokensResponse, ...getNFTsResponse})
-    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different tokentypes`;
+    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different token categories`;
     for (const tokenId of Object.keys(getFungibleTokensResponse)) {
       arrayTokens.push({ tokenId, amount: getFungibleTokensResponse[tokenId] });
     }
