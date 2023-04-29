@@ -359,7 +359,6 @@ async function loadWalletInfo() {
     if(tokenInfo){
       const symbol = tokenInfo.token.symbol || "";
       tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
-      tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
       if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
       if(token.amount){
         tokenCard.querySelector("#sendUnit").textContent = symbol;
@@ -378,6 +377,7 @@ async function loadWalletInfo() {
       }
       function newIcon(element, iconSrc){
         const icon = document.createElement("img");
+        if(iconSrc.startsWith("ipfs://"))iconSrc=  "https://dweb.link/ipfs/"+iconSrc.slice(7)
         icon.src = iconSrc;
         icon.style = "width:48px; max-width:inherit; border-radius:50%;";
         const tokenIcon = element.querySelector("#tokenIcon");
