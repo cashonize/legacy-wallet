@@ -377,7 +377,7 @@ async function loadWalletInfo() {
       }
       function newIcon(element, iconSrc){
         const icon = document.createElement("img");
-        if(iconSrc.startsWith("ipfs://"))iconSrc=  "https://dweb.link/ipfs/"+iconSrc.slice(7)
+        if(iconSrc.startsWith("ipfs://")) iconSrc = "https://dweb.link/ipfs/"+iconSrc.slice(7);
         icon.src = iconSrc;
         icon.style = "width:48px; max-width:inherit; border-radius:50%;";
         const tokenIcon = element.querySelector("#tokenIcon");
@@ -400,6 +400,8 @@ async function loadWalletInfo() {
           if(NFTmetadata) nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
           if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
             newIcon(nftCard, NFTmetadata.uris.icon);
+          } else if(tokenInfo.uris && tokenInfo.uris.icon){
+            newIcon(nftCard, tokenInfo.uris.icon);
           }
         }
       }
@@ -431,7 +433,6 @@ async function loadWalletInfo() {
       if(darkMode) actionbarIcons.forEach(icon => icon.classList.add("dark"));
       if(tokenInfo){
         tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
-        tokenCard.querySelector("#tokenBegin").textContent = `Creation date: ${tokenInfo.time.begin}`;
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
         tokenCard.querySelector("#sendUnit").textContent = symbol;
@@ -468,7 +469,7 @@ async function loadWalletInfo() {
         }
       }
       // Reusable function so it can also render icons for child nfts
-      function generateIcon(element){
+      function generateIcon(element, nftCommitment){
         // Display tokenIcon whether generated or costum
         let icon = createIcon({
           seed: token.tokenId,
@@ -478,7 +479,21 @@ async function loadWalletInfo() {
         });
         if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
           icon = document.createElement("img");
-          icon.src = tokenInfo.uris.icon;
+          let iconSrc = tokenInfo.uris.icon;
+          if(token.tokenData){
+            const NFTmetadata = tokenInfo.token.nfts.parse.types[(token.tokenData.commitment)];
+            if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+              iconSrc = NFTmetadata.uris.icon;
+            }
+          }
+          if(token.nfts){
+            const NFTmetadata = tokenInfo.token.nfts.parse.types[nftCommitment];
+            if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+              iconSrc = NFTmetadata.uris.icon;
+            }
+          }
+          if(iconSrc.startsWith("ipfs://")) iconSrc = "https://dweb.link/ipfs/"+iconSrc.slice(7);
+          icon.src = iconSrc;
           icon.style = "width:48px; max-width: inherit;";
         }
         const tokenIcon = element.querySelector("#tokenIcon");
@@ -562,12 +577,13 @@ async function loadWalletInfo() {
           const childNft = document.importNode(template.content, true);
           childNft.querySelector(".item").style.marginLeft = "25px";
           childNft.querySelector(".item").classList.add("hide");
-          generateIcon(childNft);
+          const nftCommitment = token.nfts[i].tokenData.commitment
+          generateIcon(childNft, nftCommitment);
           renderNft(token.nfts[i],childNft);
           childNft.querySelector("#tokenIdBox").classList.add("hide");
           childNft.querySelector("#infoButton").classList.add("hide");
           childNft.querySelector("#childNftCommitment").classList.remove("hide");
-          const childNftCommitment = token.nfts[i].tokenData.commitment || 'none'
+          const childNftCommitment = nftCommitment || 'none'
           childNft.querySelector("#childNftCommitment").textContent = `Commitment: ${childNftCommitment}`
 
           tokenCard.querySelector(".item").appendChild(childNft);
