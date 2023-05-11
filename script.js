@@ -219,7 +219,7 @@ async function loadWalletInfo() {
       try{
         const reponse = await fetch("https://" + url);
         const bcmrContent = await reponse.text();
-        const hashContent = sha256.hash(utf8ToBin(bcmrContent)).reverse();
+        const hashContent = sha256.hash(utf8ToBin(bcmrContent));
         const chunks = ["BCMR", hashContent, url];
         opreturnData = OpReturnData.fromArray(chunks);
       } catch (error) {
