@@ -67,6 +67,7 @@ export async function querySupplyNFTs(tokenId){
             _and: [
               { nonfungible_token_capability: { _eq: "none" } }
             ]
+            _not: { spent_by: {} }
           }
         ) {
           locking_bytecode
