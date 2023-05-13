@@ -3,13 +3,14 @@
 This is the code repository for [My CashTokens Webwallet](https://my-cashtokens-webwallet.netlify.app/), a webwallet with CashTokens support for chipnet. <br>
 It is built with the [mainnet-js](https://mainnet.cash/) library. <br>
 It started in early January as a minimum viable product but has grown into a full-fledged webwallet. <br>
-The webwallet will move to mainnet after the CashTokens upgrade on May 15th. <br>
+The webwallet will add support for mainnet after the CashTokens upgrade on May 15th. <br>
 The project has [proven helpful](https://gist.github.com/mainnet-pat/95df7e844987af8ca4bebbff90f1f625) to iron out issues, bugs and missing features in the mainnet-js library.
 
 ### Details
 
 The Webwallet creates a single address chipnet wallet which is persisted in between sessions in indexedDb. <br>
-The Webwallet uses m/44'/0'/0'/0/0 as derivation path for seedphrases, this is the mainnet-js default. <br>
+The Webwallet uses the standard derivation path (m/44'/145'/0'/0/0) to create new wallet but also supports importing 
+from m/44'/0'/0'/0/0. <br>
 You can back-up the wallet by getting the seed phrase from the settings view. <br>
 The webwallet uses [example_bcmr](https://github.com/mr-zwets/example_bcmr) as a hardcoded metadata registry for tokenmetadata. <br>
 After making a transaction a link to a chipnet blockexplorer is logged in the console (press F12 to access). <br>
