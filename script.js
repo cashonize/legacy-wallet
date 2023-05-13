@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 window.createNewWallet = async function createNewWallet() {
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
+  Config.DefaultParentDerivationPath = "m/44'/145'/0'";
   await TestNetWallet.named(nameWallet);
   loadWalletInfo()
 }
