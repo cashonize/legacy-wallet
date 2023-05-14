@@ -89,6 +89,9 @@ main{
   overflow-wrap: anywhere;
   color: var(--color-grey);
 }
+#showsUsdBalance{
+  font-size: 1.2em
+}
 .placeholderQr {
   margin: 5px auto 0 auto;
   display: block;
@@ -182,7 +185,7 @@ main{
 #noTokensFound, #noVerifiedTokens, #loadingTokenData {
   text-align: center;
 }
-#selectUnit, #selectUri {
+#selectUnit, #selectUri, #selectNetwork {
   box-sizing: content-box;
   width:80px;
   display: inline-block;

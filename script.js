@@ -1,7 +1,10 @@
 import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './queryChainGraph.js';
 
 const explorerUrl = "https://chipnet.chaingraph.cash";
-const trustedTokenLists = ["https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"]
+const trustedTokenLists = [
+  "https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json",
+  "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
+];
 const nameWallet = "mywallet";
 
 const newWalletView = document.querySelector('#newWalletView');
@@ -41,7 +44,12 @@ function toggleDarkmode() {
 // Logic default unit
 const readUnit = localStorage.getItem("unit");
 if(readUnit) document.querySelector('#selectUnit').value = readUnit;
-let unit = readUnit || 'tBCH';
+let unit = readUnit || 'BCH';
+
+// Logic network
+const readNetwork = localStorage.getItem("network");
+let network = "mainnet"
+let walletClass
 
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
@@ -55,7 +63,17 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     setTimeout(() => alert("Can't create a persistent wallet because indexedDb is unavailable, might be because of private window."), 100);
   }
 
-  const walletExists = await TestNetWallet.namedExists(nameWallet);
+  const mainnetWalletExists = await Wallet.namedExists(nameWallet);
+  const testnetWalletExists = await TestNetWallet.namedExists(nameWallet);
+  const walletExists = mainnetWalletExists || testnetWalletExists;
+  walletClass = Wallet
+
+  if(!readNetwork && walletExists){
+    network = mainnetWalletExists ? "mainnet" : "chipnet";
+    localStorage.setItem("network", network);
+  }
+  if(readNetwork) network = readNetwork;
+  if(network === "chipnet") walletClass = TestNetWallet;
   footer.classList.remove("hide");
   if(!walletExists) newWalletView.classList.remove("hide");
   else{loadWalletInfo()};
@@ -65,7 +83,7 @@ window.createNewWallet = async function createNewWallet() {
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   Config.DefaultParentDerivationPath = "m/44'/145'/0'";
-  await TestNetWallet.named(nameWallet);
+  await walletClass.named(nameWallet);
   loadWalletInfo()
 }
 
@@ -76,7 +94,7 @@ window.importWallet = async function importWallet() {
   const selectedDerivationPath = document.querySelector('#derivationPath').value;
   const derivationPath = selectedDerivationPath == "standard"? "m/44'/145'/0'/0/0" : "m/44'/0'/0'/0/0";
   const walletId = `seed:testnet:${seedphrase}:${derivationPath}`;
-  await TestNetWallet.replaceNamed(nameWallet, walletId);
+  await walletClass.replaceNamed(nameWallet, walletId);
   loadWalletInfo()
 }
 
@@ -89,7 +107,7 @@ async function loadWalletInfo() {
 
   // Initialize wallet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
-  const wallet = await TestNetWallet.named(nameWallet);
+  const wallet = await walletClass.named(nameWallet);
   seedphrase.textContent = wallet.mnemonic;
   document.querySelector('#walletDerivationPath').textContent = wallet.derivationPath;
   console.log(wallet);
@@ -103,27 +121,33 @@ async function loadWalletInfo() {
   // Display USD & BC balance and watch for changes
   let balance = await wallet.getBalance();
   let maxAmountToSend = await wallet.getMaxAmountToSend();
-  if(unit == "tBCH"){
-    const tbch = balance.sat / 100_000_000;
-    document.querySelector('#balance').innerText = tbch;
-    document.querySelector('#balanceUnit').innerText = ' tBCH';
-    document.querySelector('#sendUnit').innerText = ' tBCH';
-  } else if(unit == "satoshis"){
+  if(unit == "satoshis"){
     document.querySelector('#balance').innerText = balance.sat;
-    document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+    const bchUnit = network === "mainnet" ? " satoshis" : " testnet satoshis"; 
+    document.querySelector('#balanceUnit').innerText = bchUnit;
     document.querySelector('#sendUnit').innerText = ' sats';
+  } else {
+    const bch = balance.sat / 100_000_000;
+    document.querySelector('#balance').innerText = bch;
+    const bchUnit = network === "mainnet" ? " BCH" : " tBCH"; 
+    document.querySelector('#balanceUnit').innerText = bchUnit;
+    document.querySelector('#sendUnit').innerText = bchUnit;
   }
   document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
+  const showUsdString = network === "chipnet"? "none" : "block";
+  document.querySelector('#showsUsdBalance').style = `display: ${showUsdString}`;
   wallet.watchBalance(async (newBalance) => {
     balance = newBalance;
     maxAmountToSend = await wallet.getMaxAmountToSend();
-    if(unit == "tBCH"){
-      const tbch = balance.sat / 100_000_000
-      document.querySelector('#balance').innerText = tbch;
-      document.querySelector('#balanceUnit').innerText = ' tBCH';
-    } else if(unit == "satoshis"){
+    if(unit == "satoshis"){
       document.querySelector('#balance').innerText = balance.sat;
-      document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+      const satsUnit = network === "mainnet" ? " satoshis" : " testnet satoshis"; 
+      document.querySelector('#balanceUnit').innerText = satsUnit;
+    } else{
+      const bch = balance.sat / 100_000_000
+      document.querySelector('#balance').innerText = bch;
+      const bchUnit = network === "mainnet" ? " BCH" : " tBCH"; 
+      document.querySelector('#balanceUnit').innerText = bchUnit;
     }
     document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
   });
@@ -171,10 +195,10 @@ async function loadWalletInfo() {
     const divNoTokens = document.querySelector('#noTokensFound');
     document.querySelector('#loadingTokenData').classList.add("hide");
     const divVerifiedOnly = document.querySelector('#verifiedOnly');
+    createListWithTemplate(arrayTokens);
     if (arrayTokens.length) {
       divNoTokens.classList.add("hide");
       divVerifiedOnly.classList.remove("hide");
-      createListWithTemplate(arrayTokens);
       if(!importedRegistries) importRegistries(arrayTokens);
       importedRegistries = true;
     } else {
@@ -187,7 +211,7 @@ async function loadWalletInfo() {
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
-    if(unit == "tBCH"){
+    if(unit == "BCH"){
       event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.bch;
     } else if(unit == "satoshis"){
       event.currentTarget.parentElement.querySelector('#sendAmount').value = maxAmountToSend.sat;
@@ -200,7 +224,7 @@ async function loadWalletInfo() {
       if(!validInput && unit=="satoshis") throw(`Amount satoshis to send must be a valid integer`);
       if(amount < 546 && unit=="satoshis") throw(`Must send atleast 546 satoshis`);
       const addr = document.querySelector('#sendAddr').value;
-      const unitToSend = (unit == "tBCH")? "bch" : "sat";
+      const unitToSend = (unit == "BCH")? "bch" : "sat";
       const { txId } = await wallet.send([{ cashaddr: addr, value: amount, unit: unitToSend }]);
       alert(`Sent ${amount} sats to ${addr}`);
       console.log(`Sent ${amount} sats to ${addr} \n${explorerUrl}/tx/${txId}`);
@@ -762,22 +786,32 @@ window.selectUri = function selectUri(event){
 // Change default unit
 window.selectUnit = function selectUnit(event){
   const oldUnit = unit;
-  if(oldUnit == "tBCH"){
-    const tbch = document.querySelector('#balance').innerText;
-    const balanceSatoshis = tbch * 100_000_000;
+  if(oldUnit == "BCH"){
+    const bch = document.querySelector('#balance').innerText;
+    const balanceSatoshis = bch * 100_000_000;
+    const satsUnit = network === "mainnet" ? " satoshis" : " testnet satoshis"; 
     document.querySelector('#balance').innerText = balanceSatoshis;
-    document.querySelector('#balanceUnit').innerText = ' testnet satoshis';
+    document.querySelector('#balanceUnit').innerText = satsUnit;
     document.querySelector('#sendUnit').innerText = ' sats';
   } else if(oldUnit == "satoshis"){
   const balanceSatoshis = document.querySelector('#balance').innerText;
-    const tbch = balanceSatoshis / 100_000_000;
-    document.querySelector('#balance').innerText = tbch;
-    document.querySelector('#balanceUnit').innerText = ' tBCH';
-    document.querySelector('#sendUnit').innerText = ' tBCH';
+    const bch = balanceSatoshis / 100_000_000;
+    document.querySelector('#balance').innerText = bch;
+    const bchUnit = network === "mainnet" ? " BCH" : " tBCH"; 
+    document.querySelector('#balanceUnit').innerText = bchUnit;
+    document.querySelector('#sendUnit').innerText = bchUnit;
   }
   localStorage.setItem("unit", `${event.target.value}`);
   unit = event.target.value;
   document.querySelector('#sendAmount').value = "";
+}
+
+// Change network
+window.changeNetwork = function changeNetwork(event){
+  network = event.target.value;
+  walletClass = network === "chipnet" ? TestNetWallet : Wallet;
+  localStorage.setItem("network", network);
+  loadWalletInfo();
 }
 
 window.toggleSeedphrase = (event) => {

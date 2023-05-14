@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="switchery/switchery.css" />
   <script src="switchery/switchery.js"></script>
-  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.15.js"></script>
+  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.16.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
   <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
@@ -64,8 +64,8 @@
 
       <div id="walletView" class="hide">
 
-        <fieldset style="margin-top: 20px;">
-          <div style="margin-top: 15px; font-size: 1.2em;">
+        <fieldset style="margin-top: 20px; padding-top: 2rem;">
+          <div id="showsUsdBalance">
             <span>USD balance: </span>
             <span id="balanceUsd" class="text-primary"></span>
           </div>
@@ -116,13 +116,13 @@
           <div class="is-center"><div id="switchAddress" class="icon" onclick="switchAddressType()">⇄</div></div>
         </fieldset>
         <fieldset style="margin-top: 15px">
-          <legend>Send tBCH to</legend>
+          <legend>Send BCH to</legend>
           <p class="inputGroup">
             <span class="addressInput"><input id="sendAddr" placeholder="address"></span>
             <span class="sendAmountGroup">
               <span style="width: 100%;" class="input-icon input-icon-right">
                 <input id="sendAmount" type="text"placeholder="amount">
-                <i id="sendUnit" style="color: black;">tBCH</i>
+                <i id="sendUnit" style="color: black;">BCH</i>
               </span>
               <button onclick="maxBch(event)" style="color: black;">max</button>
             </span>
@@ -306,13 +306,20 @@
           <div style="margin-top:15px">
             <label for="selectUnit">Select default unit:</label>
             <select name="selectUnit" id="selectUnit" onchange="selectUnit(event)">
-              <option value="tBCH">tBCH</option>
+              <option value="BCH">BCH</option>
               <option value="satoshis">satoshis</option>
+            </select>
+          </div>
+          <div style="margin-top:15px">
+            <label for="selectNetwork">Change network:</label>
+            <select name="selectNetwork" id="selectNetwork" onchange="changeNetwork(event)">
+              <option value="mainnet">mainnet</option>
+              <option value="chipnet">chipnet</option>
             </select>
           </div>
           <div style="margin-top:15px">Make backup of seed phrase (mnemonic)</div>
           <input class="button primary" type="button" style="padding: 1rem 1.5rem; display: block;" value="Show seed phrase" onclick="toggleSeedphrase(event)">
-          <div id="seedphrase" class="hide"></div>
+          <div id="seedphrase" class="hide"></div><br>
           <span style="margin-top:15px">Derivation path of this wallet is</span> <span id="walletDerivationPath"></span>
         </fieldset>
       </div>
