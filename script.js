@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     localStorage.setItem("network", network);
   }
   if(readNetwork) network = readNetwork;
+  document.querySelector('#selectNetwork').value = network;
   if(network === "chipnet") walletClass = TestNetWallet;
   footer.classList.remove("hide");
   if(!walletExists) newWalletView.classList.remove("hide");
