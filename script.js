@@ -215,26 +215,23 @@ async function loadWalletInfo() {
     const httpsSelected = document.querySelector('#ipfsInfo').classList.contains("hide");
     const url = document.querySelector('#bcmrUrl').value;
     const bcmrIpfs = document.querySelector('#bcmrIpfs').value;
+    const inputField = httpsSelected ? url : bcmrIpfs;
+    let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://");
+    if(!validinput){
+      httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should start with ipfs prefix!");
+      return
+    }
     let opreturnData
-    if(httpsSelected && url){
+    if(inputField && validinput){
       try{
-        const reponse = await fetch("https://" + url);
+        const fetchLocation = httpsSelected ? "https://" + url : "https://" + bcmrIpfs.slice(7) + ".ipfs.dweb.link"
+        const reponse = await fetch(fetchLocation);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent));
-        const chunks = ["BCMR", hashContent, url];
+        const chunks = ["BCMR", hashContent, inputField];
         opreturnData = OpReturnData.fromArray(chunks);
       } catch (error) {
-        alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
-        console.log(error);
-        return
-      }
-    }
-    if(!httpsSelected && bcmrIpfs){
-      try{
-        const chunks = ["BCMR", bcmrIpfs];
-        opreturnData = OpReturnData.fromArray(chunks);
-      } catch (error) {
-        alert("Cant' read json data from the provided url. \nDouble check that the url links to a json object.")
+        alert("Cant' read json data from the provided location. \nDouble check that the provided link contains to a json object.")
         console.log(error);
         return
       }
