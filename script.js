@@ -1,6 +1,7 @@
 import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './queryChainGraph.js';
 
-const explorerUrl = "https://chipnet.chaingraph.cash";
+const explorerUrlMainnet = "https://explorer.bitcoinunlimited.info";
+const explorerUrlChipnet = "https://chipnet.chaingraph.cash";
 const trustedTokenLists = [
   "https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json",
   "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
@@ -50,6 +51,7 @@ let unit = readUnit || 'BCH';
 const readNetwork = localStorage.getItem("network");
 let network = "mainnet"
 let walletClass
+let explorerUrl
 
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
@@ -113,6 +115,7 @@ async function loadWalletInfo() {
   document.querySelector('#walletDerivationPath').textContent = wallet.derivationPath;
   console.log(wallet);
   Config.EnforceCashTokenReceiptAddresses = true;
+  explorerUrl = network === "mainnet" ? explorerUrlMainnet : explorerUrlChipnet;
 
   // Import BCMRs in the trusted tokenlists
   for await(const tokenListUrl of trustedTokenLists){
