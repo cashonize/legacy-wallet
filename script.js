@@ -96,7 +96,7 @@ window.importWallet = async function importWallet() {
   const seedphrase = document.querySelector('#enterSeedphrase').value;
   const selectedDerivationPath = document.querySelector('#derivationPath').value;
   const derivationPath = selectedDerivationPath == "standard"? "m/44'/145'/0'/0/0" : "m/44'/0'/0'/0/0";
-  const walletId = `seed:testnet:${seedphrase}:${derivationPath}`;
+  const walletId = `seed:mainnet:${seedphrase}:${derivationPath}`;
   await walletClass.replaceNamed(nameWallet, walletId);
   loadWalletInfo()
 }
