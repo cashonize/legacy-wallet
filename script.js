@@ -365,11 +365,11 @@ async function loadWalletInfo() {
           followToHead: true,
           network: Network[networkOption]
         })
-        if(authChain[0]){
+        if(authChain.at(-1)){
           try{
-            const reponse = await fetch(authChain[0].uri);
+            const reponse = await fetch(authChain.at(-1).uri);
             const json = await reponse.json();
-            await BCMR.addMetadataRegistryFromUri(authChain[0].uri);
+            await BCMR.addMetadataRegistryFromUri(authChain.at(-1).uri);
             console.log("Importing an on-chain resolved BCMR!");
             reRenderToken(token, index);
           }catch(e){ console.log(e) }
