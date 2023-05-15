@@ -359,10 +359,11 @@ async function loadWalletInfo() {
   async function importRegistries(tokens) {
     tokens.forEach(async (token, index) => {
       try{
+        const networkOption = network === "mainnet" ? "MAINNET" : "TESTNET";
         const authChain = await BCMR.buildAuthChain({
           transactionHash: token.tokenId,
           followToHead: true,
-          network: Network.TESTNET
+          network: Network[networkOption]
         })
         if(authChain[0]){
           try{
