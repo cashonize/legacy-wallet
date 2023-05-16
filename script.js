@@ -367,9 +367,7 @@ async function loadWalletInfo() {
         })
         if(authChain.at(-1)){
           try{
-            const reponse = await fetch(authChain.at(-1).uri);
-            const json = await reponse.json();
-            await BCMR.addMetadataRegistryFromUri(authChain.at(-1).uri);
+            await BCMR.addMetadataRegistryFromUri(authChain.at(-1).httpsUrl);
             console.log("Importing an on-chain resolved BCMR!");
             reRenderToken(token, index);
           }catch(e){ console.log(e) }
