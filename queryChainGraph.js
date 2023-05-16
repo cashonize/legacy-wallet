@@ -25,9 +25,6 @@ export async function queryTotalSupplyFT(tokenId){
     const queryReqTotalSupply = `query {
         transaction(
           where: {
-            block_inclusions: {
-              block: { accepted_by: { node: { name: { _eq: "bchn-chipnet" } } } }
-            }
             inputs: {
               outpoint_transaction_hash: { _eq: "\\\\x${tokenId}" }
               outpoint_index: { _eq: 0 }
