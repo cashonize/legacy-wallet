@@ -52,6 +52,8 @@ const readNetwork = localStorage.getItem("network");
 let network = "mainnet"
 let walletClass
 let explorerUrl
+let watchAddressCancel
+let watchBalanceCancel
 
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
@@ -140,7 +142,7 @@ async function loadWalletInfo() {
   document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
   const showUsdString = network === "chipnet"? "none" : "block";
   document.querySelector('#showsUsdBalance').style = `display: ${showUsdString}`;
-  wallet.watchBalance(async (newBalance) => {
+  watchBalanceCancel = wallet.watchBalance(async (newBalance) => {
     balance = newBalance;
     maxAmountToSend = await wallet.getMaxAmountToSend();
     if(unit == "satoshis"){
@@ -211,7 +213,7 @@ async function loadWalletInfo() {
     }
   }
 
-  wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
+  watchAddressCancel = wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
@@ -657,8 +659,8 @@ async function loadWalletInfo() {
   }
 
   async function sendNft(address, tokenId, tokenCapability, tokenCommitment) {
-    try {
-      const { txId } = await wallet.send([
+    try {  
+    const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
           tokenId: tokenId,
@@ -814,6 +816,8 @@ window.changeNetwork = function changeNetwork(event){
   network = event.target.value;
   walletClass = network === "chipnet" ? TestNetWallet : Wallet;
   localStorage.setItem("network", network);
+  watchAddressCancel()
+  watchBalanceCancel()
   loadWalletInfo();
 }
 
