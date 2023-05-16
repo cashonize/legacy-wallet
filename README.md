@@ -1,9 +1,9 @@
 # My CashTokens Webwallet
 
 My CashTokens WebWallet for Bitcoin Cash - [cashtokens-wallet.app](https://cashtokens-wallet.app)<br>
-:exclamation: There are scammers impersonating this wallet so carefully check the domain!
+:exclamation: There are scammers impersonating this wallet so carefully check the domain! There is no "official" webwallet!
 
-This is the code repository for [My CashTokens Webwallet](https://my-cashtokens-webwallet.netlify.app/), a webwallet with CashTokens support.
+This is the code repository for [cashtokens-wallet.app](https://cashtokens-wallet.app), a webwallet with CashTokens support.
 The wallet is built with the [mainnet-js](https://mainnet.cash/) library.
 The project was started in early January as a minimum viable product but has grown into a full-fledged webwallet.
 The webwallet can now supports both BCH mainnet and chipnet where all the testing for the CashTokens upgrade took place.
