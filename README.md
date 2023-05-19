@@ -44,7 +44,7 @@ Since the way to import it had been changes with version 1.0.0 as can be read [o
 [Chota](https://jenil.github.io/chota/) as a styling library and [Switchery](https://github.com/abpetkov/switchery) for toggle switches.
 For icons the webwallet uses [icongr.am](https://icongr.am).
 [blockies](https://github.com/download13/blockies) is used to generate blocky identicons for tokens.
-The [chaingraph demo instance](https://chipnet.chaingraph.cash) is used to query on-chain tokeen info about gensis supply and minting UTXOs.
+The publicly available [chaingraph instance by Pat](https://chaingraph.pat.mn/) is used to query on-chain token info about gensis supply and minting UTXOs.
 Finally, [bitjson/qr-code](https://github.com/bitjson/qr-code) is used to generate the qr-codes.
 
 Netlify automatically publishes the latest version of this repo: [My CashTokens Webwallet](https://github.com/mr-zwets/my-cashtokens-webwallet).
