@@ -1,4 +1,4 @@
-const chaingraphUrl = "https://demo.chaingraph.cash/v1/graphql";
+const chaingraphUrl = "https://gql.chaingraph.pat.mn/v1/graphql";
 
 async function queryChainGraph(queryReq){
     const jsonObj = {
