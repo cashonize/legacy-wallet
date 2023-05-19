@@ -388,7 +388,7 @@ async function loadWalletInfo() {
       const symbol = tokenInfo.token.symbol || "";
       tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
       if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
-      if(tokenInfo.uris.web) tokenCard.querySelector("#tokenWebLink").textContent = `Token web link: ${tokenInfo.uris.web}`;
+      if(tokenInfo.uris?.web) tokenCard.querySelector("#tokenWebLink").textContent = `Token web link: ${tokenInfo.uris.web}`;
       if(token.amount){
         tokenCard.querySelector("#sendUnit").textContent = symbol;
         const decimals = tokenInfo.token.decimals || 0;
@@ -463,7 +463,7 @@ async function loadWalletInfo() {
       if(tokenInfo){
         tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
-        if(tokenInfo.uris.web) tokenCard.querySelector("#tokenWebLink").textContent = `Token web link: ${tokenInfo.uris.web}`;
+        if(tokenInfo.uris?.web) tokenCard.querySelector("#tokenWebLink").textContent = `Token web link: ${tokenInfo.uris.web}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
         tokenCard.querySelector("#sendUnit").textContent = symbol;
         const BCMRs = BCMR.getRegistries();
