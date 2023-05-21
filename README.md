@@ -1,23 +1,23 @@
-# My CashTokens Webwallet
+# Cashonize
 
-My CashTokens WebWallet for Bitcoin Cash - [cashtokens-wallet.app](https://cashtokens-wallet.app)<br>
-:exclamation: There are scammers impersonating this wallet so carefully check the domain! There is no "official" webwallet!
+Cashonize is a Bitcoin Cash WebWallet with CashTokens support  - [cashonize.com](https://cashonize.com)<br>
+:exclamation: There are scammers impersonating this wallet so carefully check the url! There is no "official" BCH webwallet!
 
-This is the code repository for [cashtokens-wallet.app](https://cashtokens-wallet.app), a webwallet with CashTokens support.
+This is the code repository for [cashonize.com](cashonize.com), a webwallet with CashTokens support.
 The wallet is built with the [mainnet-js](https://mainnet.cash/) library.
 The project was started in early January as a minimum viable product but has grown into a full-fledged webwallet.
-The webwallet can now supports both BCH mainnet and chipnet where all the testing for the CashTokens upgrade took place.
-The project has [proven helpful](https://gist.github.com/mainnet-pat/95df7e844987af8ca4bebbff90f1f625) to iron out issues, bugs and missing features in the mainnet-js library.
+Cashonize supports both BCH mainnet and chipnet where all the testing for the CashTokens upgrade took place.
+The Cashonize wallet has [proven helpful](https://gist.github.com/mainnet-pat/95df7e844987af8ca4bebbff90f1f625) to iron out issues, bugs and missing features in the mainnet-js library.
 
 #### Details
 
 The Webwallet creates a single address wallet which is persisted in between sessions in indexedDb.
-The Webwallet uses the standard derivation path (m/44'/145'/0'/0/0) to create new wallet but also supports importing 
+Cashonize uses the standard derivation path (m/44'/145'/0'/0/0) to create a new wallet but also supports importing 
 from m/44'/0'/0'/0/0.
 You can back-up the wallet by getting the seed phrase from the settings view.
 The webwallet uses [OpenTokenRegistry](https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json) & [example_bcmr](https://github.com/mr-zwets/example_bcmr) as hardcoded metadata registries for tokenmetadata.
 After making a transaction a link to a blockexplorer is logged in the console (press F12 to access).
-The wallet was first hosted on a netlify subdomain (https://my-cashtokens-webwallet.netlify.app/) before the current domain (cashtokens-wallet.app) was acquired, the old url still works.
+The wallet was first hosted on a netlify subdomain (my-cashtokens-webwallet.netlify.app) & a temporary domain (cashtokens-wallet.app) before the current brand (cashonize.com) was worked out, the old urls still works.
 
 
 #### Disclaimer
@@ -29,7 +29,7 @@ Lastly, always back up your seedphrase!
 
 #### Faucet
 
-To start experimenting with the webwallet and create your own CashTokens without any Bitcoin Cash, You can connect the wallet to chipnet & get a tBCH balance from the [chipnet faucet](https://tbch.googol.cash/)!
+To start experimenting with Cashonize and to create your own CashTokens without any Bitcoin Cash, You can connect the webwallet to chipnet & get a tBCH balance from the [chipnet faucet](https://tbch.googol.cash/)!
 
 #### Planned features
 
@@ -47,7 +47,7 @@ For icons the webwallet uses [icongr.am](https://icongr.am).
 The publicly available [chaingraph instance by Pat](https://chaingraph.pat.mn/) is used to query on-chain token info about gensis supply and minting UTXOs.
 Finally, [bitjson/qr-code](https://github.com/bitjson/qr-code) is used to generate the qr-codes.
 
-Netlify automatically publishes the latest version of this repo: [My CashTokens Webwallet](https://github.com/mr-zwets/my-cashtokens-webwallet).
+Netlify automatically publishes the latest version of this repo: [cashonize/wallet](https://github.com/cashonize/wallet).
 
 #### Special thanks to
 bitcoincashautist, pat from mainnet-js, damascene & bitjson
