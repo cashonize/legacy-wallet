@@ -2,6 +2,7 @@ import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './query
 
 const explorerUrlMainnet = "https://explorer.bitcoinunlimited.info";
 const explorerUrlChipnet = "https://chipnet.chaingraph.cash";
+const chaingraphUrl = "https://gql.chaingraph.pat.mn/v1/graphql";
 const trustedTokenLists = [
   "https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json",
   "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
@@ -362,12 +363,11 @@ async function loadWalletInfo() {
   async function importRegistries(tokens) {
     tokens.forEach(async (token, index) => {
       try{
-        const networkOption = network === "mainnet" ? "MAINNET" : "TESTNET";
-        const authChain = await BCMR.buildAuthChain({
+        const authChain = await BCMR.fetchAuthChainFromChaingraph({
+          chaingraphUrl,
           transactionHash: token.tokenId,
-          followToHead: true,
-          network: Network[networkOption]
-        })
+          network
+        });
         if(authChain.at(-1)){
           try{
             await BCMR.addMetadataRegistryFromUri(authChain.at(-1).httpsUrl);
@@ -484,15 +484,15 @@ async function loadWalletInfo() {
         const alreadyLoaded = onchainTokenInfo.textContent;
         if(token.amount && !alreadyLoaded){
           // Fetch total token supply
-          const responseJson = await queryTotalSupplyFT(token.tokenId);
+          const responseJson = await queryTotalSupplyFT(token.tokenId, chaingraphUrl);
           const totalAmount = responseJson.data.transaction[0].outputs.reduce((total, output) => total +  parseInt(output.fungible_token_amount),0);
           onchainTokenInfo.textContent = `Genesis supply: ${totalAmount} tokens`;
           console.log(`Fetched genesis supply from chaingraph demo instance`);
         } else if(!alreadyLoaded){
           // Has active minting NFT
-          const responseJson = await queryActiveMinting(token.tokenId);
+          const responseJson = await queryActiveMinting(token.tokenId, chaingraphUrl);
           let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
-          const responseJson2 = await querySupplyNFTs(token.tokenId);
+          const responseJson2 = await querySupplyNFTs(token.tokenId, chaingraphUrl);
           textOnchainTokenInfo += ` \r\n Total supply: ${responseJson2.data.output.length} immutable NFTs`;
           onchainTokenInfo.textContent = textOnchainTokenInfo;
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);

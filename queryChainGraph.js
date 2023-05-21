@@ -1,6 +1,4 @@
-const chaingraphUrl = "https://gql.chaingraph.pat.mn/v1/graphql";
-
-async function queryChainGraph(queryReq){
+async function queryChainGraph(queryReq, chaingraphUrl){
     const jsonObj = {
         "operationName": null,
         "variables": {},
@@ -21,7 +19,7 @@ async function queryChainGraph(queryReq){
     return await response.json();
 }
 
-export async function queryTotalSupplyFT(tokenId){
+export async function queryTotalSupplyFT(tokenId, chaingraphUrl){
     const queryReqTotalSupply = `query {
         transaction(
           where: {
@@ -36,10 +34,10 @@ export async function queryTotalSupplyFT(tokenId){
           }
         }
       }`;
-    return await queryChainGraph(queryReqTotalSupply);
+    return await queryChainGraph(queryReqTotalSupply, chaingraphUrl);
 }
 
-export async function queryActiveMinting(tokenId){
+export async function queryActiveMinting(tokenId, chaingraphUrl){
     const queryReqActiveMinting = `query {
         output(
           where: {
@@ -51,10 +49,10 @@ export async function queryActiveMinting(tokenId){
           locking_bytecode
         }
       }`;
-    return await queryChainGraph(queryReqActiveMinting);
+    return await queryChainGraph(queryReqActiveMinting, chaingraphUrl);
 }
 
-export async function querySupplyNFTs(tokenId){
+export async function querySupplyNFTs(tokenId, chaingraphUrl){
     const queryReqTotalSupply = `query {
         output(
           where: {
@@ -70,5 +68,5 @@ export async function querySupplyNFTs(tokenId){
           locking_bytecode
         }
     }`;
-    return await queryChainGraph(queryReqTotalSupply);
+    return await queryChainGraph(queryReqTotalSupply, chaingraphUrl);
 }
