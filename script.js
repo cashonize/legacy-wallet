@@ -1,4 +1,4 @@
-import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs } from './queryChainGraph.js';
+import { queryTotalSupplyFT, queryActiveMinting, querySupplyNFTs, queryAuthHead } from './queryChainGraph.js';
 
 const explorerUrlMainnet = "https://explorer.bitcoinunlimited.info";
 const explorerUrlChipnet = "https://chipnet.chaingraph.cash";
@@ -188,13 +188,13 @@ async function loadWalletInfo() {
       const utxos = await wallet.getTokenUtxos(tokenId);
       if(utxos.length == 1){
         const tokenData = utxos[0].token;
-        arrayTokens.push({ tokenId, tokenData });
+        arrayTokens.push({ tokenId, tokenData, utxotxid:utxos[0].txid, vout:utxos[0].vout });
         continue;
       } else {
         const nfts = [];
         for (const utxo of utxos) {
           const tokenData = utxo.token;
-          if(tokenData.capability) nfts.push({ tokenId, tokenData });
+          if(tokenData.capability) nfts.push({ tokenId, tokenData, utxotxid:utxo.txid, vout:utxo.vout });
         }
         arrayTokens.push({ tokenId, nfts });
       }
@@ -552,7 +552,7 @@ async function loadWalletInfo() {
       } 
       if(token.tokenData) renderNft(token, tokenCard)
       // Reusable function so it can also render child nfts
-      function renderNft(nft, element){
+      async function renderNft(nft, element){
         // Stuff specific for NFTs
         const tokenCapability = nft.tokenData.capability;
         const nftTypes = {
@@ -575,13 +575,23 @@ async function loadWalletInfo() {
         }
         const nftMint = element.querySelector('#nftMint');
         const nftBurn = element.querySelector('#nftBurn');
+        const authTransfer = element.querySelector('#authTransfer');
         if (tokenCapability == "minting"){ 
           const mintButton = element.querySelector('#mintButton');
           const burnButton = element.querySelector('#burnButton');
+          const authButton = element.querySelector('#authButton');
           mintButton.classList.remove("hide");
           mintButton.onclick = () => nftMint.classList.toggle("hide");
           burnButton.classList.remove("hide");
           burnButton.onclick = () => nftBurn.classList.toggle("hide");
+          const responseJson = await queryAuthHead(nft.tokenId, chaingraphUrl);
+          const authHeadObj = responseJson.data.transaction[0];
+          const authHead = authHeadObj.authchains[0].authhead;
+          const authHeadTxId = authHead.identity_output[0].transaction_hash.slice(2);
+          if(authHeadTxId === nft.utxotxid && nft.vout === 0){
+            authButton.classList.remove("hide");
+            authButton.onclick = () => authTransfer.classList.toggle("hide");
+          }
         }
         const mintNftButton = nftMint.querySelector("#mintNFT");
         mintNftButton.onclick = () => {
@@ -591,6 +601,11 @@ async function loadWalletInfo() {
         const burnNftButton = nftBurn.querySelector("#burnNFT");
         burnNftButton.onclick = () => {
           burnNft(nft.tokenId, tokenCommitment);
+        }
+        const transferAuthButton = authTransfer.querySelector("#transferAuth");
+        transferAuthButton.onclick = () => {
+          const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
+          transferAuth(nft.tokenId, tokenCommitment, authDestinationAddress);
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
@@ -722,6 +737,30 @@ async function loadWalletInfo() {
       alert(`Burned minting NFT of category ${displayId}`);
       console.log(`Burned minting NFT of category ${displayId} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { alert(error) }
+  }
+
+  async function transferAuth(tokenId, tokenCommitment, authDestinationAddress) {
+    try {  
+      const { txId } = await wallet.send([
+        {
+          cashaddr: authDestinationAddress,
+          value: 1000,
+          unit: 'sats',
+        },
+        new TokenSendRequest({
+          cashaddr: tokenAddr,
+          tokenId: tokenId,
+          commitment: tokenCommitment,
+          capability: NFTCapability.minting,
+        }),
+      ]);
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      alert(`Transferred the Auth of token ${displayId} to ${authDestinationAddress}`);
+      console.log(`Transferred the Auth of token ${displayId} to ${authDestinationAddress} \n${explorerUrl}/tx/${txId}`);
+    } catch (error) { 
+      alert(error);
+      console.log(error);
+    }
   }
 }
 

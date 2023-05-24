@@ -188,6 +188,11 @@
                   <span class="hidemobile">burn NFT</span>
                   <span class="showmobile">burn</span>
                 </span>
+                <span class="tokenButton hide" style="white-space: nowrap;" id="authButton">
+                  <img id="authIcon" class="icon" src="/images/shield.svg">
+                  <span class="hidemobile">auth transfer</span>
+                  <span class="showmobile">auth</span>
+                </span>
                 <div id="tokenInfoDisplay" class="hide" style="margin-top: 10px;">
                   <div id="tokenBegin"></div>
                   <div id="tokenDescription"></div>
@@ -234,6 +239,15 @@
                   Burn this NFT so no new NFTs of this category can be minted
                   <br>
                   <input type="button" id="burnNFT" value="burn NFT" class="button error">
+                </div>
+                <div id="authTransfer" class="hide" style="margin-top: 10px;">
+                  Transfer the authority to change the token's metadata to another wallet <br>
+                  This happens by creating a new Authead for the tokenId's Authchain
+                  <br>
+                  <span class="grouped">
+                    <input id="destinationAddr" placeholder="destinationAddress"> 
+                    <input type="button" id="transferAuth" value="Transfer Auth">
+                  </span>
                 </div>
               </div>
             </fieldset>        
