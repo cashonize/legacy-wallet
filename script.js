@@ -413,10 +413,10 @@ async function loadWalletInfo() {
         tokenIcon.removeChild(tokenIcon.lastChild);
         tokenIcon.appendChild(icon);
       }
-      if(tokenInfo.uris && tokenInfo.uris.icon) newIcon(tokenCard, tokenInfo.uris.icon);
+      if(tokenInfo?.uris?.icon) newIcon(tokenCard, tokenInfo.uris.icon);
       if(token.tokenData){
-        const NFTmetadata = tokenInfo.token.nfts.parse.types[(token.tokenData.commitment)];
-        if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+        const NFTmetadata = tokenInfo.token.nfts?.parse.types[(token.tokenData.commitment)];
+        if(NFTmetadata?.uris?.icon){
           newIcon(tokenCard, NFTmetadata.uris.icon)
         }
       }
@@ -425,11 +425,11 @@ async function loadWalletInfo() {
         for(let i=1; i<children.length; i++){
           const nftCard = children[i];
           const nft = token.nfts[i-1];
-          const NFTmetadata = tokenInfo.token.nfts.parse.types[(nft.tokenData.commitment)];
+          const NFTmetadata = tokenInfo.token.nfts?.parse.types[(nft.tokenData.commitment)];
           if(NFTmetadata) nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
-          if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+          if(NFTmetadata?.uris?.icon){
             newIcon(nftCard, NFTmetadata.uris.icon);
-          } else if(tokenInfo.uris && tokenInfo.uris.icon){
+          } else if(tokenInfo?.uris?.icon){
             newIcon(nftCard, tokenInfo.uris.icon);
           }
         }
@@ -507,18 +507,18 @@ async function loadWalletInfo() {
           scale: 4,
           spotcolor: '#000'
         });
-        if(tokenInfo && tokenInfo.uris && tokenInfo.uris.icon){
+        if(tokenInfo?.uris?.icon){
           icon = document.createElement("img");
           let iconSrc = tokenInfo.uris.icon;
           if(token.tokenData){
-            const NFTmetadata = tokenInfo.token.nfts.parse.types[(token.tokenData.commitment)];
-            if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+            const NFTmetadata = tokenInfo.token.nfts?.parse.types[(token.tokenData.commitment)];
+            if(NFTmetadata?.uris?.icon){
               iconSrc = NFTmetadata.uris.icon;
             }
           }
           if(token.nfts){
-            const NFTmetadata = tokenInfo.token.nfts.parse.types[nftCommitment];
-            if(NFTmetadata && NFTmetadata.uris && NFTmetadata.uris.icon){
+            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
+            if(NFTmetadata?.uris?.icon){
               iconSrc = NFTmetadata.uris.icon;
             }
           }
