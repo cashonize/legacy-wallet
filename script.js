@@ -160,6 +160,19 @@ async function loadWalletInfo() {
     document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
   });
 
+  document.querySelector('#sendAddr').addEventListener("input", () => {
+    const inputValue = document.querySelector('#sendAddr').value;
+    if(inputValue.includes("?amount=")){
+      const bip21Addr = inputValue.split("?");
+      const baseAddress = bip21Addr[0];
+      document.querySelector('#sendAddr').value = baseAddress;
+      const bip21params = bip21Addr[1];
+      let amount = bip21params.split("amount=")[1];
+      if(unit == "satoshis") amount = parseFloat(amount) * 100_000_000;
+      document.querySelector('#sendAmount').value = amount;
+    }
+  })
+
   // Initilize address and display QR code
   const regularAddr = await wallet.getDepositAddress();
   const tokenAddr = await wallet.getTokenDepositAddress();
