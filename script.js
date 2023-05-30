@@ -168,7 +168,7 @@ async function loadWalletInfo() {
       document.querySelector('#sendAddr').value = baseAddress;
       const bip21params = bip21Addr[1];
       let amount = bip21params.split("amount=")[1];
-      if(unit == "satoshis") amount = parseFloat(amount) * 100_000_000;
+      if(unit == "satoshis") amount = Math.round(parseFloat(amount) * 100_000_000);
       document.querySelector('#sendAmount').value = amount;
     }
   })
