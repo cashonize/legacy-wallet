@@ -6,11 +6,19 @@ html {
 }
 header {
   margin: 0px;
+  margin-top: 25px;
   display: flex;
   align-items: center;
   flex-direction: column;
   margin-bottom: 5px;
   text-align: center;
+}
+#banner{
+  background-color: #010623;
+  height: 40px;
+  color: white;
+  text-align: center;
+  padding-top: 5px;
 }
 .tabs a{
   padding: 1rem 1.8rem;
@@ -59,7 +67,6 @@ header {
 }
 body {
   margin: 0px;
-  margin-top: 25px;
   display: block;
   --grid-maxWidth: 75rem;
 }
