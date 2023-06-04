@@ -336,6 +336,8 @@
           <input class="button primary" type="button" style="padding: 1rem 1.5rem; display: block;" value="Show seed phrase" onclick="toggleSeedphrase(event)">
           <div id="seedphrase" class="hide"></div><br>
           <span style="margin-top:15px">Derivation path of this wallet is</span> <span id="walletDerivationPath"></span>
+          <div style="margin-top:15px">Remove wallet data from browser</div>
+          <input type="button" id="burnNFT" value="Delete wallet" class="button error" style="display: block;" onclick="confirmDeleteWallet(event)">
         </fieldset>
       </div>
 

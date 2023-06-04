@@ -885,6 +885,15 @@ window.toggleSeedphrase = (event) => {
   event.srcElement.value = isHidden ? "Show seed phrase" : "Hide seed phrase";
 }
 
+window.confirmDeleteWallet = (event) => {
+  let text = "You are about to delete your Cashonize wallet info from this browser.\nAre you sure you want to delete?";
+  if (confirm(text) == true){
+    indexedDB.deleteDatabase("bitcoincash");
+    indexedDB.deleteDatabase("bchtest");
+    location.reload(); 
+  }
+}
+
 window.switchAddressType = () => {
   const currentQrCode = document.querySelector('qr-code:not(.hide)');
   const otherQrCode = document.querySelector('qr-code.hide');
