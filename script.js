@@ -795,7 +795,8 @@ function toggleVerifiedOnly() {
         const isVerified = tokenCard.children[0].querySelector('.verifiedIcon') && !tokenCard.querySelector('#verified').classList.contains("hide");
         if(isVerified) tokenCard.classList.remove("hide");
       }
-      const shownTokenCards = document.querySelectorAll(".item:not(.hide)");
+      const tokenList = document.querySelector("#Placeholder");
+      const shownTokenCards = tokenList.querySelectorAll(".item:not(.hide)");
       if(!shownTokenCards[0]) document.querySelector('#noVerifiedTokens').classList.remove("hide");
   } else {
     for(const tokenCard of tokenCards){
