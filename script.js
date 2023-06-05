@@ -7,6 +7,7 @@ const trustedTokenLists = [
   "https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json",
   "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
 ];
+const ipfsGateway = "https://ipfs.io/ipfs/";
 const nameWallet = "mywallet";
 const walletDomain = "https://cashonize.com/";
 
@@ -273,7 +274,7 @@ async function loadWalletInfo() {
     let opreturnData
     if(inputField && validinput){
       try{
-        const fetchLocation = httpsSelected ? "https://" + url : "https://" + bcmrIpfs.slice(7) + ".ipfs.dweb.link"
+        const fetchLocation = httpsSelected ? "https://" + url : ipfsGateway + bcmrIpfs.slice(7);
         const reponse = await fetch(fetchLocation);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent));
@@ -387,7 +388,11 @@ async function loadWalletInfo() {
         });
         if(authChain.at(-1)){
           try{
-            await BCMR.addMetadataRegistryFromUri(authChain.at(-1).httpsUrl);
+            const bcmrLocation = authChain.at(-1).uris[0];
+            let httpsUrl = bcmrLocation;
+            if(httpsUrl.startsWith("ipfs://")) httpsUrl = httpsUrl.replace("ipfs://", ipfsGateway);
+            if(!httpsUrl.startsWith("http")) httpsUrl = `https://${bcmrLocation}`;
+            await BCMR.addMetadataRegistryFromUri(httpsUrl);
             console.log("Importing an on-chain resolved BCMR!");
             reRenderToken(token, index);
           }catch(e){ console.log(e) }
@@ -423,7 +428,7 @@ async function loadWalletInfo() {
       }
       function newIcon(element, iconSrc){
         const icon = document.createElement("img");
-        if(iconSrc.startsWith("ipfs://")) iconSrc = "https://dweb.link/ipfs/"+iconSrc.slice(7);
+        if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
         icon.src = iconSrc;
         icon.style = "width:48px; max-width:inherit; border-radius:50%;";
         const tokenIcon = element.querySelector("#tokenIcon");
@@ -509,8 +514,16 @@ async function loadWalletInfo() {
           // Has active minting NFT
           const responseJson = await queryActiveMinting(token.tokenId, chaingraphUrl);
           let textOnchainTokenInfo = (responseJson.data.output.length)? "Has an active minting NFT":"Does not have an active minting NFT";
-          const responseJson2 = await querySupplyNFTs(token.tokenId, chaingraphUrl);
-          textOnchainTokenInfo += ` \r\n Total supply: ${responseJson2.data.output.length} immutable NFTs`;
+          let responseJson2 = await querySupplyNFTs(token.tokenId, chaingraphUrl);
+          let amountNFTs = responseJson2.data.output.length;
+          let indexOffset = 0;
+          // limit of items returned by chaingraphquery is 5000
+          while(responseJson2.data.output.length == 5000){
+            indexOffset += 1;
+            responseJson2 = await querySupplyNFTs(token.tokenId, chaingraphUrl, 5000 *indexOffset);
+            amountNFTs += responseJson2.data.output.length;
+          }
+          textOnchainTokenInfo += ` \r\n Total supply: ${amountNFTs} immutable NFTs`;
           onchainTokenInfo.textContent = textOnchainTokenInfo;
           console.log(`Fetched existance of active minting tokens from chaingraph demo instance`);
         }
@@ -539,7 +552,7 @@ async function loadWalletInfo() {
               iconSrc = NFTmetadata.uris.icon;
             }
           }
-          if(iconSrc.startsWith("ipfs://")) iconSrc = "https://dweb.link/ipfs/"+iconSrc.slice(7);
+          if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
           icon.src = iconSrc;
           icon.style = "width:48px; max-width: inherit;";
         }

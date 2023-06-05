@@ -52,9 +52,10 @@ export async function queryActiveMinting(tokenId, chaingraphUrl){
     return await queryChainGraph(queryReqActiveMinting, chaingraphUrl);
 }
 
-export async function querySupplyNFTs(tokenId, chaingraphUrl){
+export async function querySupplyNFTs(tokenId, chaingraphUrl, offset =0){
     const queryReqTotalSupply = `query {
         output(
+          offset: ${offset}
           where: {
             token_category: {
               _eq: "\\\\x${tokenId}"
