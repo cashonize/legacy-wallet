@@ -15,10 +15,9 @@ header {
 }
 #banner{
   background-color: #010623;
-  height: 40px;
   color: white;
   text-align: center;
-  padding-top: 5px;
+  padding: 7px 0;
 }
 .tabs a{
   padding: 1rem 1.8rem;
