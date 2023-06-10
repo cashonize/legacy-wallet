@@ -449,6 +449,26 @@ async function loadWalletInfo() {
           const nft = token.nfts[i-1];
           const NFTmetadata = tokenInfo.token.nfts?.parse.types[(nft.tokenData.commitment)];
           if(NFTmetadata) nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
+          if(NFTmetadata?.extensions?.attributes){
+            if(NFTmetadata?.description) nftCard.querySelector("#tokenDescription").textContent = `NFT description: ${NFTmetadata.description}`
+            const infoButtonNft = nftCard.querySelector('#infoButton');
+            const nftInfoDisplay = nftCard.querySelector("#tokenInfoDisplay");
+            const displayAttributes = nftCard.querySelector("#nftAttributes");
+            nftCard.querySelector("#showAttributes").classList.remove("hide");
+            nftCard.querySelector("#tokenCommitment").classList.add("hide");
+            infoButtonNft.classList.remove("hide");
+            infoButtonNft.onclick = async () => {
+              nftInfoDisplay.classList.toggle("hide");
+              const attributes = NFTmetadata.extensions.attributes;
+              console.log(NFTmetadata.description)
+              let htmlStringAttributes = "";
+              Object.keys(attributes).forEach(attributeKey => {
+                const nftAttribute = attributes[attributeKey] ? attributes[attributeKey] : "None";
+                htmlStringAttributes += `${attributeKey}: ${nftAttribute}\n`
+              });
+              displayAttributes.textContent = htmlStringAttributes;
+            }
+          }
           if(NFTmetadata?.uris?.icon){
             newIcon(nftCard, NFTmetadata.uris.icon);
           } else if(tokenInfo?.uris?.icon){
