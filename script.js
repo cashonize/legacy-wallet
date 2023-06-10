@@ -471,6 +471,24 @@ async function loadWalletInfo() {
           }
           if(NFTmetadata?.uris?.icon){
             newIcon(nftCard, NFTmetadata.uris.icon);
+            
+            const modal = nftCard.querySelector("#tokenIconModal");
+            // Get the image and insert it inside the modal
+            const img = nftCard.querySelector("#tokenIcon");
+            img.classList.add("nftIcon")
+            const modalImg = nftCard.querySelector("#imgTokenIcon");
+            const captionText = nftCard.querySelector("#caption");
+            img.onclick = function(){
+              modal.style.display = "block";
+              modalImg.src = this.firstChild.src;
+              captionText.textContent = NFTmetadata.name;
+            }
+            // Get the <span> element that closes the modal
+            const span = nftCard.getElementsByClassName("close")[0];
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function() {
+              modal.style.display = "none";
+            }
           } else if(tokenInfo?.uris?.icon){
             newIcon(nftCard, tokenInfo.uris.icon);
           }
