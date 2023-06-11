@@ -206,13 +206,13 @@ async function loadWalletInfo() {
       const utxos = await wallet.getTokenUtxos(tokenId);
       if(utxos.length == 1){
         const tokenData = utxos[0].token;
-        arrayTokens.push({ tokenId, tokenData, utxotxid:utxos[0].txid, vout:utxos[0].vout });
+        arrayTokens.push({ tokenId, tokenData, utxo:utxos[0] });
         continue;
       } else {
         const nfts = [];
         for (const utxo of utxos) {
           const tokenData = utxo.token;
-          if(tokenData.capability) nfts.push({ tokenId, tokenData, utxotxid:utxo.txid, vout:utxo.vout });
+          if(tokenData.capability) nfts.push({ tokenId, tokenData, utxo:utxos[0] });
         }
         arrayTokens.push({ tokenId, nfts });
       }
@@ -226,6 +226,7 @@ async function loadWalletInfo() {
       divNoTokens.classList.add("hide");
       divVerifiedOnly.classList.remove("hide");
       if(!importedRegistries) importRegistries(arrayTokens);
+      checkAuthChains(arrayTokens);
       importedRegistries = true;
     } else {
       divNoTokens.classList.remove("hide");
@@ -496,6 +497,33 @@ async function loadWalletInfo() {
       }
     }
   }
+  
+  async function checkAuthChains(tokens) {
+    tokens.forEach(async (token, index) => {
+      try{
+        const tokenCard = document.querySelector("#Placeholder").children[index];
+        if(!token.amount) return
+        const jsonRespAuthHead = await queryAuthHead(token.tokenId, chaingraphUrl);
+        const authHeadObj = jsonRespAuthHead.data.transaction[0];
+        const authHead = authHeadObj.authchains[0].authhead;
+        const authHeadTxId = authHead.identity_output[0].transaction_hash.slice(2);
+        const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
+        const authButton = tokenCard.querySelector('#authButton');
+        const authTransfer = tokenCard.querySelector('#authTransfer');
+        tokenUtxos.forEach(utxo => {
+          if(utxo.txid == authHeadTxId && utxo.vout == 0){
+            authButton.classList.remove("hide");
+            authButton.onclick = () => authTransfer.classList.toggle("hide");
+            const transferAuthButton = authTransfer.querySelector("#transferAuth");
+            transferAuthButton.onclick = () => {
+              const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
+              transferAuth(utxo,authDestinationAddress);
+            }
+          }
+        });
+      } catch (error){console.log(error)}
+    })
+  }
 
   // Create tokenlist
   function createListWithTemplate(tokens) {
@@ -656,7 +684,7 @@ async function loadWalletInfo() {
           const authHeadObj = responseJson.data.transaction[0];
           const authHead = authHeadObj.authchains[0].authhead;
           const authHeadTxId = authHead.identity_output[0].transaction_hash.slice(2);
-          if(authHeadTxId === nft.utxotxid && nft.vout === 0){
+          if(authHeadTxId === nft.utxo.txid && nft.utxo.vout === 0){
             authButton.classList.remove("hide");
             authButton.onclick = () => authTransfer.classList.toggle("hide");
           }
@@ -673,7 +701,7 @@ async function loadWalletInfo() {
         const transferAuthButton = authTransfer.querySelector("#transferAuth");
         transferAuthButton.onclick = () => {
           const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-          transferAuth(nft.tokenId, tokenCommitment, authDestinationAddress);
+          transferAuth(nft.uxto, authDestinationAddress);
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
@@ -807,23 +835,32 @@ async function loadWalletInfo() {
     } catch (error) { alert(error) }
   }
 
-  async function transferAuth(tokenId, tokenCommitment, authDestinationAddress) {
-    try {  
+  // Check the AuthChains for fungible tokens
+  async function transferAuth(autUtxo, authDestinationAddress) {
+    try {
+      const tokenId = utxo.token.tokenId;
+      const amount = utxo.token.amount;
+      const nftCommitment = utxo.token.commitment;
+      const changeOutput = amount? new TokenSendRequest({
+        cashaddr: tokenAddr,
+        tokenId: tokenId,
+        amount
+      }) : new TokenSendRequest({
+        cashaddr: tokenAddr,
+        tokenId: tokenId,
+        commitment: nftCommitment,
+        capability: NFTCapability.minting
+      });
       const { txId } = await wallet.send([
         {
           cashaddr: authDestinationAddress,
           value: 1000,
           unit: 'sats',
         },
-        new TokenSendRequest({
-          cashaddr: tokenAddr,
-          tokenId: tokenId,
-          commitment: tokenCommitment,
-          capability: NFTCapability.minting,
-        }),
-      ]);
+        changeOutput
+      ],{ ensureUtxos: [autUtxo] });
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
-      alert(`Transferred the Auth of token ${displayId} to ${authDestinationAddress}`);
+      alert(`Transferred the Auth of utxo ${displayId} to ${authDestinationAddress}`);
       console.log(`Transferred the Auth of token ${displayId} to ${authDestinationAddress} \n${explorerUrl}/tx/${txId}`);
     } catch (error) { 
       alert(error);

@@ -252,7 +252,8 @@
                 </div>
                 <div id="authTransfer" class="hide" style="margin-top: 10px;">
                   Transfer the authority to change the token's metadata to another wallet <br>
-                  This happens by creating a new Authead for the tokenId's Authchain
+                  This should be to a wallet with coin-control, where you can label the Auth UTXO<br>
+                  It is recommended to use the Electron Cash pc wallet<br>
                   <br>
                   <span class="grouped">
                     <input id="destinationAddr" placeholder="destinationAddress"> 
@@ -299,7 +300,7 @@
               <option value="HTTPS">HTTPS</option>
               <option value="IPFS">IPFS</option>
             </select><br>
-            <div id="httpsInfo">              
+            <div id="httpsInfo">           
               You can easily create a https url to host your BCMR with Github Gist, similar to 
               <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">the DogeCash example</a>. <br>
               You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>. <br>
@@ -312,7 +313,7 @@
               You can easily upload (pin) your BCMR on IPFS with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or with <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
               Icons and images can be grouped together in a separate folder, like in <a href="https://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy.ipfs.dweb.link/" target="_blank">this example bcmr</a>. <br>
               Enter the location of your bcmr (version 1 CID) in the iput field below. <br>
-              The location of your bcmr together with the hash of its content will be stored on the blockchain.
+              The location of your BCMR together with the hash of its content will be stored on the blockchain.
               <input id="bcmrIpfs" placeholder="ipfs://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
             </div>
           </details>
