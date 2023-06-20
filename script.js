@@ -838,9 +838,9 @@ async function loadWalletInfo() {
   // Check the AuthChains for fungible tokens
   async function transferAuth(autUtxo, authDestinationAddress) {
     try {
-      const tokenId = utxo.token.tokenId;
-      const amount = utxo.token.amount;
-      const nftCommitment = utxo.token.commitment;
+      const tokenId = autUtxo.token.tokenId;
+      const amount = autUtxo.token.amount;
+      const nftCommitment = autUtxo.token.commitment;
       const changeOutput = amount? new TokenSendRequest({
         cashaddr: tokenAddr,
         tokenId: tokenId,
