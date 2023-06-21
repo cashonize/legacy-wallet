@@ -382,6 +382,10 @@ async function loadWalletInfo() {
   async function importRegistries(tokens) {
     tokens.forEach(async (token, index) => {
       try{
+        const tokenCard = document.querySelector("#Placeholder").children[index];
+        const verifiedDiv = tokenCard.querySelector("#verified");
+        const isVerified = !verifiedDiv.classList.contains("hide");
+        if(isVerified) return;
         const authChain = await BCMR.fetchAuthChainFromChaingraph({
           chaingraphUrl,
           transactionHash: token.tokenId,
@@ -419,14 +423,10 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${decimals}`;
       }
-      const BCMRs = BCMR.getRegistries();
-      const hardCodedBCMR = BCMRs[0];
-      const isVerified = hardCodedBCMR.identities[token.tokenId];
+      // Unverified Tokens
       tokenCard.querySelector("#verified").classList.remove("hide");
-      if(!isVerified){
-        tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
-        tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
-      }
+      tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
+      tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
       function newIcon(element, iconSrc){
         const icon = document.createElement("img");
         if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
@@ -555,8 +555,11 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
         tokenCard.querySelector("#sendUnit").textContent = symbol;
         const BCMRs = BCMR.getRegistries();
-        const hardCodedBCMR = BCMRs[0];
-        const isVerified = hardCodedBCMR.identities[token.tokenId];
+        let isVerified = false;
+        for(let i=0; i<trustedTokenLists.length; i++){
+          const includesToken = BCMRs[i].identities[token.tokenId];
+          if(includesToken) isVerified = true;
+        }
         tokenCard.querySelector("#verified").classList.remove("hide");
         if(!isVerified){
           tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
@@ -620,7 +623,7 @@ async function loadWalletInfo() {
           }
           if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
           icon.src = iconSrc;
-          icon.style = "width:48px; max-width: inherit;";
+          icon.style = "width:48px; max-width: inherit; border-radius:50%;";
         }
         const tokenIcon = element.querySelector("#tokenIcon");
         tokenIcon.appendChild(icon);
