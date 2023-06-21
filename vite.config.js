@@ -1,8 +1,12 @@
 /** @type {import('vite').UserConfig} */
 export default {
   build: {
-    // assetsInclude: ['switchery'],
-    
-    // target: 'esnext',
+    rollupOptions: {
+      output: {
+        entryFileNames: `[name].js`,
+        chunkFileNames: `[name].js`,
+        assetFileNames: `images/[name].[ext]`
+      }
+    }
   }
 }
