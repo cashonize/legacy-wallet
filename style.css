@@ -40,6 +40,12 @@ header {
 .copyIcon{
   content:url("images/copyGrey.svg");
 }
+.cogIcon{
+  content:url("images/cogGrey.svg");
+}
+.trashIcon{
+  content:url("images/trash.svg");
+}
 #sendIcon.dark{
   content:url("images/sendGrey.svg");
 }
@@ -136,6 +142,9 @@ main{
 .primaryButton {
   background-color: var(--color-primary); 
   color: white;
+}
+.primaryAccent {
+  accent-color: var(--color-primary);
 }
 #verifiedOnly {
   width: -webkit-fill-available;
@@ -314,4 +323,38 @@ body.dark {
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+#view0:after {
+  content: "BCH";
+}
+
+#view1:after {
+  content: "Tokens"
+}
+
+#view2:after {
+  content: "Create"
+}
+
+#view4:after {
+  content: "WC"
+}
+
+@media only screen and (min-width: 480px) {
+  #view0:after {
+    content: "BchWallet"
+  }
+
+  #view1:after {
+    content: "MyTokens"
+  }
+
+  #view2:after {
+    content: "CreateTokens"
+  }
+
+  #view4:after {
+    content: "WalletConnect"
+  }
 }
