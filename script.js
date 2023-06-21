@@ -502,7 +502,7 @@ async function loadWalletInfo() {
     tokens.forEach(async (token, index) => {
       try{
         const tokenCard = document.querySelector("#Placeholder").children[index];
-        if(!token.amount) return
+        if(token?.tokenData?.commitment == "minting") return
         const jsonRespAuthHead = await queryAuthHead(token.tokenId, chaingraphUrl);
         const authHeadObj = jsonRespAuthHead.data.transaction[0];
         const authHead = authHeadObj.authchains[0].authhead;
@@ -634,10 +634,11 @@ async function loadWalletInfo() {
         const tokenSend = tokenCard.querySelector('#tokenSend');
         tokenCard.getElementById("sendButton").onclick = () => tokenSend.classList.toggle("hide");
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
+        const authButton = tokenCard.querySelector('#authButton');
         sendSomeButton.onclick = () => {
           let tokenAmount = Number(tokenSend.querySelector('#sendTokenAmount').value);
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, tokenAmount, token.tokenId, tokenInfo);
+          sendTokens(inputAddress, tokenAmount, token.tokenId, tokenInfo, authButton);
         }
         function maxTokens(event) {
           let tokenAmount = token.amount;
@@ -665,9 +666,10 @@ async function loadWalletInfo() {
         const nftSend = element.querySelector('#nftSend');
         element.getElementById("sendButton").onclick = () => nftSend.classList.toggle("hide");
         const sendNftButton = nftSend.querySelector("#sendNFT");
+        const authButton = tokenCard.querySelector('#authButton');
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
-          sendNft(inputAddress, nft.tokenId, tokenCapability, tokenCommitment)
+          sendNft(inputAddress, nft.tokenId, tokenCapability, tokenCommitment, authButton);
         }
         const nftMint = element.querySelector('#nftMint');
         const nftBurn = element.querySelector('#nftBurn');
@@ -745,13 +747,18 @@ async function loadWalletInfo() {
   }
 
   // Functionality buttons MyTokens view
-  async function sendTokens(address, amountEntered, tokenId, tokenInfo) {
+  async function sendTokens(address, amountEntered, tokenId, tokenInfo, authButton) {
     try {
       const decimals = tokenInfo? tokenInfo.token.decimals : 0;
       const amountTokens = decimals ? amountEntered * (10 ** decimals) : amountEntered;
       const validInput = Number.isInteger(amountTokens) && amountTokens > 0;
       if(!validInput && !decimals) throw(`Amount tokens to send must be a valid integer`);
       if(!validInput && decimals) throw(`Amount tokens to send must only have ${decimals} decimal places`);
+      const hasAuth = !authButton.classList.contains("hide");
+      if(hasAuth){
+        let authWarning = "You risk unintentionally sending the authority to update this token's metadata elsewhere. \nAre you sure you want to send the transaction anyways?";
+        if (confirm(authWarning) != true) return;
+      }
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
@@ -770,9 +777,14 @@ async function loadWalletInfo() {
     }
   }
 
-  async function sendNft(address, tokenId, tokenCapability, tokenCommitment) {
-    try {  
-    const { txId } = await wallet.send([
+  async function sendNft(address, tokenId, tokenCapability, tokenCommitment,authButton) {
+    try {
+      const hasAuth = !authButton.classList.contains("hide");
+      if(hasAuth){
+        let authWarning = "You risk unintentionally sending the authority to update this token's metadata elsewhere. \nAre you sure you want to send the transaction anyways?";
+        if (confirm(authWarning) != true) return;
+      }
+      const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
           tokenId: tokenId,
