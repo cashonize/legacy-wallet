@@ -263,10 +263,15 @@ async function loadWalletInfo() {
   // Functionality CreateTokens view depending on selected token-type
   document.querySelector('#createTokens').addEventListener("click", async () => {
     // Check if metadata url is added
-    const httpsSelected = document.querySelector('#ipfsInfo').classList.contains("hide");
-    const url = document.querySelector('#bcmrUrl').value;
-    const bcmrIpfs = document.querySelector('#bcmrIpfs').value;
-    const inputField = httpsSelected ? url : bcmrIpfs;
+    const selectedMethod = document.querySelector('#selectUri').value;
+    let inputField;
+    let httpsSelected = true;
+    if(selectedMethod === "github") inputField = document.querySelector('#bcmrUrlGithub').value;
+    if(selectedMethod === "website") inputField = document.querySelector('#bcmrUrlWebsite').value;
+    if(selectedMethod === "IPFS") {
+      inputField = document.querySelector('#bcmrIpfs').value;
+      httpsSelected = false;
+    }
     let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://");
     if(!validinput){
       httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should start with ipfs prefix!");
@@ -275,7 +280,8 @@ async function loadWalletInfo() {
     let opreturnData
     if(inputField && validinput){
       try{
-        const fetchLocation = httpsSelected ? "https://" + url : ipfsGateway + bcmrIpfs.slice(7);
+        const bcmrLocation = selectedMethod === "website"? "/.well-known/bitcoin-cash-metadata-registry.json" : "";
+        const fetchLocation = httpsSelected ? "https://" + inputField + bcmrLocation : ipfsGateway + bcmrIpfs.slice(7);
         const reponse = await fetch(fetchLocation);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent));
@@ -359,6 +365,7 @@ async function loadWalletInfo() {
   });
 
   document.querySelector('#view2').addEventListener("click", async () => {
+    document.querySelector("#selectUri").value = "select";
     async function getValidPreGensis() {
       let walletUtxos = await wallet.getAddressUtxos();
       return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
@@ -941,11 +948,12 @@ window.selectTokenType = function selectTokenType(event){
 }
 
 window.selectUri = function selectUri(event){
-  const httpsInfo = document.querySelector('#httpsInfo');
+  const githubInfo = document.querySelector('#githubInfo');
+  const websiteInfo = document.querySelector('#websiteInfo');
   const ipfsInfo = document.querySelector('#ipfsInfo');
-  httpsInfo.classList.add("hide");
-  ipfsInfo.classList.add("hide");
-  if(event.target.value === "HTTPS") httpsInfo.classList.remove("hide");
+  [githubInfo,websiteInfo,ipfsInfo].forEach(item => {item.classList.add("hide");})
+  if(event.target.value === "github") githubInfo.classList.remove("hide");
+  if(event.target.value === "website") websiteInfo.classList.remove("hide");
   if(event.target.value === "IPFS") ipfsInfo.classList.remove("hide");
 }
 

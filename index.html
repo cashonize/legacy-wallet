@@ -301,17 +301,26 @@
             multiple <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br><br>
             <label for="selectUri">Upload the metadata to</label>
             <select name="selectUri" id="selectUri" onchange="selectUri(event)">
-              <option value="HTTPS">HTTPS</option>
+              <option value="select">- select -</option>
+              <option value="github">HTTPS: github gist</option>
+              <option value="website">HTTPS: own website</option>
               <option value="IPFS">IPFS</option>
             </select><br>
-            <div id="httpsInfo">
+            <div id="githubInfo" class="hide">
               If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
               <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
               You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>. <br>
               Then on Github Gists, press "raw" button to get the url to the json object. <br>
               Copy this url without the 'https://' prefix and everything after '/raw'. <br>
               Your BCMR url together with the hash of its content will be stored on the blockchain.
-              <input id="bcmrUrl" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+              <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+            </div>
+            <div id="websiteInfo" class="hide">
+              You can also host the BCMR json file on your own website, the default location for it is <code>/.well-known/bitcoin-cash-metadata-registry.json</code> 
+              like <a href="https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json" target="_blank">the OTR registry</a>. <br>
+              Using this, you only need to enter the base url 'yourtokenwebsite.com' below. <br>
+              Your website url together with the hash of the BCMR file will be stored on the blockchain.
+              <input id="bcmrUrlWebsite" placeholder="yourtokenwebsite.com">
             </div>
             <div id="ipfsInfo" class="hide">
               You can easily upload (pin) your BCMR on IPFS with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or with <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>

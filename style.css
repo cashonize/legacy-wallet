@@ -156,7 +156,7 @@ main{
   margin-left: 30px;
   max-width: 225px;
 }
-#bcmrUrl, #bcmrIpfs{
+#bcmrUrlWebsite, #bcmrUrlGithub, #bcmrIpfs{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
   width: fill-available;
@@ -191,9 +191,15 @@ main{
 #noTokensFound, #noVerifiedTokens, #loadingTokenData {
   text-align: center;
 }
-#selectUnit, #selectUri, #selectNetwork {
+#selectUnit, #selectNetwork {
   box-sizing: content-box;
   width:80px;
+  display: inline-block;
+  padding: 0.4rem 1rem
+}
+#selectUri {
+  box-sizing: content-box;
+  width: 170px;
   display: inline-block;
   padding: 0.4rem 1rem
 }
