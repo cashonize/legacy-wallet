@@ -750,6 +750,9 @@ async function loadWalletInfo() {
           children.forEach(child => child.classList.toggle("hide"));
         }
         tokenCard.querySelector("#childNfts").onclick = toggleChildNfts;
+        // dark mode for action bar nft children
+        const actionbarIcons = tokenCard.querySelectorAll('.icon');
+        if(darkMode) actionbarIcons.forEach(icon => icon.classList.add("dark"));
       }
       ul.appendChild(tokenCard);
     });
