@@ -441,15 +441,6 @@ async function loadWalletInfo() {
       tokenCard.querySelector("#verified").classList.remove("hide");
       tokenCard.querySelector(".verifiedIcon").classList = "unverifiedIcon";
       tokenCard.querySelector(".tooltiptext").textContent = "Unverified";
-      function newIcon(element, iconSrc){
-        const icon = document.createElement("img");
-        if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
-        icon.src = iconSrc;
-        icon.style = "width:48px; max-width:inherit; border-radius:50%;";
-        const tokenIcon = element.querySelector("#tokenIcon");
-        tokenIcon.removeChild(tokenIcon.lastChild);
-        tokenIcon.appendChild(icon);
-      }
       if(tokenInfo?.uris?.icon) newIcon(tokenCard, tokenInfo.uris.icon);
       if(token.tokenData){
         const NFTmetadata = tokenInfo.token.nfts?.parse.types[(token.tokenData.commitment)];
@@ -463,52 +454,68 @@ async function loadWalletInfo() {
           const nftCard = children[i];
           const nft = token.nfts[i-1];
           const NFTmetadata = tokenInfo.token.nfts?.parse.types[(nft.tokenData.commitment)];
-          if(NFTmetadata) nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
-          if(NFTmetadata?.extensions?.attributes){
-            if(NFTmetadata?.description) nftCard.querySelector("#tokenDescription").textContent = `NFT description: ${NFTmetadata.description}`
-            const infoButtonNft = nftCard.querySelector('#infoButton');
-            const nftInfoDisplay = nftCard.querySelector("#tokenInfoDisplay");
-            const displayAttributes = nftCard.querySelector("#nftAttributes");
-            nftCard.querySelector("#showAttributes").classList.remove("hide");
-            nftCard.querySelector("#tokenCommitment").classList.add("hide");
-            infoButtonNft.classList.remove("hide");
-            infoButtonNft.onclick = async () => {
-              nftInfoDisplay.classList.toggle("hide");
-              const attributes = NFTmetadata.extensions.attributes;
-              let htmlStringAttributes = "";
-              Object.keys(attributes).forEach(attributeKey => {
-                const nftAttribute = attributes[attributeKey] ? attributes[attributeKey] : "None";
-                htmlStringAttributes += `${attributeKey}: ${nftAttribute}\n`
-              });
-              displayAttributes.textContent = htmlStringAttributes;
-            }
-          }
-          if(NFTmetadata?.uris?.icon){
-            newIcon(nftCard, NFTmetadata.uris.icon);
-            
-            const modal = nftCard.querySelector("#tokenIconModal");
-            // Get the image and insert it inside the modal
-            const img = nftCard.querySelector("#tokenIcon");
-            img.classList.add("nftIcon")
-            const modalImg = nftCard.querySelector("#imgTokenIcon");
-            const captionText = nftCard.querySelector("#caption");
-            img.onclick = function(){
-              modal.style.display = "block";
-              modalImg.src = this.firstChild.src;
-              captionText.textContent = NFTmetadata.name;
-            }
-            // Get the <span> element that closes the modal
-            const span = nftCard.getElementsByClassName("close")[0];
-            // When the user clicks on <span> (x), close the modal
-            span.onclick = function() {
-              modal.style.display = "none";
-            }
-          } else if(tokenInfo?.uris?.icon){
-            newIcon(nftCard, tokenInfo.uris.icon);
-          }
+          if(NFTmetadata) addNftMetadata(nftCard, NFTmetadata);
         }
       }
     }
+  }
+
+  // helper function for re-render & addNftMetadata
+  function newIcon(element, iconSrc){
+    const icon = document.createElement("img");
+    if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
+    icon.src = iconSrc;
+    icon.style = "width:48px; max-width:inherit; border-radius:50%;";
+    const tokenIcon = element.querySelector("#tokenIcon");
+    if(tokenIcon?.lastChild) tokenIcon.removeChild(tokenIcon.lastChild);
+    tokenIcon.appendChild(icon);
+  }
+
+  // helper function for re-render & createListWithTemplate
+  function addNftMetadata(nftCard, NFTmetadata){
+    nftCard.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
+    if(NFTmetadata?.extensions?.attributes){
+      if(NFTmetadata?.description) nftCard.querySelector("#tokenDescription").textContent = `NFT description: ${NFTmetadata.description}`
+      const infoButtonNft = nftCard.querySelector('#infoButton');
+      const nftInfoDisplay = nftCard.querySelector("#tokenInfoDisplay");
+      const displayAttributes = nftCard.querySelector("#nftAttributes");
+      nftCard.querySelector("#showAttributes").classList.remove("hide");
+      nftCard.querySelector("#tokenCommitment").classList.add("hide");
+      infoButtonNft.classList.remove("hide");
+      infoButtonNft.onclick = async () => {
+        nftInfoDisplay.classList.toggle("hide");
+        const attributes = NFTmetadata.extensions.attributes;
+        let htmlStringAttributes = "";
+        Object.keys(attributes).forEach(attributeKey => {
+          const nftAttribute = attributes[attributeKey] ? attributes[attributeKey] : "None";
+          htmlStringAttributes += `${attributeKey}: ${nftAttribute}\n`
+        });
+        displayAttributes.textContent = htmlStringAttributes;
+      }
+    }
+
+    if(NFTmetadata?.uris?.icon){
+      newIcon(nftCard, NFTmetadata.uris.icon);   
+      const modal = nftCard.querySelector("#tokenIconModal");
+      // Get the image and insert it inside the modal
+      const img = nftCard.querySelector("#tokenIcon");
+      img.classList.add("nftIcon")
+      const modalImg = nftCard.querySelector("#imgTokenIcon");
+      const captionText = nftCard.querySelector("#caption");
+      img.onclick = function(){
+        modal.style.display = "block";
+        modalImg.src = this.firstChild.src;
+        captionText.textContent = NFTmetadata.name;
+      }
+      // Get the <span> element that closes the modal
+      const span = nftCard.querySelector(".close");
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
+        modal.style.display = "none";
+      }
+    } else if(tokenInfo?.uris?.icon){
+      newIcon(nftCard, tokenInfo.uris.icon);
+    } 
   }
   
   async function checkAuthChains(tokens) {
@@ -724,20 +731,21 @@ async function loadWalletInfo() {
           childNft.querySelector(".item").style.marginLeft = "25px";
           childNft.querySelector(".item").classList.add("hide");
           const nftCommitment = token.nfts[i].tokenData.commitment;
-          // NFT metadata
-          let iconSrc
-          if(tokenInfo){
-            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
-            if(NFTmetadata) childNft.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
-            if(NFTmetadata?.uris?.icon) iconSrc = NFTmetadata.uris.icon;
-          }
-          generateIcon(childNft, iconSrc);
-          renderNft(token.nfts[i],childNft);
+
           childNft.querySelector("#tokenIdBox").classList.add("hide");
           childNft.querySelector("#infoButton").classList.add("hide");
           childNft.querySelector("#childNftCommitment").classList.remove("hide");
           const childNftCommitment = nftCommitment || 'none'
           childNft.querySelector("#childNftCommitment").textContent = `Commitment: ${childNftCommitment}`
+
+          generateIcon(childNft);
+          renderNft(token.nfts[i],childNft);
+
+          // NFT metadata, identical to on re-render
+          if(tokenInfo){
+            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
+            if(NFTmetadata) addNftMetadata(childNft,NFTmetadata);
+          }
 
           tokenCard.querySelector(".item").appendChild(childNft);
         }
