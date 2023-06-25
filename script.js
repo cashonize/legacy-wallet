@@ -475,7 +475,6 @@ async function loadWalletInfo() {
             infoButtonNft.onclick = async () => {
               nftInfoDisplay.classList.toggle("hide");
               const attributes = NFTmetadata.extensions.attributes;
-              console.log(NFTmetadata.description)
               let htmlStringAttributes = "";
               Object.keys(attributes).forEach(attributeKey => {
                 const nftAttribute = attributes[attributeKey] ? attributes[attributeKey] : "None";
@@ -612,7 +611,7 @@ async function loadWalletInfo() {
         }
       }
       // Reusable function so it can also render icons for child nfts
-      function generateIcon(element, nftCommitment){
+      function generateIcon(element, iconSrc){
         // Display tokenIcon whether generated or costum
         let icon = createIcon({
           seed: token.tokenId,
@@ -620,21 +619,8 @@ async function loadWalletInfo() {
           scale: 4,
           spotcolor: '#000'
         });
-        if(tokenInfo?.uris?.icon){
+        if(iconSrc){
           icon = document.createElement("img");
-          let iconSrc = tokenInfo.uris.icon;
-          if(token.tokenData){
-            const NFTmetadata = tokenInfo.token.nfts?.parse.types[(token.tokenData.commitment)];
-            if(NFTmetadata?.uris?.icon){
-              iconSrc = NFTmetadata.uris.icon;
-            }
-          }
-          if(token.nfts){
-            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
-            if(NFTmetadata?.uris?.icon){
-              iconSrc = NFTmetadata.uris.icon;
-            }
-          }
           if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
           icon.src = iconSrc;
           icon.style = "width:48px; max-width: inherit; border-radius:50%;";
@@ -642,7 +628,7 @@ async function loadWalletInfo() {
         const tokenIcon = element.querySelector("#tokenIcon");
         tokenIcon.appendChild(icon);
       }
-      generateIcon(tokenCard)
+      generateIcon(tokenCard, tokenInfo?.uris?.icon)
       // Stuff specific for fungibles
       if(token.amount){
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
@@ -675,9 +661,9 @@ async function loadWalletInfo() {
           none: "Immutable NFT"
         };
         element.querySelector("#tokenType").textContent = nftTypes[tokenCapability];
-        const tokenCommitment = nft.tokenData.commitment;
-        if (tokenCommitment != "") {
-          const commitmentText = `NFT commitment: ${tokenCommitment}`;
+        const nftCommitment = nft.tokenData.commitment;
+        if (nftCommitment != "") {
+          const commitmentText = `NFT commitment: ${nftCommitment}`;
           element.querySelector("#tokenCommitment").textContent = commitmentText;
         }
         const nftSend = element.querySelector('#nftSend');
@@ -686,7 +672,7 @@ async function loadWalletInfo() {
         const authButton = tokenCard.querySelector('#authButton');
         sendNftButton.onclick = () => {
           const inputAddress = nftSend.querySelector('#tokenAddress').value;
-          sendNft(inputAddress, nft.tokenId, tokenCapability, tokenCommitment, authButton);
+          sendNft(inputAddress, nft.tokenId, tokenCapability, nftCommitment, authButton);
         }
         const nftMint = element.querySelector('#nftMint');
         const nftBurn = element.querySelector('#nftBurn');
@@ -715,7 +701,7 @@ async function loadWalletInfo() {
         }
         const burnNftButton = nftBurn.querySelector("#burnNFT");
         burnNftButton.onclick = () => {
-          burnNft(nft.tokenId, tokenCommitment);
+          burnNft(nft.tokenId, nftCommitment);
         }
         const transferAuthButton = authTransfer.querySelector("#transferAuth");
         transferAuthButton.onclick = () => {
@@ -737,8 +723,15 @@ async function loadWalletInfo() {
           const childNft = document.importNode(template.content, true);
           childNft.querySelector(".item").style.marginLeft = "25px";
           childNft.querySelector(".item").classList.add("hide");
-          const nftCommitment = token.nfts[i].tokenData.commitment
-          generateIcon(childNft, nftCommitment);
+          const nftCommitment = token.nfts[i].tokenData.commitment;
+          // NFT metadata
+          let iconSrc
+          if(tokenInfo){
+            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
+            if(NFTmetadata) childNft.querySelector("#tokenName").textContent = `Name: ${NFTmetadata.name}`;
+            if(NFTmetadata?.uris?.icon) iconSrc = NFTmetadata.uris.icon;
+          }
+          generateIcon(childNft, iconSrc);
           renderNft(token.nfts[i],childNft);
           childNft.querySelector("#tokenIdBox").classList.add("hide");
           childNft.querySelector("#infoButton").classList.add("hide");
