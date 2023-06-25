@@ -54,6 +54,9 @@ header {
 #burnIcon.dark{
   content:url("images/fireGrey.svg");
 }
+#authIcon.dark{
+  content:url("images/shieldGrey.svg");
+}
 #showIcon.dark{
   content:url("images/chevron-square-downGrey.svg");
 }
