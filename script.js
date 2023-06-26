@@ -98,23 +98,27 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 })
 
 window.createNewWallet = async function createNewWallet() {
-  // Initialize wallet
+  // Initialize wallet for mainnet & chipnet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   Config.DefaultParentDerivationPath = "m/44'/145'/0'";
-  await walletClass.named(nameWallet);
-  loadWalletInfo()
+  const mainnetWallet = await Wallet.named(nameWallet);
+  const walletId = mainnetWallet.toDbString().replace("mainnet", "testnet");
+  await TestNetWallet.replaceNamed("mywallet", walletId);
+  loadWalletInfo();
 }
 
 window.importWallet = async function importWallet() {
-  // Initialize wallet
+  // Initialize wallet for mainnet & chipnet
   DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
   const seedphrase = document.querySelector('#enterSeedphrase').value;
   const selectedDerivationPath = document.querySelector('#derivationPath').value;
   const derivationPath = selectedDerivationPath == "standard"? "m/44'/145'/0'/0/0" : "m/44'/0'/0'/0/0";
   if(selectedDerivationPath == "standard") Config.DefaultParentDerivationPath = "m/44'/145'/0'";
   const walletId = `seed:mainnet:${seedphrase}:${derivationPath}`;
-  await walletClass.replaceNamed(nameWallet, walletId);
-  loadWalletInfo()
+  await Wallet.replaceNamed(nameWallet, walletId);
+  const walletIdTestnet = `seed:testnet:${seedphrase}:${derivationPath}`;
+  await TestNetWallet.replaceNamed("mywallet", walletIdTestnet);
+  loadWalletInfo();
 }
 
 async function loadWalletInfo() {
