@@ -112,7 +112,7 @@ window.importWallet = async function importWallet() {
 
 async function loadWalletInfo() {
   // Show My Wallet View
-  changeView(4);
+  changeView(0);
   const nav = document.querySelector('.nav');
   nav.classList.remove("hide");
   newWalletView.classList.add("hide");
