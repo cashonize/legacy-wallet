@@ -57,3 +57,24 @@
     max-width: 400px;
   }
 }
+
+#wc-session-request-modal-container {
+  padding: 1rem;
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-request-modal-container {
+    padding: 5rem;
+  }
+}
+
+#wc-session-request-modal-container > fieldset {
+  padding: 1rem;
+  background-color: var(--bg-color);
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-request-modal-container > fieldset {
+    padding: 0.5rem 2rem;
+  }
+}
