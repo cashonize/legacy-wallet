@@ -6,11 +6,10 @@ html {
 }
 header {
   margin: 0px;
-  margin-top: 25px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-bottom: 5px;
   text-align: center;
 }
 #banner{
@@ -18,6 +17,9 @@ header {
   color: white;
   text-align: center;
   padding: 7px 0;
+}
+.cashonize-logo {
+  height: 85px;
 }
 .tabs a{
   padding: 1rem 1.8rem;
@@ -57,6 +59,9 @@ header {
 }
 #burnIcon.dark{
   content:url("images/fireGrey.svg");
+}
+#authIcon.dark{
+  content:url("images/shieldGrey.svg");
 }
 #showIcon.dark{
   content:url("images/chevron-square-downGrey.svg");
@@ -165,7 +170,7 @@ main{
   margin-left: 30px;
   max-width: 225px;
 }
-#bcmrUrl, #bcmrIpfs{
+#bcmrUrlWebsite, #bcmrUrlGithub, #bcmrIpfs{
   width: -moz-available;          /* WebKit-based browsers will ignore this. */
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
   width: fill-available;
@@ -200,9 +205,15 @@ main{
 #noTokensFound, #noVerifiedTokens, #loadingTokenData {
   text-align: center;
 }
-#selectUnit, #selectUri, #selectNetwork {
+#selectUnit, #selectNetwork {
   box-sizing: content-box;
   width:80px;
+  display: inline-block;
+  padding: 0.4rem 1rem
+}
+#selectUri {
+  box-sizing: content-box;
+  width: 170px;
   display: inline-block;
   padding: 0.4rem 1rem
 }
@@ -269,6 +280,9 @@ footer{
   }
   .hidemobile {
     display: none;
+  }
+  .tabs a {
+    padding: 1rem;
   }
 }
 body.dark {
@@ -357,4 +371,77 @@ body.dark {
   #view4:after {
     content: "WalletConnect"
   }
+}
+
+ /* Style the Image Used to Trigger the Modal */
+ .nftIcon {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  }
+
+.nftIcon:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 20vh; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal-content, #caption {
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+  from {transform:scale(0)}
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
 }

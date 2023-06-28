@@ -3,7 +3,7 @@
 
 <head>
   <title>Cashonize</title>
-  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/cashonize-icon.png">
   <meta name="description" content="Cashonize: Bitcoin Cash Webwallet with CashTokens support for mainnet & chipnet.">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="walletconnect.css">
   <link rel="stylesheet" href="switchery/switchery.css" />
   <script src="switchery/switchery.js"></script>
-  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.27.js"></script>
-  <script>window.exports = {};</script>
+  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.30.js"></script>
+  <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
   <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -24,10 +24,7 @@
     The official url for Cashonize going forward is <a href="https://cashonize.com/">Cashonize.com</a>, please migrate!
   </div> -->
   <header>
-    <h1 style="margin: 0.35em 0 0.35em">
-      <img class="icon" style="width: 40px;" src="/images/favicon.png">
-      Cashonize
-    </h1>
+    <img class="cashonize-logo" src="./images/cashonize-logo.png">
     <div>
       <nav class="nav hide">
         <div class="nav-left">
@@ -100,7 +97,7 @@
               background-color: #fff;
             "
           >
-            <img src="/images/favicon.png" slot="icon" />
+            <img src="/images/bch-icon.png" slot="icon" />
           </qr-code>
 
           <qr-code
@@ -157,6 +154,11 @@
               </div>
               <div class="tokenInfo">
                 <div id="tokenIcon" class="tokenIcon"></div>
+                <div id="tokenIconModal" class="modal">
+                  <span class="close">&times;</span>
+                  <img class="modal-content" id="imgTokenIcon" style="width: 400px; max-width: 80%;">
+                  <div id="caption"></div>
+                </div>
                 <div class="tokenBaseInfo">
                   <div class="tokenBaseInfo1">
                     <div id="tokenName"></div>
@@ -204,6 +206,10 @@
                   <div id="tokenCommitment"></div>
                   <div id="tokenWebLink"></div>
                   <div id="onchainTokenInfo" style="white-space: pre-line;"></div>
+                  <details id="showAttributes" class="hide">
+                    <summary>NFT attributes</summary>
+                    <div id="nftAttributes" style="white-space: pre-wrap;"></div>
+                  </details> 
                 </div>
                 <div id="tokenSend" class="hide"  style="margin-top: 10px;">
                   Send these tokens to
@@ -246,7 +252,8 @@
                 </div>
                 <div id="authTransfer" class="hide" style="margin-top: 10px;">
                   Transfer the authority to change the token's metadata to another wallet <br>
-                  This happens by creating a new Authead for the tokenId's Authchain
+                  This should be to a wallet with coin-control, where you can label the Auth UTXO<br>
+                  It is recommended to use the Electron Cash pc wallet<br>
                   <br>
                   <span class="grouped">
                     <input id="destinationAddr" placeholder="destinationAddress"> 
@@ -286,31 +293,47 @@
             Add immutable commitment data to add to this NFT (hexadecimals only)
             <input id="inputNftCommitment" placeholder="commitment">
           </div>
-          <details>
+          <details  style="margin-bottom: 0.5em;">
             <summary>Optionally link metadata to this token</summary>
+            You can add metadata to your Cashtokens using the <a href="https://github.com/bitjson/chip-bcmr" target="_blank">BCMR-standard</a>. <br>
+            You do this by creating a JSON file and uploading it to HTTPS or to IPFS. <br>
+            There's a <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> for fungible tokens and 
+            multiple <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br><br>
             <label for="selectUri">Upload the metadata to</label>
             <select name="selectUri" id="selectUri" onchange="selectUri(event)">
-              <option value="HTTPS">HTTPS</option>
+              <option value="select">- select -</option>
+              <option value="github">HTTPS: github gist</option>
+              <option value="website">HTTPS: own website</option>
               <option value="IPFS">IPFS</option>
             </select><br>
-            <div id="httpsInfo">              
-              You can easily create a https url to host your BCMR with Github Gist, similar to 
-              <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">the DogeCash example</a>. <br>
+            <div id="githubInfo" class="hide">
+              If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
+              <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
               You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>. <br>
               Then on Github Gists, press "raw" button to get the url to the json object. <br>
-              Copy this url without the 'https://'' prefix and everything after '/raw'. <br>
+              Copy this url without the 'https://' prefix and everything after '/raw'. <br>
               Your BCMR url together with the hash of its content will be stored on the blockchain.
-              <input id="bcmrUrl" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+              <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+            </div>
+            <div id="websiteInfo" class="hide">
+              You can also host the BCMR json file on your own website, the default location for it is <code>/.well-known/bitcoin-cash-metadata-registry.json</code> 
+              like <a href="https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json" target="_blank">the OTR registry</a>. <br>
+              Using this, you only need to enter the base url 'yourtokenwebsite.com' below. <br>
+              Your website url together with the hash of the BCMR file will be stored on the blockchain.
+              <input id="bcmrUrlWebsite" placeholder="yourtokenwebsite.com">
             </div>
             <div id="ipfsInfo" class="hide">
               You can easily upload (pin) your BCMR on IPFS with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or with <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
               Icons and images can be grouped together in a separate folder, like in <a href="https://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy.ipfs.dweb.link/" target="_blank">this example bcmr</a>. <br>
-              Enter the location of your bcmr (version 1 CID) in the iput field below. <br>
-              The location of your bcmr together with the hash of its content will be stored on the blockchain.
+              Enter the location of your bcmr (version 1 CID) with 'ipfs://' prefix in the input field below. <br>
+              The location of your BCMR together with the hash of its content will be stored on the blockchain.
               <input id="bcmrIpfs" placeholder="ipfs://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
             </div>
+            <br>
           </details>
-          <br>
+          <b>Note:</b> Metadata can still be added/updated later by the token's 
+          <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
+          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away. <br>
           Process might take a few seconds... 
           <input type="button" class="primaryButton" id="createTokens" value="Create">
         </fieldset>
