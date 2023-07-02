@@ -144,7 +144,7 @@ Web3Wallet.init({
     name: 'Cashonize',
     description: 'Cashonize BitcoinCash Web Wallet',
     url: 'cashonize.com/',
-    icons: ['https://cashonize.com/images/favicon.png'],
+    icons: ['https://cashonize.com/images/favicon.ico'],
   }
 }).then(async (web3wallet) =>
 {
@@ -981,7 +981,7 @@ Web3Wallet.init({
         const outputsHtml = tx.outputs.map((output, idx) => {
           if (output.lockingBytecode[0] === 106) {
             const chunks = parsedOpReturn(output.lockingBytecode).map((chunk) => `<span>${ chunk }<br/></span>`).join("");
-            return /* html */ `<div style="margin-top: 1rem;"><span style="font-weight: 500; margin-right: 0.5rem;">#${idx}:</span>
+            return /* html */ `<div style="margin-top: 1rem; max-width: 300px;"><span style="font-weight: 500; margin-right: 0.5rem;">#${idx}:</span>
               OP_RETURN<br/>
               ${chunks}
             </div>`;
