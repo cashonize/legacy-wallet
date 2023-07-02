@@ -139,34 +139,40 @@ async function loadWalletInfo() {
   Config.EnforceCashTokenReceiptAddresses = true;
   explorerUrl = network === "mainnet" ? explorerUrlMainnet : explorerUrlChipnet;
 
+  let balancePromise = wallet.getBalance();
   // Enable fetching validPreGenesis on CreateTokens view
   document.querySelector('#view2').addEventListener("click", async () => {
     async function getValidPreGensis() {
       let walletUtxos = await wallet.getAddressUtxos();
       return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
     }
-    let validPreGenesis= await getValidPreGensis()
-    console.log(validPreGenesis)
-    if(validPreGenesis.length === 0){
-      document.querySelector("#plannedTokenId").textContent = 'loading...';
-      document.querySelector("#plannedTokenId").value = "";
-      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 10000, unit: "sat" }]);
-      console.log("Created output with vout zero for token genesis");
-      validPreGenesis= await getValidPreGensis()
+    const balance = await balancePromise;
+    if (balance.sat) {
+      document.querySelector("#warningNoBCH").classList.add("hide");
+      let validPreGenesis = await getValidPreGensis();
+      if (validPreGenesis.length === 0) {
+        document.querySelector("#plannedTokenId").textContent = 'loading...';
+        document.querySelector("#plannedTokenId").value = "";
+        await wallet.send([{ cashaddr: wallet.tokenaddr, value: 10000, unit: "sat" }]);
+        console.log("Created output with vout zero for token genesis");
+        validPreGenesis = await getValidPreGensis();
+      }
+      const tokenId = validPreGenesis[0].txid;
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      document.querySelector("#plannedTokenId").textContent = displayId;
+      document.querySelector("#plannedTokenId").value = tokenId;
+    } else {
+      document.querySelector("#warningNoBCH").classList.remove("hide");
     }
-    const tokenId = validPreGenesis[0].txid;
-    const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
-    document.querySelector("#plannedTokenId").textContent = displayId;
-    document.querySelector("#plannedTokenId").value = tokenId;
   });
-
+  
   // Import BCMRs in the trusted tokenlists
   for await(const tokenListUrl of trustedTokenLists){
     await BCMR.addMetadataRegistryFromUri(tokenListUrl);
   }
 
   // Display USD & BC balance and watch for changes
-  let balance = await wallet.getBalance();
+  let balance = await balancePromise;
   let maxAmountToSend = await wallet.getMaxAmountToSend();
   if(unit == "satoshis"){
     document.querySelector('#balance').innerText = balance.sat;
