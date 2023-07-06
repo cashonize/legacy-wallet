@@ -184,7 +184,7 @@
                   <img id="infoIcon" class="icon" src="/images/info.svg"> info 
                 </span>
                 <span class="tokenButton hide" id="mintButton">
-                  <img id="mintIcon" class="icon" src="/images/hammer.svg"> mint NFT 
+                  <img id="mintIcon" class="icon" src="/images/hammer.svg"> mint NFTs 
                 </span>
                 <span class="tokenButton hide" style="white-space: nowrap;" id="burnButton">
                   <img id="burnIcon" class="icon" src="/images/fire.svg">
@@ -230,17 +230,20 @@
                   </p>
                 </div>
                 <div id="nftMint"  class="hide"  style="margin-top: 10px;">
-                  Mint a single NFT (optionally with commitment)
-                  <p class="grouped">
-                    <input id="commitmentInput" placeholder="commitment">
-                    <input type="button" id="mintNFT" value="Mint NFT">
+                  Mint a number of (unique) NFTs to a specific address
+                  <div>
+                    <input type="checkbox" checked id="uniqueNFTs" onchange="disableInputfield(event)" style="margin: 0px; vertical-align: text-bottom;">
+                    make each NFT unique by numbering each one in the collection
+                  </div>
+                  <p class="grouped" style="align-items: center; margin-bottom: 5px;">
+                    <input id="amountNFTs" type="number" placeholder="amount NFTs">
+                    <input id="startingNumberNFTs" type="number" placeholder="starting number" style="margin-right: 0px;">
+                    <input id="commitmentNFTs" placeholder="commitment" style="display: none;">
                   </p>
-
-                  Mint a bunch of NFTs
-                  <p class="grouped">
-                    <input id="amountNFTs" type="number" style="width: 160px;" placeholder="number of NFTs">
+                  <span class="grouped">
+                    <input id="destinationAddr" placeholder="destinationAddress"> 
                     <input type="button" id="mintNFTs" value="Mint NFTs">
-                  </p>
+                  </span>
                 </div>
                 <div id="nftBurn"  class="hide"  style="margin-top: 10px;">
                   Burn this NFT so no new NFTs of this category can be minted
