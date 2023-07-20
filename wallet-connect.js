@@ -1,4 +1,4 @@
-import { encodeTransaction, generateTransaction, hash256, generateSigningSerializationBCH, SigningSerializationFlag, decodePrivateKeyWif, secp256k1, authenticationTemplateToCompilerBCH, importAuthenticationTemplate, authenticationTemplateP2pkhNonHd, lockingBytecodeToCashAddress, decodeAuthenticationInstructions, binToHex, hexToBin, decodeCashAddress, binsAreEqual, cashAddressToLockingBytecode } from "@bitauth/libauth";
+import { encodeTransaction, generateTransaction, hash256, generateSigningSerializationBCH, SigningSerializationFlag, decodePrivateKeyWif, secp256k1, authenticationTemplateToCompilerBCH, importAuthenticationTemplate, authenticationTemplateP2pkhNonHd, lockingBytecodeToCashAddress, decodeAuthenticationInstructions, binToHex, hexToBin, decodeCashAddress, binsAreEqual, cashAddressToLockingBytecode, decodeTransaction } from "@bitauth/libauth";
 
 const nameWallet = "mywallet";
 let historyUpdateInterval;
@@ -138,6 +138,25 @@ const core = new Core({
   projectId: "3fd234b8e2cd0e1da4bc08a0011bbf64"
 })
 
+const ready = async () => {
+  return new Promise((resolve) => {
+    let retries = 0;
+    const interval = setInterval(() => {
+      retries++;
+      if (retries > 30) {
+        clearInterval(interval);
+        resolve(false);
+      }
+
+      if (window.walletClass) {
+        clearInterval(interval);
+        resolve(true);
+      }
+    }, 50);
+  });
+};
+
+
 Web3Wallet.init({
   core,
   metadata: {
@@ -148,6 +167,8 @@ Web3Wallet.init({
   }
 }).then(async (web3wallet) =>
 {
+  await ready();
+
   const updateProposal = (proposal) => {
     const proposalParent = document.getElementById("wc-session-approval");
 
@@ -276,8 +297,8 @@ Web3Wallet.init({
 
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
                   <div style="color: rgb(107 114 128); width: 75px;">Address:</div>
-                  <div class="history-value-address" style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row;"><div class="prefix-span">bitcoincash:</div><div style="overflow-x: hidden; text-overflow: ellipsis;">${item.request.params?.request?.params?.address.split(":")[1]}</div></div>
-                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText(${item.request.params?.request?.params?.address})">
+                  <div class="history-value-address" style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row;"><div class="prefix-span">${walletClass.networkPrefix}:</div><div style="overflow-x: hidden; text-overflow: ellipsis;">${item.request.params?.request?.params?.address.split(":")[1]}</div></div>
+                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${item.request.params?.request?.params?.address}')">
                     <img class="copyIcon icon" src="/images/copy.svg">
                   </button>
                 </div>
@@ -423,7 +444,6 @@ Web3Wallet.init({
     const { requiredNamespaces } = sessionProposal.params;
 
     if (!requiredNamespaces.bch) {
-      console.log("error");
       return;
     }
 
@@ -435,9 +455,7 @@ Web3Wallet.init({
           "bch_signTransaction",
           "bch_signMessage"
         ],
-        chains: [
-          "bch:bitcoincash"
-        ],
+        chains: walletClass.network === "testnet" ? ["bch:bchtest"] : ["bch:bitcoincash"],
         events: [
           "addressesChanged"
         ],
@@ -519,7 +537,6 @@ Web3Wallet.init({
       },
       /* verbose= */ false);
     html5QrcodeScanner.render(async (decodedText) => {
-      console.log(`Code matched = ${decodedText}`);
       document.getElementById("wc-session-scan-modal").style.display = "none";
       await html5QrcodeScanner?.clear();
       document.getElementById("wcUri").value = decodedText;
@@ -541,87 +558,6 @@ Web3Wallet.init({
   };
 
   const renderRequest = async (event) => {
-    // console.log(event);
-
-    // export interface SignMessageOptions {
-    //   assetId?: string;
-    //   message: string;
-    //   userPrompt?: string
-    // }
-
-    // message
-  //   {
-  //     "id": 1686314178933879,
-  //     "topic": "fe4af9ac1e450c66e48e240bc1dd591ae9edf526128828e1ff3b2bd3a22e523a",
-  //     "params": {
-  //         "request": {
-  //             "method": "bch_signMessage",
-  //             "params": {
-  //                 "account": "bitcoincash:qqjtahtuk64600jx6uw2uzcrj059y9tflgrsjrh496",
-  //                 "payload": "05010000004254"
-  //             }
-  //         },
-  //         "chainId": "bch:bitcoincash"
-  //     },
-  //     "verifyContext": {
-  //         "verified": {
-  //             "verifyUrl": "",
-  //             "validation": "VALID",
-  //             "origin": "http://localhost:3000"
-  //         }
-  //     }
-  // }
-
-    // transaction
-  //   {
-  //     "id": 1686315234896544,
-  //     "topic": "fe4af9ac1e450c66e48e240bc1dd591ae9edf526128828e1ff3b2bd3a22e523a",
-  //     "params": {
-  //         "request": {
-  //             "method": "bch_signTransaction",
-  //             "params": {
-  //                 "account": "bitcoincash:qqjtahtuk64600jx6uw2uzcrj059y9tflgrsjrh496",
-  //                 "operations": [
-  //                     {
-  //                         "kind": "transaction",
-  //                         "amount": "1",
-  //                         "destination": "bitcoincash:qqjtahtuk64600jx6uw2uzcrj059y9tflgrsjrh496"
-  //                     }
-  //                 ]
-  //             }
-  //         },
-  //         "chainId": "bch:bitcoincash"
-  //     },
-  //     "verifyContext": {
-  //         "verified": {
-  //             "verifyUrl": "",
-  //             "validation": "VALID",
-  //             "origin": "http://localhost:3000"
-  //         }
-  //     }
-  // }
-
-    // bch_getAddresses
-  //   {
-  //     "id": 1686315379378125,
-  //     "topic": "fe4af9ac1e450c66e48e240bc1dd591ae9edf526128828e1ff3b2bd3a22e523a",
-  //     "params": {
-  //         "request": {
-  //             "method": "bch_getAddresses",
-  //             "params": {}
-  //         },
-  //         "chainId": "bch:bitcoincash"
-  //     },
-  //     "verifyContext": {
-  //         "verified": {
-  //             "verifyUrl": "",
-  //             "validation": "VALID",
-  //             "origin": "http://localhost:3000"
-  //         }
-  //     }
-  // }
-
-    // console.log(event);
     const wallet = await walletClass.named(nameWallet);
 
     const { topic, params, id } = event
@@ -706,9 +642,9 @@ Web3Wallet.init({
                 </div>
                 <div style="font-size: large; margin-top: 2rem;">Signer:</div>
                 <div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-                  <div style="font-size: smaller;" class="prefix-span">bitcoincash:</div>
+                  <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
                   <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${signingAddress.split(":")[1]}</div>
-                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText(${signingAddress})">
+                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${signingAddress}')">
                     <img class="copyIcon icon" src="/images/copy.svg">
                   </button>
                 </div>
@@ -754,11 +690,15 @@ Web3Wallet.init({
       case "bch_signTransaction": {
         const params = parseExtendedJson(JSON.stringify(request.params));
 
+        if (typeof params.transaction === "string") {
+          params.transaction = decodeTransaction(hexToBin(params.transaction));
+        }
+
         const tx = params.transaction;
         const sourceOutputsUnpacked = params.sourceOutputs;
 
         const toCashaddr = (lockingBytecode) => {
-          const result = lockingBytecodeToCashAddress(lockingBytecode);
+          const result = lockingBytecodeToCashAddress(lockingBytecode, walletClass.networkPrefix);
           if (typeof result !== "string") {
             throw result;
           }
@@ -840,19 +780,13 @@ Web3Wallet.init({
           const privateKeyWif = wallet.privateKeyWif;
           const decodeResult = decodePrivateKeyWif(privateKeyWif);
           if (typeof decodeResult === "string") {
-            $q.dialog({
-              message: "Not enough information provided, please include contract redeemScript",
-              title: "Error"
-            });
+            alert("Not enough information provided, please include contract redeemScript");
             return;
           }
           const privateKey = decodeResult.privateKey;
           const pubkeyCompressed = secp256k1.derivePublicKeyCompressed(privateKey);
           if (typeof pubkeyCompressed === "string") {
-            $q.dialog({
-              message: pubkeyCompressed,
-              title: "Error",
-            });
+            alert(pubkeyCompressed);
             return;
           }
 
@@ -872,20 +806,14 @@ Web3Wallet.init({
 
                 const coveredBytecode = sourceOutputsUnpacked[index].contract?.redeemScript;
                 if (!coveredBytecode) {
-                  $q.dialog({
-                    message: "Not enough information provided, please include contract redeemScript",
-                    title: "Error"
-                  });
+                  alert("Not enough information provided, please include contract redeemScript");
                   return;
                 }
                 const sighashPreimage = generateSigningSerializationBCH(context, { coveredBytecode, signingSerializationType });
                 const sighash = hash256(sighashPreimage);
                 const signature = secp256k1.signMessageHashSchnorr(privateKey, sighash);
                 if (typeof signature === "string") {
-                  $q.dialog({
-                    message: signature,
-                    title: "Error",
-                  });
+                  alert(signature);
                   return;
                 }
                 const sig = Uint8Array.from([...signature, hashType]);
@@ -936,7 +864,6 @@ Web3Wallet.init({
         // UI relevant part
         const parsedOpReturn = (bytecode) => {
           const decoded = decodeAuthenticationInstructions(bytecode);
-          console.log(decoded)
           return (decoded.slice(1)).map(val => "0x" + binToHex(val.data))
         }
 
@@ -954,9 +881,9 @@ Web3Wallet.init({
         const inputsHtml = sourceOutputsUnpacked.map((input, idx) => {
           const address = toCashaddr(input.lockingBytecode);
           const addressHtml = /* html */ `<div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-            <div style="font-size: smaller;" class="prefix-span">bitcoincash:</div>
+            <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
             <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${address.split(":")[1]}</div>
-            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText(${address})">
+            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${address}')">
               <img class="copyIcon icon" src="/images/copy.svg">
             </button>
           </div>`;
@@ -989,9 +916,9 @@ Web3Wallet.init({
 
           const address = toCashaddr(output.lockingBytecode);
           const addressHtml = /* html */ `<div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-            <div style="font-size: smaller;" class="prefix-span">bitcoincash:</div>
+            <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
             <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${address.split(":")[1]}</div>
-            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText(${address})">
+            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${address}')">
               <img class="copyIcon icon" src="/images/copy.svg">
             </button>
           </div>`;
@@ -1022,9 +949,9 @@ Web3Wallet.init({
               </div>
               <div style="font-size: large; margin-top: 2rem;">Signer:</div>
               <div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-                <div style="font-size: smaller;" class="prefix-span">bitcoincash:</div>
+                <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
                 <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${signingAddress.split(":")[1]}</div>
-                <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText(${signingAddress})">
+                <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${signingAddress}')">
                   <img class="copyIcon icon" src="/images/copy.svg">
                 </button>
               </div>
@@ -1085,7 +1012,6 @@ Web3Wallet.init({
   const wcuri = new URL(window.location.href).searchParams.get("uri");
 
   if (wcuri && wcuri.indexOf("wc:") === 0) {
-    console.log(111, web3wallet.core.pairing.pairings.getAll());
     const pairings = web3wallet.core.pairing.pairings.getAll();
     const topic = wcuri.match(/^wc:([a-zA-Z0-9]+).*/)?.[1];
     if (pairings.some(val => val.topic === topic)) {
@@ -1097,7 +1023,3 @@ Web3Wallet.init({
     }
   }
 })
-
-// console.log(window.location.href)
-// wc:8a314e2f31e4585316ca1e40b40f5180e56a320c758baca42b430516f54ef3ac@2?relay-protocol=irn&symKey=8f7910c91cb6b77341e691965da74d60184a71acf58ed4b86fa8b5462710820e
-// http://127.0.0.1:5173/wc?uri=wc%3A6f92789a3c7c0d36e26469302c56b12d8127885668d100f72335d5694d312d0f%402%3Frelay-protocol%3Dirn%26symKey%3Dc3656f132cfee5001c5745cab1d4364f156f096069b24ffea09330bed901ae17
