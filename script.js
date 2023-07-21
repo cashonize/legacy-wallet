@@ -68,6 +68,8 @@ let explorerUrl
 let watchAddressCancel
 let watchBalanceCancel
 
+document.querySelector("#selectUri").value = "select";
+
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
@@ -137,13 +139,40 @@ async function loadWalletInfo() {
   Config.EnforceCashTokenReceiptAddresses = true;
   explorerUrl = network === "mainnet" ? explorerUrlMainnet : explorerUrlChipnet;
 
+  let balancePromise = wallet.getBalance();
+  // Enable fetching validPreGenesis on CreateTokens view
+  document.querySelector('#view2').addEventListener("click", async () => {
+    async function getValidPreGensis() {
+      let walletUtxos = await wallet.getAddressUtxos();
+      return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
+    }
+    const balance = await balancePromise;
+    if (balance.sat) {
+      document.querySelector("#warningNoBCH").classList.add("hide");
+      let validPreGenesis = await getValidPreGensis();
+      if (validPreGenesis.length === 0) {
+        document.querySelector("#plannedTokenId").textContent = 'loading...';
+        document.querySelector("#plannedTokenId").value = "";
+        await wallet.send([{ cashaddr: wallet.tokenaddr, value: 10000, unit: "sat" }]);
+        console.log("Created output with vout zero for token genesis");
+        validPreGenesis = await getValidPreGensis();
+      }
+      const tokenId = validPreGenesis[0].txid;
+      const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
+      document.querySelector("#plannedTokenId").textContent = displayId;
+      document.querySelector("#plannedTokenId").value = tokenId;
+    } else {
+      document.querySelector("#warningNoBCH").classList.remove("hide");
+    }
+  });
+  
   // Import BCMRs in the trusted tokenlists
   for await(const tokenListUrl of trustedTokenLists){
     await BCMR.addMetadataRegistryFromUri(tokenListUrl);
   }
 
   // Display USD & BC balance and watch for changes
-  let balance = await wallet.getBalance();
+  let balance = await balancePromise;
   let maxAmountToSend = await wallet.getMaxAmountToSend();
   if(unit == "satoshis"){
     document.querySelector('#balance').innerText = balance.sat;
@@ -283,16 +312,16 @@ async function loadWalletInfo() {
       inputField = document.querySelector('#bcmrIpfs').value;
       httpsSelected = false;
     }
-    let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://");
-    if(!validinput){
-      httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should start with ipfs prefix!");
-      return
-    }
     let opreturnData
-    if(inputField && validinput){
+    if(inputField){
+      let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://");
+      if(!validinput){
+        httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should start with ipfs prefix!");
+        return
+      }
       try{
         const bcmrLocation = selectedMethod === "website"? "/.well-known/bitcoin-cash-metadata-registry.json" : "";
-        const fetchLocation = httpsSelected ? "https://" + inputField + bcmrLocation : ipfsGateway + bcmrIpfs.slice(7);
+        const fetchLocation = httpsSelected ? "https://" + inputField + bcmrLocation : ipfsGateway + inputField.slice(7);
         const reponse = await fetch(fetchLocation);
         const bcmrContent = await reponse.text();
         const hashContent = sha256.hash(utf8ToBin(bcmrContent));
@@ -373,27 +402,6 @@ async function loadWalletInfo() {
         return txId
       }catch (error) { alert(error) }
     }
-  });
-
-  document.querySelector('#view2').addEventListener("click", async () => {
-    document.querySelector("#selectUri").value = "select";
-    async function getValidPreGensis() {
-      let walletUtxos = await wallet.getAddressUtxos();
-      return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
-    }
-    let validPreGenesis= await getValidPreGensis()
-    console.log(validPreGenesis)
-    if(validPreGenesis.length === 0){
-      document.querySelector("#plannedTokenId").textContent = 'loading...';
-      document.querySelector("#plannedTokenId").value = "";
-      await wallet.send([{ cashaddr: wallet.tokenaddr, value: 10000, unit: "sat" }]);
-      console.log("Created output with vout zero for token genesis");
-      validPreGenesis= await getValidPreGensis()
-    }
-    const tokenId = validPreGenesis[0].txid;
-    const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
-    document.querySelector("#plannedTokenId").textContent = displayId;
-    document.querySelector("#plannedTokenId").value = tokenId;
   });
 
   // Import onchain resolved BCMRs
@@ -705,11 +713,6 @@ async function loadWalletInfo() {
             authButton.onclick = () => authTransfer.classList.toggle("hide");
           }
         }
-        const mintNftButton = nftMint.querySelector("#mintNFT");
-        mintNftButton.onclick = () => {
-          const commitmentInput = nftMint.querySelector('#commitmentInput').value;
-          mintNft(nft.tokenId, commitmentInput);
-        }
         const burnNftButton = nftBurn.querySelector("#burnNFT");
         burnNftButton.onclick = () => {
           burnNft(nft.tokenId, nftCommitment);
@@ -721,8 +724,13 @@ async function loadWalletInfo() {
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
+          const uniqueNFTsCheckBox = nftMint.querySelector("#uniqueNFTs");
+          const uniqueNFTs = uniqueNFTsCheckBox.checked;
+          const startingNumberNFTs = nftMint.querySelector('#startingNumberNFTs').value;
+          const commitmentNFTs = !uniqueNFTs? nftMint.querySelector('#commitmentNFTs').value : "";
           const amountNFTs = nftMint.querySelector('#amountNFTs').value;
-          mintNft(nft.tokenId, "", amountNFTs);
+          const destinationAddr = nftMint.querySelector('#destinationAddr').value;
+          mintNft(token.tokenId, commitmentNFTs, amountNFTs, uniqueNFTs, startingNumberNFTs, destinationAddr);
         }
       } if(token.nfts){
         tokenCard.querySelector("#tokenType").textContent = "NFT group";
@@ -827,19 +835,26 @@ async function loadWalletInfo() {
     }
   }
 
-  async function mintNft(tokenId, tokenCommitment, amount=1) {
+  async function mintNft(tokenId, tokenCommitment, amount=1, unique=false , startingNumber, destinationAddr) {
     try {
       const isHex = (str) => /^[A-F0-9]+$/i.test(str);
       const validCommitment = (isHex(tokenCommitment) || tokenCommitment == "")
       if(!validCommitment) throw(`tokenCommitment '${tokenCommitment}' must be a hexadecimal`);
-      const mintRequest = new TokenMintRequest({
-        cashaddr: tokenAddr,
-        commitment: tokenCommitment,
-        capability: NFTCapability.none,
-        value: 1000,
-      })
+      const recipientAddr = destinationAddr? destinationAddr : tokenAddr;
       const arraySendrequests = [];
-      for (let i = 0; i < amount; i++) arraySendrequests.push(mintRequest);
+      for (let i = 0; i < amount; i++){
+        if(unique){
+          tokenCommitment = (parseInt(startingNumber) + i).toString(16);
+          if(tokenCommitment.length % 2 != 0) tokenCommitment = `0${tokenCommitment}`;
+        }
+        const mintRequest = new TokenMintRequest({
+          cashaddr: recipientAddr,
+          commitment: tokenCommitment,
+          capability: NFTCapability.none,
+          value: 1000,
+        })
+        arraySendrequests.push(mintRequest);
+      }
       const { txId } = await wallet.tokenMint(
         tokenId,
         arraySendrequests
@@ -1026,4 +1041,13 @@ window.switchAddressType = () => {
   currentQrCode.classList.add("hide");
   otherQrCode.classList.remove("hide");
   otherQrCode.animateQRCode('MaterializeIn');
+}
+
+window.disableInputfield = (event) => {
+  const uniqueNFTs = event.srcElement;
+  const enableUniqueNumbers = uniqueNFTs.checked;
+  const inputUniqueNumbers = uniqueNFTs.parentElement.parentElement.querySelector("#startingNumberNFTs");
+  const inputCommitment = uniqueNFTs.parentElement.parentElement.querySelector("#commitmentNFTs");
+  inputUniqueNumbers.style.display = enableUniqueNumbers? "block" : "none";
+  inputCommitment.style.display = enableUniqueNumbers? "none" : "block";
 }

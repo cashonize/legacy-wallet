@@ -187,7 +187,7 @@
                   <img id="infoIcon" class="icon" src="/images/info.svg"> info 
                 </span>
                 <span class="tokenButton hide" id="mintButton">
-                  <img id="mintIcon" class="icon" src="/images/hammer.svg"> mint NFT 
+                  <img id="mintIcon" class="icon" src="/images/hammer.svg"> mint NFTs 
                 </span>
                 <span class="tokenButton hide" style="white-space: nowrap;" id="burnButton">
                   <img id="burnIcon" class="icon" src="/images/fire.svg">
@@ -233,17 +233,20 @@
                   </p>
                 </div>
                 <div id="nftMint"  class="hide"  style="margin-top: 10px;">
-                  Mint a single NFT (optionally with commitment)
-                  <p class="grouped">
-                    <input id="commitmentInput" placeholder="commitment">
-                    <input type="button" id="mintNFT" value="Mint NFT">
+                  Mint a number of (unique) NFTs to a specific address
+                  <div>
+                    <input type="checkbox" checked id="uniqueNFTs" onchange="disableInputfield(event)" style="margin: 0px; vertical-align: text-bottom;">
+                    make each NFT unique by numbering each one in the collection
+                  </div>
+                  <p class="grouped" style="align-items: center; margin-bottom: 5px;">
+                    <input id="amountNFTs" type="number" placeholder="amount NFTs">
+                    <input id="startingNumberNFTs" type="number" placeholder="starting number" style="margin-right: 0px;">
+                    <input id="commitmentNFTs" placeholder="commitment" style="display: none;">
                   </p>
-
-                  Mint a bunch of NFTs
-                  <p class="grouped">
-                    <input id="amountNFTs" type="number" style="width: 160px;" placeholder="number of NFTs">
+                  <span class="grouped">
+                    <input id="destinationAddr" placeholder="destinationAddress"> 
                     <input type="button" id="mintNFTs" value="Mint NFTs">
-                  </p>
+                  </span>
                 </div>
                 <div id="nftBurn"  class="hide"  style="margin-top: 10px;">
                   Burn this NFT so no new NFTs of this category can be minted
@@ -271,6 +274,7 @@
       <div id="createTokensView" class="hide">
         <fieldset class="item">
           <legend>Create new tokens</legend>
+          <div style="color: red;" id="warningNoBCH" class="hide">Need BCH in wallet to create tokens</div>
           <label for="newtokens">Select token-type:</label>
           <select name="newtokens" id="newtokens" onchange="selectTokenType(event)">
             <option value="fungibles">Fungible Tokens</option>
@@ -286,8 +290,10 @@
             </button>
           </div>
           <div style="margin-bottom: 1em;">
-            Choose the total supply of these fungible tokens
+            Choose the total supply of fungible tokens<br>
             <input id="tokenSupply" placeholder="total supply">
+            If you set decimals in the metadata, take the amount of the smallest unit <br>
+            <i>(for 100 A-tokens with 2 decimals this means 10,000 units)</i>
           </div>
           <div class="hide" style="margin-bottom: 1em;">
             Add immutable commitment data to add to this NFT (hexadecimals only)
@@ -309,9 +315,9 @@
             <div id="githubInfo" class="hide">
               If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
               <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
-              You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>. <br>
-              Then on Github Gists, press "raw" button to get the url to the json object. <br>
-              Copy this url without the 'https://' prefix and everything after '/raw'. <br>
+              You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>
+              or to put your icon on IPFS, you can use the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
+              Then on Github Gists, press "raw" button and copy the url until <code>/raw</code> in the input field below. <br>
               Your BCMR url together with the hash of its content will be stored on the blockchain.
               <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
             </div>
@@ -325,7 +331,8 @@
             <div id="ipfsInfo" class="hide">
               You can easily upload (pin) your BCMR on IPFS with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or with <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
               Icons and images can be grouped together in a separate folder, like in <a href="https://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy.ipfs.dweb.link/" target="_blank">this example bcmr</a>. <br>
-              Enter the location of your bcmr (version 1 CID) with 'ipfs://' prefix in the input field below. <br>
+              Enter the ipfs location of your bcmr (the version 1 CID which starts with <code>baf...</code>) with 
+              <code>ipfs://</code> prefix in the input field below. <br>
               The location of your BCMR together with the hash of its content will be stored on the blockchain.
               <input id="bcmrIpfs" placeholder="ipfs://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
             </div>
