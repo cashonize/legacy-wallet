@@ -502,11 +502,6 @@ Web3Wallet.init({
   web3wallet.on('session_proposal', renderSessionProposal);
 
   web3wallet.on('session_delete', async params => {
-    await web3wallet.disconnectSession({
-      topic: params.topic,
-      reason: getSdkError('USER_DISCONNECTED')
-    });
-
     updateSessions();
     updateHistory();
   });
