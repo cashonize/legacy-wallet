@@ -1004,8 +1004,7 @@ Web3Wallet.init({
   renderSessionProposals();
   renderRequests();
 
-  const wcuri = new URL(window.location.href).searchParams.get("uri");
-
+  const wcuri = new URL(window.location.href.replace("#", "")).searchParams.get("uri");
   if (wcuri && wcuri.indexOf("wc:") === 0) {
     const pairings = web3wallet.core.pairing.pairings.getAll();
     const topic = wcuri.match(/^wc:([a-zA-Z0-9]+).*/)?.[1];
@@ -1014,7 +1013,8 @@ Web3Wallet.init({
     } else {
       document.getElementById("wcUri").value = wcuri;
       setTimeout(connectButton.onclick(), 250);
-      window.history.replaceState(null, "Cashonize", ``);
+      window.history.replaceState(null, "Cashonize", "/");
+      document.getElementById("view4").click();
     }
   }
-})
+});
