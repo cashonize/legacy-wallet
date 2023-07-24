@@ -134,21 +134,17 @@ import { Core, HISTORY_EVENTS } from '@walletconnect/core'
 import { getSdkError } from '@walletconnect/utils';
 import { Web3Wallet } from '@walletconnect/web3wallet'
 
-const core = new Core({
-  projectId: "3fd234b8e2cd0e1da4bc08a0011bbf64"
-})
-
 const ready = async () => {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     let retries = 0;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       retries++;
-      if (retries > 30) {
+      if (retries > 50) {
         clearInterval(interval);
         resolve(false);
       }
 
-      if (window.walletClass) {
+      if (window.walletClass && await Wallet.namedExists(nameWallet)) {
         clearInterval(interval);
         resolve(true);
       }
@@ -156,6 +152,14 @@ const ready = async () => {
   });
 };
 
+const core = new Core({
+  projectId: "3fd234b8e2cd0e1da4bc08a0011bbf64"
+});
+
+const initWalletConnect = async () => {
+if (!await ready()) {
+  return;
+}
 
 Web3Wallet.init({
   core,
@@ -167,8 +171,6 @@ Web3Wallet.init({
   }
 }).then(async (web3wallet) =>
 {
-  await ready();
-
   const updateProposal = (proposal) => {
     const proposalParent = document.getElementById("wc-session-approval");
 
@@ -444,26 +446,41 @@ Web3Wallet.init({
     const { requiredNamespaces } = sessionProposal.params;
 
     if (!requiredNamespaces.bch) {
+      alert(`You are trying to connect an app from unsupported blockchain(s): ${Object.keys(requiredNamespaces).join(", ")}`);
       return;
     }
 
-    const wallet = await walletClass.named(nameWallet);
-    const namespaces = {
-      bch: {
-        methods: [
-          "bch_getAddresses",
-          "bch_signTransaction",
-          "bch_signMessage"
-        ],
-        chains: walletClass.network === "testnet" ? ["bch:bchtest"] : ["bch:bitcoincash"],
-        events: [
-          "addressesChanged"
-        ],
-        accounts: [`bch:${wallet.getDepositAddress()}`],
-      }
+    const requiredNetworkPrefix = requiredNamespaces.bch.chains[0]?.split(":")[1];
+    let needsNetworkSwitch = false;
+    if (walletClass.networkPrefix !== requiredNetworkPrefix) {
+      needsNetworkSwitch = true;
+      const requiredNetworkFullName = requiredNetworkPrefix === "bchtest" ? "BCH Chipnet" : "BCH Mainnet";
+      document.getElementById("session-approve-button").value = `Switch to ${requiredNetworkFullName} and approve`;
     }
 
     document.getElementById("session-approve-button").onclick = async () => {
+      if (needsNetworkSwitch) {
+        const networkName = requiredNetworkPrefix === "bchtest" ? "chipnet" : "mainnet";
+        changeNetwork({ target: { value: networkName } });
+        changeView(4);
+      }
+
+      const wallet = await walletClass.named(nameWallet);
+      const namespaces = {
+        bch: {
+          methods: [
+            "bch_getAddresses",
+            "bch_signTransaction",
+            "bch_signMessage"
+          ],
+          chains: walletClass.network === "testnet" ? ["bch:bchtest"] : ["bch:bitcoincash"],
+          events: [
+            "addressesChanged"
+          ],
+          accounts: [`bch:${wallet.getDepositAddress()}`],
+        }
+      }
+
       await web3wallet.approveSession({
         id: sessionProposal.id,
         namespaces: namespaces,
@@ -1018,3 +1035,7 @@ Web3Wallet.init({
     }
   }
 });
+};
+
+window.initWalletConnect = initWalletConnect;
+initWalletConnect();

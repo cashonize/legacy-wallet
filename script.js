@@ -107,6 +107,7 @@ window.createNewWallet = async function createNewWallet() {
   const walletId = mainnetWallet.toDbString().replace("mainnet", "testnet");
   await TestNetWallet.replaceNamed("mywallet", walletId);
   loadWalletInfo();
+  initWalletConnect();
 }
 
 window.importWallet = async function importWallet() {
@@ -121,6 +122,7 @@ window.importWallet = async function importWallet() {
   const walletIdTestnet = `seed:testnet:${seedphrase}:${derivationPath}`;
   await TestNetWallet.replaceNamed("mywallet", walletIdTestnet);
   loadWalletInfo();
+  initWalletConnect();
 }
 
 async function loadWalletInfo() {
