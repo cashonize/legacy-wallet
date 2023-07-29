@@ -538,7 +538,7 @@ async function loadWalletInfo() {
         const jsonRespAuthHead = await queryAuthHead(token.tokenId, chaingraphUrl);
         const authHeadObj = jsonRespAuthHead.data.transaction[0];
         const authHead = authHeadObj.authchains[0].authhead;
-        const authHeadTxId = authHead.identity_output[0].transaction_hash.slice(2);
+        const authHeadTxId = authHead.hash.slice(2);
         const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
         const authButton = tokenCard.querySelector('#authButton');
         const authTransfer = tokenCard.querySelector('#authTransfer');
@@ -707,7 +707,7 @@ async function loadWalletInfo() {
           const responseJson = await queryAuthHead(nft.tokenId, chaingraphUrl);
           const authHeadObj = responseJson.data.transaction[0];
           const authHead = authHeadObj.authchains[0].authhead;
-          const authHeadTxId = authHead.identity_output[0].transaction_hash.slice(2);
+          const authHeadTxId = authHead.hash.slice(2);
           if(authHeadTxId === nft.utxo.txid && nft.utxo.vout === 0){
             authButton.classList.remove("hide");
             authButton.onclick = () => authTransfer.classList.toggle("hide");

@@ -84,9 +84,7 @@ export async function queryAuthHead(tokenId, chaingraphUrl){
       hash
       authchains {
         authhead {
-          identity_output {
-            transaction_hash
-          }
+          hash
         }
       }
     }
