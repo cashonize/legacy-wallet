@@ -542,6 +542,7 @@ async function loadWalletInfo() {
         const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
         const authButton = tokenCard.querySelector('#authButton');
         const authTransfer = tokenCard.querySelector('#authTransfer');
+        const tokenCapability = token.tokenData.capability;
         tokenUtxos.forEach(utxo => {
           if(utxo.txid == authHeadTxId && utxo.vout == 0){
             authButton.classList.remove("hide");
@@ -549,7 +550,7 @@ async function loadWalletInfo() {
             const transferAuthButton = authTransfer.querySelector("#transferAuth");
             transferAuthButton.onclick = () => {
               const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-              transferAuth(utxo,authDestinationAddress);
+              transferAuth(utxo,authDestinationAddress, tokenCapability);
             }
           }
         });
@@ -720,7 +721,7 @@ async function loadWalletInfo() {
         const transferAuthButton = authTransfer.querySelector("#transferAuth");
         transferAuthButton.onclick = () => {
           const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-          transferAuth(nft.uxto, authDestinationAddress);
+          transferAuth(nft.uxto, authDestinationAddress, tokenCapability);
         }
         const mintNftsButton = nftMint.querySelector("#mintNFTs");
         mintNftsButton.onclick = () => {
@@ -888,7 +889,7 @@ async function loadWalletInfo() {
   }
 
   // Check the AuthChains for fungible tokens
-  async function transferAuth(autUtxo, authDestinationAddress) {
+  async function transferAuth(autUtxo, authDestinationAddress, tokenCapability) {
     try {
       const tokenId = autUtxo.token.tokenId;
       const amount = autUtxo.token.amount;
@@ -901,7 +902,7 @@ async function loadWalletInfo() {
         cashaddr: tokenAddr,
         tokenId: tokenId,
         commitment: nftCommitment,
-        capability: NFTCapability.minting
+        capability: tokenCapability
       });
       const { txId } = await wallet.send([
         {
