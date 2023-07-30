@@ -456,9 +456,7 @@ async function loadWalletInfo() {
       if(tokenInfo?.uris?.icon) newIcon(tokenCard, tokenInfo.uris.icon);
       if(token.tokenData){
         const NFTmetadata = tokenInfo.token.nfts?.parse.types[(token.tokenData.commitment)];
-        if(NFTmetadata?.uris?.icon){
-          newIcon(tokenCard, NFTmetadata.uris.icon)
-        }
+        if(NFTmetadata?.uris?.icon) addNftMetadata(tokenCard, NFTmetadata);
       }
       if(token.nfts){
         const children = tokenCard.children;
@@ -534,7 +532,6 @@ async function loadWalletInfo() {
     tokens.forEach(async (token, index) => {
       try{
         const tokenCard = document.querySelector("#Placeholder").children[index];
-        if(token?.tokenData?.commitment == "minting") return
         const jsonRespAuthHead = await queryAuthHead(token.tokenId, chaingraphUrl);
         const authHeadObj = jsonRespAuthHead.data.transaction[0];
         const authHead = authHeadObj.authchains[0].authhead;
@@ -542,7 +539,7 @@ async function loadWalletInfo() {
         const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
         const authButton = tokenCard.querySelector('#authButton');
         const authTransfer = tokenCard.querySelector('#authTransfer');
-        const tokenCapability = token.tokenData.capability;
+        const tokenCapability = token?.tokenData?.capability;
         tokenUtxos.forEach(utxo => {
           if(utxo.txid == authHeadTxId && utxo.vout == 0){
             authButton.classList.remove("hide");
@@ -568,12 +565,8 @@ async function loadWalletInfo() {
     tokens.forEach(async (token, index) => {
       const tokenCard = document.importNode(template.content, true);
       const tokenInfo = BCMR.getTokenInfo(token.tokenId);
-      let decimals = 0;
-      let symbol = "";
-      if(tokenInfo){
-        symbol = tokenInfo.token.symbol;
-        decimals = tokenInfo.token.decimals;
-      }
+      const decimals = tokenInfo?.token?.decimals || 0;
+      const symbol = tokenInfo?.token?.symbol || "";
       // Display tokenID for fungibles & NFTs
       const displayId = `${token.tokenId.slice(0, 20)}...${token.tokenId.slice(-10)}`;
       tokenCard.querySelector("#tokenID").textContent = displayId;
@@ -585,7 +578,6 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
         if(tokenInfo.description) tokenCard.querySelector("#tokenDescription").textContent = `Token description: ${tokenInfo.description}`;
         if(tokenInfo.uris?.web) tokenCard.querySelector("#tokenWebLink").textContent = `Token web link: ${tokenInfo.uris.web}`;
-        tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${tokenInfo.token.decimals}`;
         tokenCard.querySelector("#sendUnit").textContent = symbol;
         const BCMRs = BCMR.getRegistries();
         let isVerified = false;
@@ -654,6 +646,7 @@ async function loadWalletInfo() {
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
         const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
+        tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${decimals}`;
         const tokenSend = tokenCard.querySelector('#tokenSend');
         tokenCard.getElementById("sendButton").onclick = () => tokenSend.classList.toggle("hide");
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
@@ -700,19 +693,10 @@ async function loadWalletInfo() {
         if (tokenCapability == "minting"){ 
           const mintButton = element.querySelector('#mintButton');
           const burnButton = element.querySelector('#burnButton');
-          const authButton = element.querySelector('#authButton');
           mintButton.classList.remove("hide");
           mintButton.onclick = () => nftMint.classList.toggle("hide");
           burnButton.classList.remove("hide");
           burnButton.onclick = () => nftBurn.classList.toggle("hide");
-          const responseJson = await queryAuthHead(nft.tokenId, chaingraphUrl);
-          const authHeadObj = responseJson.data.transaction[0];
-          const authHead = authHeadObj.authchains[0].authhead;
-          const authHeadTxId = authHead.hash.slice(2);
-          if(authHeadTxId === nft.utxo.txid && nft.utxo.vout === 0){
-            authButton.classList.remove("hide");
-            authButton.onclick = () => authTransfer.classList.toggle("hide");
-          }
         }
         const burnNftButton = nftBurn.querySelector("#burnNFT");
         burnNftButton.onclick = () => {
@@ -732,6 +716,12 @@ async function loadWalletInfo() {
           const amountNFTs = nftMint.querySelector('#amountNFTs').value;
           const destinationAddr = nftMint.querySelector('#destinationAddr').value;
           mintNft(token.tokenId, commitmentNFTs, amountNFTs, uniqueNFTs, startingNumberNFTs, destinationAddr);
+        }
+
+        // NFT metadata, identical to on re-render
+        if(tokenInfo){
+          const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
+          if(NFTmetadata) addNftMetadata(element,NFTmetadata);
         }
       } if(token.nfts){
         tokenCard.querySelector("#tokenType").textContent = "NFT group";
@@ -753,12 +743,6 @@ async function loadWalletInfo() {
 
           generateIcon(childNft);
           renderNft(token.nfts[i],childNft);
-
-          // NFT metadata, identical to on re-render
-          if(tokenInfo){
-            const NFTmetadata = tokenInfo.token.nfts?.parse.types[nftCommitment];
-            if(NFTmetadata) addNftMetadata(childNft,NFTmetadata);
-          }
 
           tokenCard.querySelector(".item").appendChild(childNft);
         }
