@@ -299,10 +299,10 @@
           <details  style="margin-bottom: 0.5em;">
             <summary>Optionally link metadata to this token</summary>
             You can add metadata to your Cashtokens using the <a href="https://github.com/bitjson/chip-bcmr" target="_blank">BCMR-standard</a>. <br>
-            You do this by creating a JSON file and uploading it to HTTPS or to IPFS. <br>
-            There's a <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> for fungible tokens and 
-            multiple <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br><br>
-            <label for="selectUri">Upload the metadata to</label>
+            First you need to create a JSON file either with the <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> form or
+            with a code-editor by using the BCMR-schema and the <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br>
+            Then you need to upload this BCMR metadata file to HTTPS or to IPFS. <br><br>       
+            <label for="selectUri">Select which method to use: </label>
             <select name="selectUri" id="selectUri" onchange="selectUri(event)">
               <option value="select">- select -</option>
               <option value="github">HTTPS: github gist</option>
