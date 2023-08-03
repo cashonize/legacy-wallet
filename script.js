@@ -309,14 +309,14 @@ async function loadWalletInfo() {
     if(selectedMethod === "github") inputField = document.querySelector('#bcmrUrlGithub').value;
     if(selectedMethod === "website") inputField = document.querySelector('#bcmrUrlWebsite').value;
     if(selectedMethod === "IPFS") {
-      inputField = document.querySelector('#bcmrIpfs').value;
+      inputField = "ipfs://" + document.querySelector('#bcmrIpfs').value;
       httpsSelected = false;
     }
     let opreturnData
     if(inputField){
-      let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://");
+      let validinput = httpsSelected? !inputField.startsWith("http"): inputField.startsWith("ipfs://baf");
       if(!validinput){
-        httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should start with ipfs prefix!");
+        httpsSelected ? alert("Urls should not have any prefix!") : alert("Ipfs location should be a v1 CID");
         return
       }
       try{
