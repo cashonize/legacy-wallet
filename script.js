@@ -463,6 +463,7 @@ async function loadWalletInfo() {
         for(let i=1; i<children.length; i++){
           const nftCard = children[i];
           const nft = token.nfts[i-1];
+          newIcon(nftCard, tokenInfo?.uris?.icon);
           const NFTmetadata = tokenInfo.token.nfts?.parse.types[(nft.tokenData.commitment)];
           if(NFTmetadata) addNftMetadata(nftCard, NFTmetadata);
         }
@@ -741,7 +742,7 @@ async function loadWalletInfo() {
           const childNftCommitment = nftCommitment || 'none'
           childNft.querySelector("#childNftCommitment").textContent = `Commitment: ${childNftCommitment}`
 
-          generateIcon(childNft);
+          generateIcon(childNft, tokenInfo?.uris?.icon);
           renderNft(token.nfts[i],childNft);
 
           tokenCard.querySelector(".item").appendChild(childNft);
