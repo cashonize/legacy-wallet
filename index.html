@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="switchery/switchery.css" />
   <script src="switchery/switchery.js"></script>
-  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.30.js"></script>
+  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.32.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
   <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
@@ -303,7 +303,7 @@
             with a code-editor by using the <a href="https://github.com/bitjson/chip-bcmr/blob/master/bcmr-v2.schema.ts" target="_blank">BCMR-schema</a> 
             and the <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br>
             You will need to upload the image(s) for your token and this BCMR file to HTTPS or to IPFS.
-            The different methods are listed below with more steps for each one. <br><br>       
+            The different methods are listed below with more steps for each one. (IPFS recommended) <br><br>       
             <label for="selectUri">Select which method to use: </label>
             <select name="selectUri" id="selectUri" onchange="selectUri(event)">
               <option value="select">- select -</option>
@@ -338,7 +338,8 @@
           </details>
           <b>Note:</b> Metadata can still be added/updated later by the token's 
           <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
-          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away. <br>
+          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away.
+          You can publish an on-chain metadata update with the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> program.<br><br>
           Process might take a few seconds... 
           <input type="button" class="primaryButton" id="createTokens" value="Create">
         </fieldset>

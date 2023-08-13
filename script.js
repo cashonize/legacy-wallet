@@ -252,7 +252,7 @@ async function loadWalletInfo() {
         const nfts = [];
         for (const utxo of utxos) {
           const tokenData = utxo.token;
-          if(tokenData.capability) nfts.push({ tokenId, tokenData, utxo:utxos[0] });
+          if(tokenData.capability) nfts.push({ tokenId, tokenData, utxo });
         }
         arrayTokens.push({ tokenId, nfts });
       }
@@ -540,15 +540,15 @@ async function loadWalletInfo() {
         const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
         const authButton = tokenCard.querySelector('#authButton');
         const authTransfer = tokenCard.querySelector('#authTransfer');
-        const tokenCapability = token?.tokenData?.capability;
         tokenUtxos.forEach(utxo => {
           if(utxo.txid == authHeadTxId && utxo.vout == 0){
+            const tokenCapabilityAuth = utxo?.token?.capability;
             authButton.classList.remove("hide");
             authButton.onclick = () => authTransfer.classList.toggle("hide");
             const transferAuthButton = authTransfer.querySelector("#transferAuth");
             transferAuthButton.onclick = () => {
               const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-              transferAuth(utxo,authDestinationAddress, tokenCapability);
+              transferAuth(utxo,authDestinationAddress, tokenCapabilityAuth);
             }
           }
         });
