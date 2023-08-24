@@ -320,7 +320,7 @@ async function loadWalletInfo() {
         return
       }
       try{
-        const bcmrLocation = selectedMethod === "website"? "/.well-known/bitcoin-cash-metadata-registry.json" : "";
+        const bcmrLocation = selectedMethod === "website" && !inputField.endsWith(".json")? "/.well-known/bitcoin-cash-metadata-registry.json" : "";
         const fetchLocation = httpsSelected ? "https://" + inputField + bcmrLocation : ipfsGateway + inputField.slice(7);
         const reponse = await fetch(fetchLocation);
         const bcmrContent = await reponse.text();
