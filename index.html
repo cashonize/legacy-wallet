@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="walletconnect.css">
   <link rel="stylesheet" href="switchery/switchery.css" />
   <script src="switchery/switchery.js"></script>
-  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.30.js"></script>
+  <script defer src="https://cdn.mainnet.cash/mainnet-1.1.32.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
   <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
@@ -302,10 +302,12 @@
           <details  style="margin-bottom: 0.5em;">
             <summary>Optionally link metadata to this token</summary>
             You can add metadata to your Cashtokens using the <a href="https://github.com/bitjson/chip-bcmr" target="_blank">BCMR-standard</a>. <br>
-            You do this by creating a JSON file and uploading it to HTTPS or to IPFS. <br>
-            There's a <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> for fungible tokens and 
-            multiple <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br><br>
-            <label for="selectUri">Upload the metadata to</label>
+            You create a BCMR JSON file either with the <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> form or
+            with a code-editor by using the <a href="https://github.com/bitjson/chip-bcmr/blob/master/bcmr-v2.schema.ts" target="_blank">BCMR-schema</a> 
+            and the <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br>
+            You will need to upload the image(s) for your token and this BCMR file to HTTPS or to IPFS.
+            The different methods are listed below with more steps for each one. (IPFS recommended) <br><br>       
+            <label for="selectUri">Select which method to use: </label>
             <select name="selectUri" id="selectUri" onchange="selectUri(event)">
               <option value="select">- select -</option>
               <option value="github">HTTPS: github gist</option>
@@ -316,7 +318,7 @@
               If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
               <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
               You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>
-              or to put your icon on IPFS, you can use the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
+              or to put your icon on IPFS, you can use <a href="https://nft.storage/" target="_blank">nft.storage</a> for a single icon or the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool for a folders of images. <br>
               Then on Github Gists, press "raw" button and copy the url until <code>/raw</code> in the input field below. <br>
               Your BCMR url together with the hash of its content will be stored on the blockchain.
               <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
@@ -329,18 +331,18 @@
               <input id="bcmrUrlWebsite" placeholder="yourtokenwebsite.com">
             </div>
             <div id="ipfsInfo" class="hide">
-              You can easily upload (pin) your BCMR on IPFS with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service or with <a href="https://nft.storage/" target="_blank">nft.storage</a>. <br>
-              Icons and images can be grouped together in a separate folder, like in <a href="https://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy.ipfs.dweb.link/" target="_blank">this example bcmr</a>. <br>
-              Enter the ipfs location of your bcmr (the version 1 CID which starts with <code>baf...</code>) with 
-              <code>ipfs://</code> prefix in the input field below. <br>
-              The location of your BCMR together with the hash of its content will be stored on the blockchain.
-              <input id="bcmrIpfs" placeholder="ipfs://bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
+              You can easily upload (pin) your BCMR on IPFS with <a href="https://nft.storage/" target="_blank">nft.storage</a> or with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service. <br>
+              Uploading multiple images grouped together on IPFS can be done with the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool. <br>
+              Enter the IPFS location of your BCMR json file (version 1 CID starting with <code>baf...</code>) below. <br>
+              The BCMR location together with the hash of its content will be stored on the blockchain.
+              <input id="bcmrIpfs" placeholder="bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
             </div>
             <br>
           </details>
           <b>Note:</b> Metadata can still be added/updated later by the token's 
           <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
-          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away. <br>
+          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away.
+          You can publish an on-chain metadata update with the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> program.<br><br>
           Process might take a few seconds... 
           <input type="button" class="primaryButton" id="createTokens" value="Create">
         </fieldset>
