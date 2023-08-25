@@ -272,76 +272,87 @@
         <fieldset class="item">
           <legend>Create new tokens</legend>
           <div style="color: red;" id="warningNoBCH" class="hide">Need BCH in wallet to create tokens</div>
-          <label for="newtokens">Select token-type:</label>
-          <select name="newtokens" id="newtokens" onchange="selectTokenType(event)">
-            <option value="fungibles">Fungible Tokens</option>
-            <option value="mintingNFT">Minting NFT</option>
-            <option value="immutableNFT">Immutable NFT</option>
-          </select>
-          <br>
+
           <div style="margin-bottom: 1em;">
             Planned tokenId:
             <span id="plannedTokenId">loading...</span>
             <button type="button" style="background: none; padding: 0;" onclick="copyTokenID(event,'plannedTokenId')">
-              <img class="copyIcon" src="/images/copy.svg">
+              <img class="copyIcon icon" src="/images/copy.svg">
             </button>
           </div>
-          <div style="margin-bottom: 1em;">
-            Choose the total supply of fungible tokens<br>
-            <input id="tokenSupply" placeholder="total supply">
-            If you set decimals in the metadata, take the amount of the smallest unit <br>
-            <i>(for 100 A-tokens with 2 decimals this means 10,000 units)</i>
+
+          <label for="newtokens">Select token-type:</label>
+          <select name="newtokens" id="newtokens" onchange="selectTokenType(event)">
+            <option autocomplete="off" selected value="-select-">-select-</option>
+            <option autocomplete="off" value="fungibles">Fungible Tokens</option>
+            <option autocomplete="off" value="mintingNFT">Minting NFT</option>
+            <option autocomplete="off" value="immutableNFT">Immutable NFT</option>
+          </select>
+          <br>
+          <div id="infoTokenTypes">
+            <b>Fungible Tokens</b> is used to create interchangable tokens. The total supply of the tokens needs to be determined at creation. <br>
+            <b>Minting NFT</b> is used to create an NFT collection. The Minting NFT has the ability to mint new NFTs with the same tokenId. <br>
+            <b>Immutable NFT</b> is used to create a one-off NFT. There is no option to create more NFTs of the same kind. <br><br>
           </div>
-          <div class="hide" style="margin-bottom: 1em;">
-            Add immutable commitment data to add to this NFT (hexadecimals only)
-            <input id="inputNftCommitment" placeholder="commitment">
+
+          <div id="createTokenType" class="hide">
+            <div style="margin-bottom: 1em;">
+              Choose the total supply of fungible tokens<br>
+              <input id="tokenSupply" placeholder="total supply">
+              If you set decimals in the metadata, take the amount of the smallest unit <br>
+              <i>(for 100 A-tokens with 2 decimals this means 10,000 units)</i>
+            </div>
+            <div class="hide" style="margin-bottom: 1em;">
+              Add immutable commitment data to add to this NFT (hexadecimals only)
+              <input id="inputNftCommitment" placeholder="commitment">
+            </div>
+            <details  style="margin-bottom: 0.5em;">
+              <summary>Optionally link metadata to this token</summary>
+              You can add metadata to your Cashtokens using the <a href="https://github.com/bitjson/chip-bcmr" target="_blank">BCMR-standard</a>. <br>
+              You create a BCMR JSON file either with the <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> form or
+              with a code-editor by using the <a href="https://github.com/bitjson/chip-bcmr/blob/master/bcmr-v2.schema.ts" target="_blank">BCMR-schema</a> 
+              and the <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br>
+              You will need to upload the image(s) for your token and this BCMR file to HTTPS or to IPFS.
+              The different methods are listed below with more steps for each one. (IPFS recommended) <br><br>       
+              <label for="selectUri">Select which method to use: </label>
+              <select name="selectUri" id="selectUri" onchange="selectUri(event)">
+                <option value="select">- select -</option>
+                <option value="github">HTTPS: github gist</option>
+                <option value="website">HTTPS: own website</option>
+                <option value="IPFS">IPFS</option>
+              </select><br>
+              <div id="githubInfo" class="hide">
+                If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
+                <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
+                You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>
+                or to put your icon on IPFS, you can use <a href="https://nft.storage/" target="_blank">nft.storage</a> for a single icon or the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool for a folders of images. <br>
+                Then on Github Gists, press "raw" button and copy the url until <code>/raw</code> in the input field below. <br>
+                Your BCMR url together with the hash of its content will be stored on the blockchain.
+                <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
+              </div>
+              <div id="websiteInfo" class="hide">
+                You can also host the BCMR json file on your own website, the recommended location for it is <code>/.well-known/bitcoin-cash-metadata-registry.json</code> 
+                like <a href="https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json" target="_blank">the OTR registry</a> does. <br>
+                Using this, you only need to enter the base url 'yourtokenwebsite.com' below. <br>
+                Your website url together with the hash of the BCMR file will be stored on the blockchain.
+                <input id="bcmrUrlWebsite" placeholder="yourtokenwebsite.com">
+              </div>
+              <div id="ipfsInfo" class="hide">
+                You can easily upload (pin) your BCMR on IPFS with <a href="https://nft.storage/" target="_blank">nft.storage</a> or with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service. <br>
+                Uploading multiple images grouped together on IPFS can be done with the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool. <br>
+                Enter the IPFS location of your BCMR json file (version 1 CID starting with <code>baf...</code>) below. <br>
+                The BCMR location together with the hash of its content will be stored on the blockchain.
+                <input id="bcmrIpfs" placeholder="bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
+              </div>
+              <br>
+            </details>
+            <b>Note:</b> Token metadata can still be added/updated later by the token's 
+            <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
+            The authority to update the metadata should be transferred to a wallet with coin-control right after creation.
+            Then you can publish on-chain metadata updates with the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> tool.<br><br>
+            Process might take a few seconds... 
+            <input type="button" class="primaryButton" id="createTokens" value="Create">
           </div>
-          <details  style="margin-bottom: 0.5em;">
-            <summary>Optionally link metadata to this token</summary>
-            You can add metadata to your Cashtokens using the <a href="https://github.com/bitjson/chip-bcmr" target="_blank">BCMR-standard</a>. <br>
-            You create a BCMR JSON file either with the <a href="https://bcmr-generator.netlify.app/" target="_blank">BCMR generator</a> form or
-            with a code-editor by using the <a href="https://github.com/bitjson/chip-bcmr/blob/master/bcmr-v2.schema.ts" target="_blank">BCMR-schema</a> 
-            and the <a href="https://github.com/bitjson/chip-bcmr/tree/master/examples" target="_blank">official examples</a>. <br>
-            You will need to upload the image(s) for your token and this BCMR file to HTTPS or to IPFS.
-            The different methods are listed below with more steps for each one. (IPFS recommended) <br><br>       
-            <label for="selectUri">Select which method to use: </label>
-            <select name="selectUri" id="selectUri" onchange="selectUri(event)">
-              <option value="select">- select -</option>
-              <option value="github">HTTPS: github gist</option>
-              <option value="website">HTTPS: own website</option>
-              <option value="IPFS">IPFS</option>
-            </select><br>
-            <div id="githubInfo" class="hide">
-              If you have a GitHub account and know how to use git, you can easily host your BCMR on Github Gist, similar to 
-              <a href="https://gist.github.com/mr-zwets/84b0057808af20df392815fb27d4a661" target="_blank">DogeCash</a>. <br>
-              You can add an icon image to your gist by following <a href="https://gist.github.com/mroderick/1afdd71aa69f6b29601d335751a1a9be" target="_blank">these steps</a>
-              or to put your icon on IPFS, you can use <a href="https://nft.storage/" target="_blank">nft.storage</a> for a single icon or the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool for a folders of images. <br>
-              Then on Github Gists, press "raw" button and copy the url until <code>/raw</code> in the input field below. <br>
-              Your BCMR url together with the hash of its content will be stored on the blockchain.
-              <input id="bcmrUrlGithub" placeholder="gist.githubusercontent.com/mr-zwets/323c7786e2acf01e3c04a440d7cf6c2c/raw">
-            </div>
-            <div id="websiteInfo" class="hide">
-              You can also host the BCMR json file on your own website, the recommended location for it is <code>/.well-known/bitcoin-cash-metadata-registry.json</code> 
-              like <a href="https://otr.cash/.well-known/bitcoin-cash-metadata-registry.json" target="_blank">the OTR registry</a> does. <br>
-              Using this, you only need to enter the base url 'yourtokenwebsite.com' below. <br>
-              Your website url together with the hash of the BCMR file will be stored on the blockchain.
-              <input id="bcmrUrlWebsite" placeholder="yourtokenwebsite.com">
-            </div>
-            <div id="ipfsInfo" class="hide">
-              You can easily upload (pin) your BCMR on IPFS with <a href="https://nft.storage/" target="_blank">nft.storage</a> or with the <a href="https://ipfs-bch.pat.mn/" target="_blank">IPFS-BCH</a> service. <br>
-              Uploading multiple images grouped together on IPFS can be done with the <a href="https://nft.storage/docs/how-to/nftup/" target="_blank">NFT UP</a> tool. <br>
-              Enter the IPFS location of your BCMR json file (version 1 CID starting with <code>baf...</code>) below. <br>
-              The BCMR location together with the hash of its content will be stored on the blockchain.
-              <input id="bcmrIpfs" placeholder="bafkreiaqpmlrtsdf5cvwgh46mpyric2r44ikqzqgtevny74qdmrjc5dkxy">
-            </div>
-            <br>
-          </details>
-          <b>Note:</b> Metadata can still be added/updated later by the token's 
-          <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
-          It's best pracitice to transfer the authority to update metadata to a wallet with coin-control right away.
-          Then you can publish on-chain metadata updates with the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> program.<br><br>
-          Process might take a few seconds... 
-          <input type="button" class="primaryButton" id="createTokens" value="Create">
         </fieldset>
       </div>
 

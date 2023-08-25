@@ -55,6 +55,9 @@ function toggleDarkmode() {
   document.querySelector('#darkmode').checked = darkMode;
 }
 
+// Overwrite any browser stored select options 
+document.querySelector('#newtokens').value = "-select-";
+
 // Logic default unit
 const readUnit = localStorage.getItem("unit");
 if(readUnit) document.querySelector('#selectUnit').value = readUnit;
@@ -955,6 +958,15 @@ window.changeView = function changeView(newView) {
 
 // Change create token view
 window.selectTokenType = function selectTokenType(event){
+  const infoTokenTypes = document.querySelector('#infoTokenTypes');
+  const createTokenType = document.querySelector('#createTokenType');
+  if(event.target.value === "-select-"){
+    infoTokenTypes.classList.remove("hide");
+    createTokenType.classList.add("hide");
+  } else {
+    createTokenType.classList.remove("hide");
+    infoTokenTypes.classList.add("hide");
+  }
   const tokenSupply = document.querySelector('#tokenSupply').parentElement;
   const tokenCommitment = document.querySelector('#inputNftCommitment').parentElement;
   tokenSupply.classList.add("hide");
