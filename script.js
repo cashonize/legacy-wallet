@@ -465,8 +465,9 @@ async function loadWalletInfo() {
         const children = tokenCard.children;
         for(let i=1; i<children.length; i++){
           const nftCard = children[i];
-          const nft = token.nfts[i-1];
-          newIcon(nftCard, tokenInfo?.uris?.icon);
+          const nft = token.nfts[i - 1];
+          const icon = tokenInfo?.uris?.icon
+          if (icon) newIcon(nftCard, icon);
           const NFTmetadata = tokenInfo.token.nfts?.parse.types[(nft.tokenData.commitment)];
           if(NFTmetadata) addNftMetadata(nftCard, NFTmetadata);
         }
