@@ -480,7 +480,7 @@ async function loadWalletInfo() {
     const icon = document.createElement("img");
     if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
     icon.src = iconSrc;
-    icon.style = "width:48px; max-width:inherit; border-radius:50%;";
+    icon.style = "width:48px; max-width:inherit;";
     const tokenIcon = element.querySelector("#tokenIcon");
     if(tokenIcon?.lastChild) tokenIcon.removeChild(tokenIcon.lastChild);
     tokenIcon.appendChild(icon);
@@ -640,7 +640,7 @@ async function loadWalletInfo() {
           icon = document.createElement("img");
           if(iconSrc.startsWith("ipfs://")) iconSrc = ipfsGateway+iconSrc.slice(7);
           icon.src = iconSrc;
-          icon.style = "width:48px; max-width: inherit; border-radius:50%;";
+          icon.style = "width:48px; max-width: inherit;";
         }
         const tokenIcon = element.querySelector("#tokenIcon");
         tokenIcon.appendChild(icon);
