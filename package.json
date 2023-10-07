@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp -r switchery dist && cp images/cashonize-icon.png dist/favicon.ico"
+    "build": "vite build && cp -r switchery dist && cp images/cashonize-icon.png dist/favicon.ico",
+    "preview": "vite preview"
   },
   "repository": "https://github.com/cashonize/wallet.git",
   "author": "mainnet-pat <mainnet_pat@protonmail.com>",
