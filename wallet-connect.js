@@ -3,6 +3,10 @@ import { encodeTransaction, generateTransaction, hash256, generateSigningSeriali
 const nameWallet = "mywallet";
 let historyUpdateInterval;
 
+let darkMode = false;
+const readDarkMode = localStorage.getItem("darkMode");
+if (readDarkMode === "true") darkMode = true;
+
 document.getElementById("wc-session-approval-modal").onclick = (event) => {
   document.getElementById("wc-session-approval-modal").style.display = "none";
 }
@@ -227,8 +231,8 @@ Web3Wallet.init({
             <div id="session-app-description">${sanitize(meta.description)}</div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div id="session-settings-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="cogIcon icon"></div>
-            <div id="session-delete-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="trashIcon icon"></div>
+            <div id="session-settings-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="settingsIcon icon ${darkMode? "dark":""}"></div>
+            <div id="session-delete-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="trashIcon icon ${darkMode? "dark":""}"></div>
           </div>
         </div>`;
       sessionParent.innerHTML += sessionHtml;

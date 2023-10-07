@@ -27,11 +27,14 @@ header {
 .icon{
   vertical-align: text-bottom;
 }
-#settingsIcon.dark{
+.settingsIcon.dark{
   content:url("/images/cogGrey.svg");
 }
-.active #settingsIcon{
+.active .settingsIcon{
   content:url("/images/cogGreen.svg");
+}
+.settingsIcon{
+  content:url("/images/settings.svg");
 }
 .plusIcon.dark{
   content:url("/images/plus-squareGrey.svg");
@@ -44,6 +47,9 @@ header {
 }
 .cogIcon{
   content:url("/images/cogGrey.svg");
+}
+.trashIcon.dark{
+  content:url("/images/trashGrey.svg");
 }
 .trashIcon{
   content:url("/images/trash.svg");
