@@ -28,52 +28,52 @@ header {
   vertical-align: text-bottom;
 }
 #settingsIcon.dark{
-  content:url("images/cogGrey.svg");
+  content:url("/images/cogGrey.svg");
 }
 .active #settingsIcon{
   content:url("/images/cogGreen.svg");
 }
 .plusIcon.dark{
-  content:url("images/plus-squareGrey.svg");
+  content:url("/images/plus-squareGrey.svg");
 }
 .importIcon.dark{
-  content:url("images/log-inGrey.svg");
+  content:url("/images/log-inGrey.svg");
 }
 .copyIcon{
-  content:url("images/copyGrey.svg");
+  content:url("/images/copyGrey.svg");
 }
 .cogIcon{
-  content:url("images/cogGrey.svg");
+  content:url("/images/cogGrey.svg");
 }
 .trashIcon{
-  content:url("images/trash.svg");
+  content:url("/images/trash.svg");
 }
 #sendIcon.dark{
-  content:url("images/sendGrey.svg");
+  content:url("/images/sendGrey.svg");
 }
 #infoIcon.dark{
-  content:url("images/infoGrey.svg");
+  content:url("/images/infoGrey.svg");
 }
 #mintIcon.dark{
-  content:url("images/hammerGrey.svg");
+  content:url("/images/hammerGrey.svg");
 }
 #burnIcon.dark{
-  content:url("images/fireGrey.svg");
+  content:url("/images/fireGrey.svg");
 }
 #authIcon.dark{
-  content:url("images/shieldGrey.svg");
+  content:url("/images/shieldGrey.svg");
 }
 #showIcon.dark{
-  content:url("images/chevron-square-downGrey.svg");
+  content:url("/images/chevron-square-downGrey.svg");
 }
 #showIcon.less{
-  content:url("images/chevron-square-up.svg");
+  content:url("/images/chevron-square-up.svg");
 }
 #showIcon.less.dark{
-  content:url("images/chevron-square-upGrey.svg");
+  content:url("/images/chevron-square-upGrey.svg");
 }
 .unverifiedIcon{
-  content:url("images/exclamation-circle.svg");
+  content:url("/images/exclamation-circle.svg");
 }
 body {
   margin: 0px;
