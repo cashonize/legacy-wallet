@@ -1,0 +1,80 @@
+.prefix-span {
+  display: none;
+}
+
+@media only screen and (min-width: 480px) {
+  .prefix-span {
+    display: block;
+  }
+}
+
+.history-item {
+  padding: 0px;
+}
+
+@media only screen and (min-width: 480px) {
+  .history-item {
+    padding: 7px;
+  }
+}
+
+#wc-session-history-modal-inner {
+  padding: 1rem;
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-history-modal-inner {
+    padding: 3rem;
+  }
+}
+
+#wc-session-history-modal {
+  padding: 1rem;
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-history-modal {
+    padding: 5rem;
+  }
+}
+
+.history-value {
+  max-width: calc(100vw - 180px);
+}
+
+@media only screen and (min-width: 480px) {
+  .history-value {
+    max-width: 420px;
+  }
+}
+
+.history-value-address {
+  max-width: calc(100vw - 200px);
+}
+
+@media only screen and (min-width: 480px) {
+  .history-value-address {
+    max-width: 400px;
+  }
+}
+
+#wc-session-request-modal-container {
+  padding: 1rem;
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-request-modal-container {
+    padding: 5rem;
+  }
+}
+
+#wc-session-request-modal-container > fieldset {
+  padding: 1rem;
+  background-color: var(--bg-color);
+}
+
+@media only screen and (min-width: 480px) {
+  #wc-session-request-modal-container > fieldset {
+    padding: 0.5rem 2rem;
+  }
+}

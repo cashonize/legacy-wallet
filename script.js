@@ -66,7 +66,7 @@ let unit = readUnit || 'BCH';
 // Logic network
 const readNetwork = localStorage.getItem("network");
 let network = "mainnet"
-let walletClass
+// let walletClass
 let explorerUrl
 let watchAddressCancel
 let watchBalanceCancel
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   const mainnetWalletExists = await Wallet.namedExists(nameWallet);
   const testnetWalletExists = await TestNetWallet.namedExists(nameWallet);
   const walletExists = mainnetWalletExists || testnetWalletExists;
-  walletClass = Wallet
+  window.walletClass = Wallet
 
   if(!readNetwork && walletExists){
     network = mainnetWalletExists ? "mainnet" : "chipnet";
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   }
   if(readNetwork) network = readNetwork;
   document.querySelector('#selectNetwork').value = network;
-  if(network === "chipnet") walletClass = TestNetWallet;
+  if(network === "chipnet") window.walletClass = TestNetWallet;
   footer.classList.remove("hide");
   if(!walletExists) newWalletView.classList.remove("hide");
   else{loadWalletInfo()};
@@ -110,6 +110,7 @@ window.createNewWallet = async function createNewWallet() {
   const walletId = mainnetWallet.toDbString().replace("mainnet", "testnet");
   await TestNetWallet.replaceNamed("mywallet", walletId);
   loadWalletInfo();
+  initWalletConnect();
 }
 
 window.importWallet = async function importWallet() {
@@ -124,6 +125,7 @@ window.importWallet = async function importWallet() {
   const walletIdTestnet = `seed:testnet:${seedphrase}:${derivationPath}`;
   await TestNetWallet.replaceNamed("mywallet", walletIdTestnet);
   loadWalletInfo();
+  initWalletConnect();
 }
 
 async function loadWalletInfo() {
@@ -946,7 +948,7 @@ window.copyTokenID = function copyTokenID(event, id='tokenID') {
 
 // Change view logic
 window.changeView = function changeView(newView) {
-  const views = ['walletView','tokenView','createTokensView','settingsView'];
+  const views = ['walletView','tokenView','createTokensView','settingsView','walletConnectView'];
   // First hide all views
   views.forEach((view, index) => {
     document.querySelector(`#${view}`).classList.add("hide");
@@ -1012,7 +1014,7 @@ window.selectUnit = function selectUnit(event){
 // Change network
 window.changeNetwork = function changeNetwork(event){
   network = event.target.value;
-  walletClass = network === "chipnet" ? TestNetWallet : Wallet;
+  window.walletClass = network === "chipnet" ? TestNetWallet : Wallet;
   localStorage.setItem("network", network);
   watchAddressCancel()
   watchBalanceCancel()

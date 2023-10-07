@@ -9,27 +9,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/chota@0.8.0/dist/chota.min.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="walletconnect.css">
   <link rel="stylesheet" href="switchery/switchery.css" />
   <script src="switchery/switchery.js"></script>
   <script defer src="https://cdn.mainnet.cash/mainnet-2.0.1.js"></script>
   <script>window.exports = {}</script>
   <script defer src="https://unpkg.com/@download/blockies@1.0.3/dist/blockies.min.js"></script>
   <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 
 <body>
-  <div id="banner">
+  <!-- <div id="banner">
     The official url for Cashonize going forward is <a href="https://cashonize.com/">Cashonize.com</a>, please migrate!
-  </div>
+  </div> -->
   <header>
     <img class="cashonize-logo" src="./images/cashonize-logo.png">
     <div>
       <nav class="nav hide">
         <div class="nav-left">
           <div class="tabs">
-            <a id="view0" class="view active" onclick="changeView(0)">BchWallet</a>
-            <a id="view1" class="view" onclick="changeView(1)">MyTokens</a>
-            <a id="view2" class="view" onclick="changeView(2)">CreateTokens</a>
+            <a id="view0" class="view active" onclick="changeView(0)"></a>
+            <a id="view1" class="view" onclick="changeView(1)"></a>
+            <a id="view2" class="view" onclick="changeView(2)"></a>
+            <a id="view4" class="view" onclick="changeView(4)"></a>
             <a id="view3" class="view" onclick="changeView(3)">
               <div><img id="settingsIcon" class="icon" src="/images/settings.svg"></div>
             </a>
@@ -49,7 +52,7 @@
             <br>
             <h4><img class="icon importIcon" src="/images/log-in.svg"> Import existing wallet</h4> 
             <div>Enter mnemonic seed phrase</div>
-            <textarea style="resize: none;" id="enterSeedphrase"rows="3" cols="50" placeholder="word1 word2 ..."></textarea>
+            <textarea style="resize: none;" id="enterSeedphrase" rows="3" cols="50" placeholder="word1 word2 ..."></textarea>
             <span>Derivation path: </span>
             <select name="derivationPath" id="derivationPath" onchange="selectTokenType(event)">
               <option value="standard">m/44’/145’/0’ (standard)</option>
@@ -119,7 +122,7 @@
             <span class="addressInput"><input id="sendAddr" placeholder="address"></span>
             <span class="sendAmountGroup">
               <span style="width: 100%;" class="input-icon input-icon-right">
-                <input id="sendAmount" type="text"placeholder="amount">
+                <input id="sendAmount" type="text" placeholder="amount">
                 <i id="sendUnit" style="color: black;">BCH</i>
               </span>
               <button onclick="maxBch(event)" style="color: black;">max</button>
@@ -384,6 +387,21 @@
         </fieldset>
       </div>
 
+      <div id="walletConnectView" class="hide">
+        <fieldset id="sessions" style="display: block; margin-top: 15px">
+          <legend>Active Sessions</legend>
+          <p class="inputGroup">
+            <span style="width: 100%;" class="addressInput"><input id="wcUri" placeholder="Wallet Connect URI"></span>
+          </p>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+            <input type="button" class="primaryButton" id="connect-button" value="Connect New dApp">
+            <input type="button" class="primaryButton" id="scan-button" value="Scan QR Code">
+          </div>
+          <div id="wc-sessions" style="display: flex; flex-direction: column; margin-top: 3rem;">
+          </div>
+        </fieldset>
+      </div>
+
       <br>
       <footer class="footer hide" id="githubLink">
         <a href="https://github.com/cashonize/wallet" target="_blank" >
@@ -402,9 +420,62 @@
         
       </footer>
     </div>
+
+    <div id="wc-session-approval-modal" style="top: 0; display: none; position: fixed; align-items: center; justify-content: center; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 10; width: 100%; height: 100%; padding: 5rem;">
+      <fieldset id="wc-session-approval-modal-inner" style="padding: 3rem; width: 100%; max-width: 500px; overflow-y: scroll; height: 250px; background-color: white;">
+        <legend style="font-size: larger;">Approve Session?</legend>
+        <div id="wc-session-approval" style="display: flex; flex-direction: column; gap: 1rem;">
+        </div>
+        <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem;">
+          <input id="session-approve-button" class="button primary" type="button" value="Approve">
+          <input id="session-reject-button" style="margin-left: 0;" class="button" type="button" value="Reject">
+        </div>
+      </fieldset>
+    </div>
+
+    <div id="wc-session-history-modal" style="top: 0; display: none; position: fixed; align-items: center; justify-content: center; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 10; width: 100%; height: 100%;">
+      <fieldset id="wc-session-history-modal-inner" style="width: 100%; max-width: 500px; overflow-y: scroll; max-height: 90vh; background-color: white;">
+        <legend style="font-size: larger;">Session</legend>
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center;">
+            <input type="checkbox" id="session-auto">
+            <label for="session-auto">Auto-approve requests</label>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <input id="session-auto-requests" type="number" min="1" max="999" placeholder="For N requests" oninput="validity.valid||(value='');">
+            <span id="session-auto-requests-left" style="width: 77px; text-align: end;">&infin; left</span>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <select id="session-auto-minutes">
+              <option disabled selected value="">For N minutes</option>
+              <option value="10">10 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+            </select>
+            <span id="session-auto-minutes-left" style="width: 77px; text-align: end;">&infin;m left</span>
+          </div>
+        </div>
+        <fieldset id="history" style="display: block; margin-top: 12px">
+          <legend>Request History</legend>
+          <div id="wc-history" style="display: flex; flex-direction: column; gap: 1rem;">
+          </div>
+        </fieldset>
+      </fieldset>
+    </div>
+
+    <div id="wc-session-request-modal-container" style="top: 0; display: none; flex-wrap: wrap-reverse; overflow-y: scroll; gap: 5rem; position: fixed; align-items: center; justify-content: center; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 10; width: 100%; height: 100%;">
+    </div>
+
+    <div id="wc-session-scan-modal" style="top: 0; display: none; position: fixed; align-items: center; justify-content: center; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 10; width: 100%; height: 100%; padding: 5rem;">
+      <fieldset id="wc-session-scan-modal-inner" style="padding: 3rem; width: 350px; overflow-y: scroll; background-color: white;">
+        <legend style="font-size: larger;">Scan QR Code</legend>
+        <div id="reader"></div>
+      </fieldset>
+    </div>
   </main>
 
   <script type="module" src="./script.js"></script>
+  <script type="module" src="./wallet-connect.js"></script>
   <script type="module" src="./queryChainGraph.js"></script>
   <script>
     document.getElementById('qr1').addEventListener('codeRendered', () => {
