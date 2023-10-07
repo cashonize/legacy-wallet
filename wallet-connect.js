@@ -31,6 +31,25 @@ document.getElementById("wc-session-history-modal-inner").onclick = (event) => {
   event.stopPropagation();
 }
 
+// Sanitize a string to prevent XSS injection.
+// NOTE: We should, in future, migrate to Sanitize API once it is well-supported across browsers:
+//       https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API
+const sanitize = (string) => {
+  // If it is not a string, do nothing.
+  if (typeof string !== 'string') {
+    return string;
+  }
+
+  // Encode the string using encodeURI.
+  const encoded = encodeURI(string);
+
+  // Encode URI will encode spaces as '%20' - so let's restore these.
+  const withSpacesRestored = encoded.replaceAll('%20', ' ');
+
+  // Return the sanitized string.
+  return withSpacesRestored;
+}
+
 const parseExtendedJson = (jsonString) => {
   const uint8ArrayRegex = /^<Uint8Array: 0x(?<hex>[0-9a-f]*)>$/u;
   const bigIntRegex = /^<bigint: (?<bigint>[0-9]*)n>$/;
@@ -96,7 +115,7 @@ const toggleAutoApprove = (topic, enable) => {
 
 const checkAutoApproveTimeAndUpdateCounters = (topic) => {
   const state = JSON.parse(localStorage.getItem("auto-approve") || "{}");
-  document.getElementById(`session-auto-requests-left`).innerHTML = `${state?.[topic]?.requests === undefined ? '&infin;' : state?.[topic]?.requests} left`;
+  document.getElementById(`session-auto-requests-left`).innerHTML = `${state?.[topic]?.requests === undefined ? '&infin;' : sanitize(state?.[topic]?.requests)} left`;
   if (state?.[topic]?.timestamp !== undefined) {
     const delta = state?.[topic]?.timestamp - new Date().getTime();
     if (delta < 0) {
@@ -104,7 +123,7 @@ const checkAutoApproveTimeAndUpdateCounters = (topic) => {
       toggleAutoApprove(topic, false);
     } else {
       const minutes = new Date(delta).getMinutes();
-      document.getElementById(`session-auto-minutes-left`).innerHTML = `${minutes}m left`;
+      document.getElementById(`session-auto-minutes-left`).innerHTML = `${sanitize(minutes)}m left`;
     }
   } else {
     document.getElementById(`session-auto-minutes-left`).innerHTML = `${'&infin;'}m left`;
@@ -123,7 +142,7 @@ const checkAutoApproveRequestsLeftAndUpdateCounters = (topic) => {
         toggleAutoApprove(topic, false);
       }, 0);
     } else {
-      document.getElementById(`session-auto-requests-left`).innerHTML = `${state?.[topic]?.requests} left`;
+      document.getElementById(`session-auto-requests-left`).innerHTML = `${sanitize(state?.[topic]?.requests)} left`;
     }
   } else {
     document.getElementById(`session-auto-requests-left`).innerHTML = `${'&infin;'} left`;
@@ -177,11 +196,11 @@ Web3Wallet.init({
     const meta = proposal.params.proposer.metadata;
     const peerName = meta.name;
     const approvalHtml = /* html */`
-      <div id="proposal-${proposal.id}" style="display: flex; align-items: center; flex-direction: row; gap: 10px;">
-        <div id="proposal-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${meta.icons[0]}"></div>
+      <div id="proposal-${sanitize(proposal.id)}" style="display: flex; align-items: center; flex-direction: row; gap: 10px;">
+        <div id="proposal-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${sanitize(meta.icons[0])}"></div>
         <div style="display: flex; flex-direction: column; width: 100%;">
-          <div id="proposal-app-name">${peerName}</div>
-          <div id="proposal-app-url"><a href="${meta.url}" target="_blank">${meta.url}</a></div>
+          <div id="proposal-app-name">${sanitize(peerName)}</div>
+          <div id="proposal-app-url"><a href="${sanitize(meta.url)}" target="_blank">${sanitize(meta.url)}</a></div>
         </div>
       </div>`;
     proposalParent.innerHTML = approvalHtml;
@@ -200,16 +219,16 @@ Web3Wallet.init({
         sessions[val].peer.metadata.name === meta.name &&
         sessions[val].topic != session.topic) !== -1 ? ` - ${session.topic.slice(0, 6)}` : "");
       const sessionHtml = /* html */`
-        <div id="session-${session.topic}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px; ${index % 2 === 0 ? "" : "background: azure"}">
-          <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${meta.icons[0]}"></div>
+        <div id="session-${sanitize(session.topic)}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px; ${index % 2 === 0 ? "" : "background: azure"}">
+          <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${sanitize(meta.icons[0])}"></div>
           <div style="display: flex; flex-direction: column; width: 100%;">
-            <div id="session-app-name">${peerName}</div>
-            <div id="session-app-url"><a href="${meta.url}" target="_blank">${meta.url}</a></div>
-            <div id="session-app-description">${meta.description}</div>
+            <div id="session-app-name">${sanitize(peerName)}</div>
+            <div id="session-app-url"><a href="${sanitize(meta.url)}" target="_blank">${sanitize(meta.url)}</a></div>
+            <div id="session-app-description">${sanitize(meta.description)}</div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div id="session-settings-${session.topic}" style="height: 24px; width: 24px; cursor: pointer;"><img class="cogIcon icon"></div>
-            <div id="session-delete-${session.topic}" style="height: 24px; width: 24px; cursor: pointer;"><img class="trashIcon icon"></div>
+            <div id="session-settings-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="cogIcon icon"></div>
+            <div id="session-delete-${sanitize(session.topic)}" style="height: 24px; width: 24px; cursor: pointer;"><img class="trashIcon icon"></div>
           </div>
         </div>`;
       sessionParent.innerHTML += sessionHtml;
@@ -228,7 +247,7 @@ Web3Wallet.init({
 
         document.getElementById(`session-settings-${session.topic}`).onclick = async () => {
           document.getElementById("wc-session-history-modal").style.display = "flex";
-          document.getElementById("wc-session-history-modal").dataset.topic = session.topic;
+          document.getElementById("wc-session-history-modal").dataset.topic = sanitize(session.topic);
           updateHistory();
         };
       }, 250);
@@ -255,14 +274,14 @@ Web3Wallet.init({
       toggleAutoApprove(topic, event.target.checked);
     };
     document.getElementById(`session-auto-requests`).onchange = (event) => {
-      document.getElementById(`session-auto-requests-left`).innerHTML = `${event.target.value} left`;
+      document.getElementById(`session-auto-requests-left`).innerHTML = `${sanitize(event.target.value)} left`;
       setAutoApproveState(topic, { requests: parseInt(event.target.value) });
     }
 
     document.getElementById(`session-auto-minutes`).onchange = (event) => {
       const minutes = parseInt(event.target.value);
       const timestamp = new Date().getTime() + minutes * 60000;
-      document.getElementById(`session-auto-minutes-left`).innerHTML = `${minutes}m left`;
+      document.getElementById(`session-auto-minutes-left`).innerHTML = `${sanitize(minutes)}m left`;
       setAutoApproveState(topic, { timestamp: timestamp });
     }
 
@@ -285,34 +304,34 @@ Web3Wallet.init({
                      { title: "Response:", text: "No response." };
 
           historyHtml = /* html */`
-            <div id="history-${item.id}" class="history-item" style="display: flex; align-items: center; flex-direction: row; gap: 10px; ${index % 2 === 0 ? "" : "background: ghostwhite"}">
+            <div id="history-${sanitize(item.id)}" class="history-item" style="display: flex; align-items: center; flex-direction: row; gap: 10px; ${index % 2 === 0 ? "" : "background: ghostwhite"}">
               <div style="display: flex; flex-direction: column; width: 100%; gap: 0.5rem">
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem;">
                   <div style="color: rgb(107 114 128); width: 75px;">Date:</div>
-                  <div class="history-value" style="overflow-wrap: break-word;">${new Date(item.id / 1000).toUTCString()}</div>
+                  <div class="history-value" style="overflow-wrap: break-word;">${sanitize(new Date(item.id / 1000).toUTCString())}</div>
                 </div>
 
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
                   <div style="color: rgb(107 114 128); width: 75px;">Request:</div>
-                  <div class="history-value">${item.request.params?.request?.method}</div>
+                  <div class="history-value">${sanitize(item.request.params?.request?.method)}</div>
                 </div>
 
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
                   <div style="color: rgb(107 114 128); width: 75px;">Address:</div>
-                  <div class="history-value-address" style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row;"><div class="prefix-span">${walletClass.networkPrefix}:</div><div style="overflow-x: hidden; text-overflow: ellipsis;">${item.request.params?.request?.params?.address.split(":")[1]}</div></div>
-                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${item.request.params?.request?.params?.address}')">
+                  <div class="history-value-address" style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row;"><div class="prefix-span">${sanitize(walletClass.networkPrefix)}:</div><div style="overflow-x: hidden; text-overflow: ellipsis;">${sanitize(item.request.params?.request?.params?.address.split(":")[1])}</div></div>
+                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(item.request.params?.request?.params?.address)}')">
                     <img class="copyIcon icon" src="/images/copy.svg">
                   </button>
                 </div>
 
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
                   <div style="color: rgb(107 114 128); width: 75px;">Message:</div>
-                  <div class="history-value" style="overflow-wrap: break-word;">${item.request.params?.request?.params?.message}</div>
+                  <div class="history-value" style="overflow-wrap: break-word;">${sanitize(item.request.params?.request?.params?.message)}</div>
                 </div>
 
                 <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
-                  <div style="color: rgb(107 114 128); width: 75px;">${response.title}</div>
-                  <div class="history-value" style="overflow-wrap: break-word;">${response.text}</div>
+                  <div style="color: rgb(107 114 128); width: 75px;">${sanitize(response.title)}</div>
+                  <div class="history-value" style="overflow-wrap: break-word;">${sanitize(response.text)}</div>
                 </div>
               </div>
             </div>`;
@@ -327,7 +346,7 @@ Web3Wallet.init({
           const userPromptHtml = params.userPrompt ? /* html */ `
             <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
               <div style="color: rgb(107 114 128); width: 75px;">Prompt:</div>
-              <div class="history-value">${item.request.params?.request?.params?.userPrompt}</div>
+              <div class="history-value">${sanitize(item.request.params?.request?.params?.userPrompt)}</div>
             </div>` : "";
 
           const sourceOutputsUnpacked = params.sourceOutputs;
@@ -389,32 +408,32 @@ Web3Wallet.init({
           const contractHtml = firstContract ? /* html */ `
             <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
               <div style="color: rgb(107 114 128); width: 75px;">Contract:</div>
-              <div class="history-value">${firstContract.artifact.contractName} - ${firstContract.abiFunction?.name}</div>
+              <div class="history-value">${sanitize(firstContract.artifact.contractName)} - ${sanitize(firstContract.abiFunction?.name)}</div>
             </div>` : "";
 
           const copyHtml = response.title === "Result:" ? /* html */ `
-            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${response.text}')">
+            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(response.text)}')">
               <img class="copyIcon icon" src="/images/copy.svg">
             </button>` : "";
 
           const valueHtml = /* html */ `
             <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
               <div style="color: rgb(107 114 128); width: 75px;">Cost:</div>
-              <div class="history-value">${satoshiToBCHString(valueTransfer)}</div>
+              <div class="history-value">${sanitize(satoshiToBCHString(valueTransfer))}</div>
             </div>`;
 
           // const inputValue = sourceOutputsUnpacked.reduce(val => val)
           historyHtml = /* html */`
-          <div id="history-${item.id}" class="history-item" style="display: flex; align-items: center; flex-direction: row; gap: 10px; ${index % 2 === 0 ? "" : "background: ghostwhite"}">
+          <div id="history-${sanitize(item.id)}" class="history-item" style="display: flex; align-items: center; flex-direction: row; gap: 10px; ${index % 2 === 0 ? "" : "background: ghostwhite"}">
             <div style="display: flex; flex-direction: column; width: 100%; gap: 0.5rem">
               <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem;">
                 <div style="color: rgb(107 114 128); width: 75px;">Date:</div>
-                <div class="history-value" style="overflow-wrap: break-word;">${new Date(item.id / 1000).toUTCString()}</div>
+                <div class="history-value" style="overflow-wrap: break-word;">${sanitize(new Date(item.id / 1000).toUTCString())}</div>
               </div>
 
               <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
                 <div style="color: rgb(107 114 128); width: 75px;">Request:</div>
-                <div class="history-value">${item.request.params?.request?.method}</div>
+                <div class="history-value">${sanitize(item.request.params?.request?.method)}</div>
               </div>
 
               ${userPromptHtml}
@@ -424,8 +443,8 @@ Web3Wallet.init({
               ${valueHtml}
 
               <div style="display: flex; flex-direction: row; width: 100%; gap: 0.5rem">
-                <div style="color: rgb(107 114 128); width: 75px;">${response.title}</div>
-                <div class="history-value" style="overflow-wrap: break-word;">${response.text.length > 20 ? response.text.slice(0, 20) + "..." : response.text}${copyHtml}</div>
+                <div style="color: rgb(107 114 128); width: 75px;">${sanitize(response.title)}</div>
+                <div class="history-value" style="overflow-wrap: break-word;">${sanitize(response.text.length > 20 ? response.text.slice(0, 20) + "..." : response.text)}${copyHtml}</div>
               </div>
             </div>
         </div>`;
@@ -640,32 +659,32 @@ Web3Wallet.init({
             sessions[val].peer.metadata.name === meta.name &&
             sessions[val].topic != session.topic) !== -1 ? ` - ${session.topic.slice(0, 6)}` : "");
 
-          const requestHtml = /* html */ `<fieldset id="wc-session-request-modal-inner-${id}" style="padding: 3rem; width: 510px; overflow-y: scroll; max-height: 90vh;">
+          const requestHtml = /* html */ `<fieldset id="wc-session-request-modal-inner-${sanitize(id)}" style="padding: 3rem; width: 510px; overflow-y: scroll; max-height: 90vh;">
             <legend style="font-size: larger;">Sign Message</legend>
             <div id="wc-request">
               <div style="display: flex; justify-content: center; font-size: larger;">Sign this test message</div>
                 <div style="font-size: large; margin-top: 2rem;">Origin:</div>
-                <div id="session-${session.topic}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
-                  <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${meta.icons[0]}"></div>
+                <div id="session-${sanitize(session.topic)}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
+                  <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${sanitize(meta.icons[0])}"></div>
                   <div style="display: flex; flex-direction: column; width: 100%;">
-                    <div id="session-app-name">${peerName}</div>
-                    <div id="session-app-url" style="overflow-wrap: anywhere;"><a href="${meta.url}" target="_blank">${meta.url}</a></div>
+                    <div id="session-app-name">${sanitize(peerName)}</div>
+                    <div id="session-app-url" style="overflow-wrap: anywhere;"><a href="${sanitize(meta.url)}" target="_blank">${sanitize(meta.url)}</a></div>
                   </div>
                 </div>
                 <div style="font-size: large; margin-top: 2rem;">Signer:</div>
                 <div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-                  <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
-                  <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${signingAddress.split(":")[1]}</div>
-                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${signingAddress}')">
+                  <div style="font-size: smaller;" class="prefix-span">${sanitize(walletClass.networkPrefix)}:</div>
+                  <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${sanitize(signingAddress.split(":")[1])}</div>
+                  <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(signingAddress)}')">
                     <img class="copyIcon icon" src="/images/copy.svg">
                   </button>
                 </div>
                 <div style="font-size: large; margin-top: 2rem;">Message:</div>
-                <div style="overflow-wrap: anywhere; font-size: smaller;">${message}</div>
+                <div style="overflow-wrap: anywhere; font-size: smaller;">${sanitize(message)}</div>
               <hr style="margin-top: 3rem;" />
               <div style="display: flex; justify-content: center; margin-top: 1rem; margin-bottom: 2rem;">
-                <input id="request-approve-button-${id}" style="width: 111px;" class="button primary" type="button" value="Sign">
-                <input id="request-reject-button-${id}" style="width: 111px;" class="button" type="button" value="Cancel">
+                <input id="request-approve-button-${sanitize(id)}" style="width: 111px;" class="button primary" type="button" value="Sign">
+                <input id="request-reject-button-${sanitize(id)}" style="width: 111px;" class="button" type="button" value="Cancel">
               </div>
             </div>
           </fieldset>`
@@ -893,9 +912,9 @@ Web3Wallet.init({
         const inputsHtml = sourceOutputsUnpacked.map((input, idx) => {
           const address = toCashaddr(input.lockingBytecode);
           const addressHtml = /* html */ `<div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-            <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
-            <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${address.split(":")[1]}</div>
-            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${address}')">
+            <div style="font-size: smaller;" class="prefix-span">${sanitize(walletClass.networkPrefix)}:</div>
+            <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${sanitize(address.split(":")[1])}</div>
+            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(address)}')">
               <img class="copyIcon icon" src="/images/copy.svg">
             </button>
           </div>`;
@@ -904,23 +923,23 @@ Web3Wallet.init({
           const tokenHtml = input.token ? /* html */ `<span>
             <br/>
             <hr/>
-            Token: <span style="background-color: #${binToHex(input.token.category.slice(0, 3))}">${binToHex(input.token.category.slice(0, 3))}<br/></span>
-            ${input.token?.nft?.commitment.length ? `<span> Commitment: ${binToHex(input.token.nft.commitment)} <br/></span>` : ""}
-            ${input.token?.nft?.capability ? `<span> Capability: ${input.token.nft.capability} <br/></span>` : ""}
-            ${input.token?.amount > 0n ? `<span> Fungible amount: ${input.token.amount} <br/></span>` : ""}
+            Token: <span style="background-color: #${sanitize(binToHex(input.token.category.slice(0, 3)))}">${sanitize(binToHex(input.token.category.slice(0, 3)))}<br/></span>
+            ${input.token?.nft?.commitment.length ? `<span> Commitment: ${sanitize(binToHex(input.token.nft.commitment))} <br/></span>` : ""}
+            ${input.token?.nft?.capability ? `<span> Capability: ${sanitize(input.token.nft.capability)} <br/></span>` : ""}
+            ${input.token?.amount > 0n ? `<span> Fungible amount: ${sanitize(input.token.amount)} <br/></span>` : ""}
           </span>` : "";
           const contractHtml = input.contract?.artifact.contractName ? /* html */ `<span>
             <hr/>
-            Contract: ${ input.contract?.artifact.contractName } <br/>
-            Function: ${ input.contract?.abiFunction.name } <br/>
+            Contract: ${ sanitize(input.contract?.artifact.contractName) } <br/>
+            Function: ${ sanitize(input.contract?.abiFunction.name) } <br/>
           </span>` : "";
-          return /* html */`<div style="margin-top: 1rem;"><span style="font-weight: 500; margin-right: 0.5rem;">#${idx}:</span>${satoshiToBCHString(input.valueSatoshis)} (${binToHex(input.outpointTransactionHash).slice(0,4)}...${binToHex(input.outpointTransactionHash).slice(-4)}:${input.outpointIndex}) ${addressHtml}${tokenHtml}${contractHtml}</div>`
+          return /* html */`<div style="margin-top: 1rem;"><span style="font-weight: 500; margin-right: 0.5rem;">#${sanitize(idx)}:</span>${sanitize(satoshiToBCHString(input.valueSatoshis))} (${sanitize(binToHex(input.outpointTransactionHash).slice(0,4))}...${sanitize(binToHex(input.outpointTransactionHash).slice(-4))}:${sanitize(input.outpointIndex)}) ${addressHtml}${tokenHtml}${contractHtml}</div>`
         }).join("");
 
         const outputsHtml = tx.outputs.map((output, idx) => {
           if (output.lockingBytecode[0] === 106) {
-            const chunks = parsedOpReturn(output.lockingBytecode).map((chunk) => `<span>${ chunk }<br/></span>`).join("");
-            return /* html */ `<div style="margin-top: 1rem; max-width: 300px;"><span style="font-weight: 500; margin-right: 0.5rem;">#${idx}:</span>
+            const chunks = parsedOpReturn(output.lockingBytecode).map((chunk) => `<span>${ sanitize(chunk) }<br/></span>`).join("");
+            return /* html */ `<div style="margin-top: 1rem; max-width: 300px;"><span style="font-weight: 500; margin-right: 0.5rem;">#${sanitize(idx)}:</span>
               OP_RETURN<br/>
               ${chunks}
             </div>`;
@@ -928,9 +947,9 @@ Web3Wallet.init({
 
           const address = toCashaddr(output.lockingBytecode);
           const addressHtml = /* html */ `<div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-            <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
-            <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${address.split(":")[1]}</div>
-            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${address}')">
+            <div style="font-size: smaller;" class="prefix-span">${sanitize(walletClass.networkPrefix)}:</div>
+            <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${sanitize(address.split(":")[1])}</div>
+            <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(address)}')">
               <img class="copyIcon icon" src="/images/copy.svg">
             </button>
           </div>`;
@@ -938,32 +957,32 @@ Web3Wallet.init({
           const tokenHtml = output.token ? /* html */ `<span>
             <br/>
             <hr/>
-            Token: <span style="background-color: #${binToHex(output.token.category.slice(0, 3))}">${binToHex(output.token.category.slice(0, 3))}<br/></span>
-            ${output.token?.nft?.commitment.length ? `<span> Commitment: ${binToHex(output.token.nft.commitment)} <br/></span>` : ""}
-            ${output.token?.nft?.capability ? `<span> Capability: ${output.token.nft.capability} <br/></span>` : ""}
-            ${output.token?.amount > 0n ? `<span> Fungible amount: ${output.token.amount} <br/></span>` : ""}
+            Token: <span style="background-color: #${sanitize(binToHex(output.token.category.slice(0, 3)))}">${sanitize(binToHex(output.token.category.slice(0, 3)))}<br/></span>
+            ${output.token?.nft?.commitment.length ? `<span> Commitment: ${sanitize(binToHex(output.token.nft.commitment))} <br/></span>` : ""}
+            ${output.token?.nft?.capability ? `<span> Capability: ${sanitize(output.token.nft.capability)} <br/></span>` : ""}
+            ${output.token?.amount > 0n ? `<span> Fungible amount: ${sanitize(output.token.amount)} <br/></span>` : ""}
           </span>` : "";
 
-          return /* html */ `<div style="margin-top: 1rem;"><span style="font-weight: 500; margin-right: 0.5rem;">#${idx}:</span>${satoshiToBCHString(output.valueSatoshis)} ${addressHtml}${tokenHtml}`;
+          return /* html */ `<div style="margin-top: 1rem;"><span style="font-weight: 500; margin-right: 0.5rem;">#${sanitize(idx)}:</span>${sanitize(satoshiToBCHString(output.valueSatoshis))} ${addressHtml}${tokenHtml}`;
         }).join("");
 
-        const requestHtml = /* html */ `<fieldset id="wc-session-request-modal-inner-${id}" style="width: 510px; overflow-y: scroll; max-height: 90vh;">
+        const requestHtml = /* html */ `<fieldset id="wc-session-request-modal-inner-${sanitize(id)}" style="width: 510px; overflow-y: scroll; max-height: 90vh;">
           <legend style="font-size: larger;">Sign Transaction</legend>
           <div id="wc-request">
-            <div style="display: flex; justify-content: center; font-size: larger;">${params.userPrompt}</div>
+            <div style="display: flex; justify-content: center; font-size: larger;">${sanitize(params.userPrompt)}</div>
               <div style="font-size: large; margin-top: 2rem;">Origin:</div>
-              <div id="session-${session.topic}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
-                <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${meta.icons[0]}"></div>
+              <div id="session-${sanitize(session.topic)}" style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
+                <div id="session-app-icon" style="display: flex; align-items: center; height: 64px; width: 64px;"><img src="${sanitize(meta.icons[0])}"></div>
                 <div style="display: flex; flex-direction: column; width: 100%;">
-                  <div id="session-app-name">${peerName}</div>
-                  <div id="session-app-url" style="overflow-wrap: anywhere;"><a href="${meta.url}" target="_blank">${meta.url}</a></div>
+                  <div id="session-app-name">${sanitize(peerName)}</div>
+                  <div id="session-app-url" style="overflow-wrap: anywhere;"><a href="${sanitize(meta.url)}" target="_blank">${sanitize(meta.url)}</a></div>
                 </div>
               </div>
               <div style="font-size: large; margin-top: 2rem;">Signer:</div>
               <div style="overflow-x: hidden; text-overflow: ellipsis; display: flex; flex-direction: row; overflow-wrap: anywhere;">
-                <div style="font-size: smaller;" class="prefix-span">${walletClass.networkPrefix}:</div>
-                <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${signingAddress.split(":")[1]}</div>
-                <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${signingAddress}')">
+                <div style="font-size: smaller;" class="prefix-span">${sanitize(walletClass.networkPrefix)}:</div>
+                <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">${sanitize(signingAddress.split(":")[1])}</div>
+                <button type="button" style="background: none; padding: 0;" onclick="navigator.clipboard.writeText('${sanitize(signingAddress)}')">
                   <img class="copyIcon icon" src="/images/copy.svg">
                 </button>
               </div>
@@ -973,8 +992,8 @@ Web3Wallet.init({
               ${outputsHtml}
             <hr style="margin-top: 3rem;" />
             <div style="display: flex; justify-content: center; margin-top: 1rem; margin-bottom: 2rem;">
-              <input id="request-approve-button-${id}" style="width: 111px;" class="button primary" type="button" value="Sign">
-              <input id="request-reject-button-${id}" style="width: 111px;" class="button" type="button" value="Cancel">
+              <input id="request-approve-button-${sanitize(id)}" style="width: 111px;" class="button primary" type="button" value="Sign">
+              <input id="request-reject-button-${sanitize(id)}" style="width: 111px;" class="button" type="button" value="Cancel">
             </div>
           </div>
         </fieldset>`
