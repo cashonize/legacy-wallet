@@ -81,6 +81,9 @@ header {
 .unverifiedIcon{
   content:url("/images/exclamation-circle.svg");
 }
+.modalClass.dark{
+  background-color: #1b1b1b !important;
+}
 body {
   margin: 0px;
   display: block;
