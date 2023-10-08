@@ -425,9 +425,9 @@ async function loadWalletInfo() {
         if(authChain.at(-1)){
           try{
             const bcmrLocation = authChain.at(-1).uris[0];
-            let httpsUrl = bcmrLocation;
-            if(httpsUrl.startsWith("ipfs://")) httpsUrl = httpsUrl.replace("ipfs://", ipfsGateway);
-            if(!httpsUrl.startsWith("http")) httpsUrl = `https://${bcmrLocation}`;
+            let httpsUrl = authChain.at(-1).httpsUrl;
+            // If IPFS, use own configured IPFS gateway
+            if(bcmrLocation.startsWith("ipfs://")) httpsUrl = bcmrLocation.replace("ipfs://", ipfsGateway);
             await BCMR.addMetadataRegistryFromUri(httpsUrl);
             console.log("Importing an on-chain resolved BCMR!");
             reRenderToken(token, index);
