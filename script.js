@@ -76,6 +76,7 @@ document.querySelector("#selectUri").value = "select";
 document.addEventListener("DOMContentLoaded", async (event) => {
   // Make sure rest of code executes after mainnet-js has been imported properly
   Object.assign(globalThis, await __mainnetPromise);
+  BaseWallet.StorageProvider = IndexedDBProvider;
 
   // Test that indexedDB is available
   var db = window.indexedDB.open('test');
