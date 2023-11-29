@@ -8,6 +8,7 @@ const trustedTokenLists = [
   "https://raw.githubusercontent.com/mr-zwets/example_bcmr/main/example_bcmr.json"
 ];
 const ipfsGateway = "https://ipfs.io/ipfs/";
+const bcmrIndexer = "https://bcmr.paytaca.com/api";
 const nameWallet = "mywallet";
 const walletDomain = "https://cashonize.com/";
 
@@ -145,14 +146,22 @@ async function loadWalletInfo() {
   Config.EnforceCashTokenReceiptAddresses = true;
   explorerUrl = network === "mainnet" ? explorerUrlMainnet : explorerUrlChipnet;
 
-  let balancePromise = wallet.getBalance();
+  console.time('Balance Promises');
+  const balancePromise = wallet.getBalance();
+  const maxAmountToSendPromise = wallet.getMaxAmountToSend();
+  const balancePromises = [balancePromise, maxAmountToSendPromise,];
+  const [resultWalletBalance, resultMaxAmountToSend] = await Promise.all(balancePromises);
+  console.timeEnd('Balance Promises');
+
+  let balance = resultWalletBalance;
+  let maxAmountToSend = resultMaxAmountToSend;
+
   // Enable fetching validPreGenesis on CreateTokens view
   document.querySelector('#view2').addEventListener("click", async () => {
     async function getValidPreGensis() {
       let walletUtxos = await wallet.getAddressUtxos();
       return walletUtxos.filter(utxo => !utxo.token && utxo.vout === 0);
     }
-    const balance = await balancePromise;
     if (balance.sat) {
       document.querySelector("#warningNoBCH").classList.add("hide");
       let validPreGenesis = await getValidPreGensis();
@@ -171,15 +180,8 @@ async function loadWalletInfo() {
       document.querySelector("#warningNoBCH").classList.remove("hide");
     }
   });
-  
-  // Import BCMRs in the trusted tokenlists
-  for await(const tokenListUrl of trustedTokenLists){
-    await BCMR.addMetadataRegistryFromUri(tokenListUrl);
-  }
 
   // Display USD & BC balance and watch for changes
-  let balance = await balancePromise;
-  let maxAmountToSend = await wallet.getMaxAmountToSend();
   if(unit == "satoshis"){
     document.querySelector('#balance').innerText = balance.sat;
     const bchUnit = network === "mainnet" ? " satoshis" : " testnet satoshis"; 
@@ -234,6 +236,11 @@ async function loadWalletInfo() {
   document.querySelector('#placeholderQr').classList.add("hide");
   document.querySelector('#qr1').classList.remove("hide");
 
+  // Import BCMRs in the trusted tokenlists
+  for await(const tokenListUrl of trustedTokenLists){
+    await BCMR.addMetadataRegistryFromUri(tokenListUrl);
+  }
+
   // Display token categories, construct arrayTokens and watch for changes
   let arrayTokens = [];
   let tokenCategories = [];
@@ -241,15 +248,26 @@ async function loadWalletInfo() {
   fetchTokens();
   async function fetchTokens() {
     arrayTokens = [];
-    const getFungibleTokensResponse = await wallet.getAllTokenBalances();
-    const getNFTsResponse = await wallet.getAllNftTokenBalances();
+    console.time('fetchTokens Promises');
+    const promiseGetFungibleTokens = wallet.getAllTokenBalances();
+    const promiseGetNFTs = wallet.getAllNftTokenBalances();
+    const balancePromises = [promiseGetFungibleTokens, promiseGetNFTs];
+    const [getFungibleTokensResponse, getNFTsResponse] = await Promise.all(balancePromises);
+    console.time('fetchTokens Promises');
+
     tokenCategories = Object.keys({...getFungibleTokensResponse, ...getNFTsResponse})
     document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different token categories`;
     for (const tokenId of Object.keys(getFungibleTokensResponse)) {
       arrayTokens.push({ tokenId, amount: getFungibleTokensResponse[tokenId] });
     }
+    console.time('Utxo Promises');
+    const nftUtxoPromises = [];
     for (const tokenId of Object.keys(getNFTsResponse)) {
-      const utxos = await wallet.getTokenUtxos(tokenId);
+      nftUtxoPromises.push(wallet.getTokenUtxos(tokenId));
+    }
+    const nftUtxoResults = await Promise.all(nftUtxoPromises);
+    for (const utxos of nftUtxoResults) {
+      const tokenId = utxos[0].token?.tokenId;
       if(utxos.length == 1){
         const tokenData = utxos[0].token;
         arrayTokens.push({ tokenId, tokenData, utxo:utxos[0] });
@@ -263,6 +281,7 @@ async function loadWalletInfo() {
         arrayTokens.push({ tokenId, nfts });
       }
     }
+    console.timeEnd('Utxo Promises');
     // Either display tokens in wallet or display there are no tokens
     const divNoTokens = document.querySelector('#noTokensFound');
     document.querySelector('#loadingTokenData').classList.add("hide");
@@ -271,7 +290,7 @@ async function loadWalletInfo() {
     if (arrayTokens.length) {
       divNoTokens.classList.add("hide");
       divVerifiedOnly.classList.remove("hide");
-      if(!importedRegistries) importRegistries(arrayTokens);
+      if(!importedRegistries) await importRegistries(arrayTokens);
       checkAuthChains(arrayTokens);
       importedRegistries = true;
     } else {
@@ -412,37 +431,76 @@ async function loadWalletInfo() {
 
   // Import onchain resolved BCMRs
   async function importRegistries(tokens) {
-    tokens.forEach(async (token, index) => {
-      try{
+    if(network == "mainnet"){
+      let metadataPromises = [];
+      for(let index=0; index < tokens.length; index++){
+        const tokenId = tokens[index].tokenId;
         const tokenCard = document.querySelector("#Placeholder").children[index];
         const verifiedDiv = tokenCard.querySelector("#verified");
         const isVerified = !verifiedDiv.classList.contains("hide");
-        if(isVerified) return;
-        const authChain = await BCMR.fetchAuthChainFromChaingraph({
-          chaingraphUrl,
-          transactionHash: token.tokenId,
-          network
-        });
-        if(authChain.at(-1)){
-          try{
-            const bcmrLocation = authChain.at(-1).uris[0];
-            let httpsUrl = authChain.at(-1).httpsUrl;
-            // If IPFS, use own configured IPFS gateway
-            if(bcmrLocation.startsWith("ipfs://")) httpsUrl = bcmrLocation.replace("ipfs://", ipfsGateway);
-            await BCMR.addMetadataRegistryFromUri(httpsUrl);
-            console.log("Importing an on-chain resolved BCMR!");
-            reRenderToken(token, index);
-          }catch(e){ console.log(e) }
+        if(isVerified) continue;
+        try{
+          const metadataPromise = fetch(`${bcmrIndexer}/registries/${tokenId}/latest`);
+          metadataPromises.push(metadataPromise);
+        } catch(error){ /*console.log(error)*/ }
+      }
+      console.time('Promises BCMR indexer');
+      const resolveMetadataPromsises = Promise.all(metadataPromises);
+      const resultsMetadata = await resolveMetadataPromsises;
+      console.timeEnd('Promises BCMR indexer');
+      const jsonPromises = []
+      for(let i=0; i < resultsMetadata.length; i++){
+        const response = resultsMetadata[i];
+        if(response.status != 404){
+          const jsonPromise = response.json();
+          jsonPromises.push(jsonPromise)
         }
-      } catch(error){ }
-    })
+      }
+      const jsonResponses = await Promise.all(jsonPromises)
+      for(let i=0; i < jsonResponses.length; i++){
+        const jsonResponse = jsonResponses[i];
+        await BCMR.addMetadataRegistry(jsonResponse);
+      }
+      console.log("re-rendering tokens with new tokenInfo");
+      tokens.forEach(async (token, index) => {
+        reRenderToken(token, index);
+      })
+    } else {
+      tokens.forEach(async (token, index) => {
+        try{
+          const tokenCard = document.querySelector("#Placeholder").children[index];
+          const verifiedDiv = tokenCard.querySelector("#verified");
+          const isVerified = !verifiedDiv.classList.contains("hide");
+          if(isVerified) return;
+          const authChain = await BCMR.fetchAuthChainFromChaingraph({
+            chaingraphUrl,
+            transactionHash: token.tokenId,
+            network
+          });
+          if(authChain.at(-1)){
+            try{
+              const bcmrLocation = authChain.at(-1).uris[0];
+              let httpsUrl = authChain.at(-1).httpsUrl;
+              // If IPFS, use own configured IPFS gateway
+              if(bcmrLocation.startsWith("ipfs://")) httpsUrl = bcmrLocation.replace("ipfs://", ipfsGateway);
+              await BCMR.addMetadataRegistryFromUri(httpsUrl);
+              console.log("Importing an on-chain resolved BCMR!");
+              reRenderToken(token, index);
+            }catch(e){ console.log(e) }
+          }
+        } catch(error){ }
+      })
+    }
   }
   
   // Rerender token after new tokenInfo
   function reRenderToken(token, index) {
     const tokenCard = document.querySelector("#Placeholder").children[index];
+    const verifiedDiv = tokenCard.querySelector("#verified");
+    const isVerified = !verifiedDiv.classList.contains("hide");
+    if(isVerified) return;
+
     const tokenInfo = BCMR.getTokenInfo(token.tokenId);
-    console.log("re-rendering token with new tokenInfo");
     if(tokenInfo){
       const symbol = tokenInfo.token.symbol || "";
       tokenCard.querySelector("#tokenName").textContent = `Name: ${tokenInfo.name}`;
