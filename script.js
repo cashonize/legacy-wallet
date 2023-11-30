@@ -580,7 +580,9 @@ async function loadWalletInfo() {
       const captionText = nftCard.querySelector("#caption");
       img.onclick = function(){
         modal.style.display = "block";
-        modalImg.src = this.firstChild.src;
+        let imageSrc = NFTmetadata?.uris?.image ? NFTmetadata?.uris?.image : NFTmetadata?.uris?.icon;
+        if(imageSrc.startsWith("ipfs://")) imageSrc = ipfsGateway + imageSrc.slice(7);
+        modalImg.src = imageSrc? imageSrc : iconSrc;
         captionText.textContent = NFTmetadata.name;
       }
       // Get the <span> element that closes the modal
