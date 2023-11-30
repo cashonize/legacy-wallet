@@ -604,6 +604,9 @@ async function loadWalletInfo() {
         const authHeadTxId = authHead.hash.slice(2);
         const tokenUtxos = await wallet.getTokenUtxos(token.tokenId);
         const authButton = tokenCard.querySelector('#authButton');
+        const reservedSupply = tokenCard.querySelector('#reservedSupply');
+        const authInfoFungible = tokenCard.querySelector('#authInfoFungible');
+        const authInfoNft = tokenCard.querySelector('#authInfoNft');
         const authTransfer = tokenCard.querySelector('#authTransfer');
         tokenUtxos.forEach(utxo => {
           if(utxo.txid == authHeadTxId && utxo.vout == 0){
@@ -612,8 +615,14 @@ async function loadWalletInfo() {
             authButton.onclick = () => authTransfer.classList.toggle("hide");
             const transferAuthButton = authTransfer.querySelector("#transferAuth");
             transferAuthButton.onclick = () => {
+              const reservedSupply = authTransfer.querySelector('#reservedSupply').value;
               const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-              transferAuth(utxo,authDestinationAddress, tokenCapabilityAuth);
+              transferAuth(utxo, authDestinationAddress, tokenCapabilityAuth, +reservedSupply);
+            }
+            if(! utxo?.token?.amount){
+              reservedSupply.style.display = "none";
+              authInfoFungible.style.display = "none";
+              authInfoNft.style.display = "block";
             }
           }
         });
@@ -840,7 +849,7 @@ async function loadWalletInfo() {
       if(!validInput && decimals) throw(`Amount tokens to send must only have ${decimals} decimal places`);
       const hasAuth = !authButton.classList.contains("hide");
       if(hasAuth){
-        let authWarning = "You risk unintentionally sending the authority to update this token's metadata elsewhere. \nAre you sure you want to send the transaction anyways?";
+        let authWarning = "Warning: You are about to send the authority to update this token's metadata elsewhere. You should first transfer the Auth to a dedicated wallet before sending tokens. \nAre you sure you want to send this transaction anyways?";
         if (confirm(authWarning) != true) return;
       }
       const { txId } = await wallet.send([
@@ -939,15 +948,25 @@ async function loadWalletInfo() {
   }
 
   // Check the AuthChains for fungible tokens
-  async function transferAuth(autUtxo, authDestinationAddress, tokenCapability) {
+  async function transferAuth(authUtxo, authDestinationAddress, tokenCapability, reservedSupply) {
     try {
-      const tokenId = autUtxo.token.tokenId;
-      const amount = autUtxo.token.amount;
-      const nftCommitment = autUtxo.token.commitment;
+      const tokenId = authUtxo.token.tokenId;
+      const amount = authUtxo.token.amount;
+      const changeAmount = reservedSupply? amount - reservedSupply : amount;
+      const nftCommitment = authUtxo.token.commitment;
+      const authTransfer = !reservedSupply? {
+        cashaddr: authDestinationAddress,
+        value: 1000,
+        unit: 'sats',
+      } : new TokenSendRequest({
+        cashaddr: authDestinationAddress,
+        tokenId: tokenId,
+        amount: reservedSupply
+      });
       const changeOutput = amount? new TokenSendRequest({
         cashaddr: tokenAddr,
         tokenId: tokenId,
-        amount
+        amount: changeAmount
       }) : new TokenSendRequest({
         cashaddr: tokenAddr,
         tokenId: tokenId,
@@ -955,13 +974,9 @@ async function loadWalletInfo() {
         capability: tokenCapability
       });
       const { txId } = await wallet.send([
-        {
-          cashaddr: authDestinationAddress,
-          value: 1000,
-          unit: 'sats',
-        },
+        authTransfer,
         changeOutput
-      ],{ ensureUtxos: [autUtxo] });
+      ],{ ensureUtxos: [authUtxo] });
       const displayId = `${tokenId.slice(0, 20)}...${tokenId.slice(-10)}`;
       alert(`Transferred the Auth of utxo ${displayId} to ${authDestinationAddress}`);
       console.log(`Transferred the Auth of token ${displayId} to ${authDestinationAddress} \n${explorerUrl}/tx/${txId}`);
