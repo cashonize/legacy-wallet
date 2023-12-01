@@ -299,7 +299,17 @@ async function loadWalletInfo() {
     }
   }
 
-  watchAddressCancel = wallet.watchAddressTokenTransactions(async(tx) => fetchTokens());
+  watchAddressCancel = wallet.watchAddressTokenTransactions(async(tx) => {
+    const walletPkh = binToHex(wallet.getPublicKeyHash());
+    const tokenOutput = tx.vout.find(elem => elem.scriptPubKey.hex.includes(walletPkh));
+    const tokenId = tokenOutput?.tokenData?.category;
+    const previousTokenList = arrayTokens;
+    await fetchTokens();
+    if(!tokenId)return;
+    const isNewCategory = !previousTokenList?.find(elem => elem.tokenId == tokenId);
+    // Dynamically import token metadata
+    if(isNewCategory) await importRegistries(arrayTokens);
+  });
 
   // Functionality buttons BchWallet view
   window.maxBch = function maxBch(event) {
@@ -431,6 +441,7 @@ async function loadWalletInfo() {
 
   // Import onchain resolved BCMRs
   async function importRegistries(tokens) {
+    console.log("importRegistries")
     if(network == "mainnet"){
       let metadataPromises = [];
       for(let index=0; index < tokens.length; index++){
@@ -484,7 +495,6 @@ async function loadWalletInfo() {
               // If IPFS, use own configured IPFS gateway
               if(bcmrLocation.startsWith("ipfs://")) httpsUrl = bcmrLocation.replace("ipfs://", ipfsGateway);
               await BCMR.addMetadataRegistryFromUri(httpsUrl);
-              console.log("Importing an on-chain resolved BCMR!");
               reRenderToken(token, index);
             }catch(e){ console.log(e) }
           }
