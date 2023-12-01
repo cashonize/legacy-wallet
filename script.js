@@ -618,7 +618,7 @@ async function loadWalletInfo() {
         const authButton = tokenCard.querySelector('#authButton');
         const reservedSupply = tokenCard.querySelector('#reservedSupply');
         const authInfoFungible = tokenCard.querySelector('#authInfoFungible');
-        const authInfoNft = tokenCard.querySelector('#authInfoNft');
+        const authInfoReserved = tokenCard.querySelector('#authInfoReserved');
         const authTransfer = tokenCard.querySelector('#authTransfer');
         tokenUtxos.forEach(utxo => {
           if(utxo.txid == authHeadTxId && utxo.vout == 0){
@@ -634,7 +634,7 @@ async function loadWalletInfo() {
             if(! utxo?.token?.amount){
               reservedSupply.style.display = "none";
               authInfoFungible.style.display = "none";
-              authInfoNft.style.display = "block";
+              authInfoReserved.style.display = "none";
             }
           }
         });

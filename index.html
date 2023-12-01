@@ -256,18 +256,23 @@
                 </div>
                 <div id="authTransfer" class="hide" style="margin-top: 10px;">
                   Transfer the authority to change the token's metadata <br>
-                  The Auth should be kept safe in a dedicated wallet to not accidentally transfer it. <br>
-                  It is recommended to use the Electron Cash pc wallet to label and freeze the AuthUTXO. <br>
+                  You can either transfer the Auth to a dedicated wallet or to the <a href="https://cashtokens.studio/" target="_blank">CashTokens Studio</a>.
                   <div id="authInfoFungible">
-                    You can keep token supply at the Auth UTXO to mark it as reserved supply. <br>
-                    To update metadata on-chain or manage the reserved supply, use the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> tool.<br>
+                    Token supply kept at the Auth UTXO will be marked as reserved supply, not yet in circulation. <br>
                   </div>
-                  <div id="authInfoNft" style="display: none;">
-                    To update metadata on-chain, use the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> tool.<br>
-                  </div>
-                  <span class="grouped">
+                  <details>
+                    <summary>Managing your Token's Auth</summary>
+                    <p>
+                      With the CashTokens Studio managing your token's Auth is easy for regular users.
+                      The alternative, using a dedicated wallet, is more complex but gives you more control.
+                      For this it's recommended to use Electron Cash on pc to label and freeze the AuthUTXO.
+                      Then, to update metadata on-chain<span id="authInfoReserved"> or manage the reserved supply</span>, 
+                      use the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> program.<br>
+                    </p>
+                  </details>
+                  <span class="inputGroup grouped">
                     <input id="destinationAddr" placeholder="destinationAddress">
-                    <input id="reservedSupply" placeholder="reservedSupply" style="width: 160px;"> 
+                    <input id="reservedSupply" placeholder="reservedSupply"> 
                     <input type="button" id="transferAuth" value="Transfer Auth">
                   </span>
                 </div>
@@ -357,10 +362,9 @@
               </div>
               <br>
             </details>
-            <b>Note:</b> Token metadata can still be added/updated later by the token's 
-            <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthHead</a> output. <br>
-            The authority to update the metadata should be transferred to a wallet with coin-control right after creation.
-            Then you can publish on-chain metadata updates with the <a href="https://github.com/mr-zwets/AuthUpdate" target="_blank">AuthUpdate</a> tool.<br><br>
+            <b>Note:</b> Token metadata can still be added/updated later with the token's 
+            <a href="https://github.com/bitjson/chip-bcmr#zeroth-descendant-transaction-chains" target="_blank">AuthUTXO</a>. <br>
+            This authority to update the metadata (AuthUTXO) should be transferred to a dedicated wallet or to the <a href="https://cashtokens.studio/" target="_blank">CashTokens Studio</a> right after creation.<br><br>
             Process might take a few seconds... 
             <input type="button" class="primaryButton" id="createTokens" value="Create">
           </div>
