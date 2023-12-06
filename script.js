@@ -372,14 +372,18 @@ async function loadWalletInfo() {
     if(document.querySelector('#newtokens').value === "fungibles"){
       // Check inputField
       const tokenSupply = document.querySelector('#tokenSupply').value;
-      const validInput = Number.isInteger(+tokenSupply) && +tokenSupply > 0;
+      const validInput = isValidBigInt(tokenSupply) && tokenSupply > 0;
+      function isValidBigInt(value) {
+        try { return BigInt(value) }
+        catch (e) { return false }
+      } 
       if(!validInput){alert(`Input total supply must be a valid integer`); return}
       // Create fungible tokens
       try {
         const genesisResponse = await wallet.tokenGenesis(
           {
             cashaddr: tokenAddr,
-            amount: tokenSupply,            // fungible token amount
+            amount: BigInt(tokenSupply),    // fungible token amount
             value: 1000,                    // Satoshi value
           }, 
           opreturnData 
@@ -519,7 +523,8 @@ async function loadWalletInfo() {
       if(token.amount){
         tokenCard.querySelector("#sendUnit").textContent = symbol;
         const decimals = tokenInfo.token.decimals || 0;
-        const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
+        const tokenAmountDecimals = decimals ? Number(token.amount)/(10**decimals) : token.amount;
+        const textTokenAmount = `${tokenAmountDecimals} ${symbol}`;
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${decimals}`;
       }
@@ -731,7 +736,8 @@ async function loadWalletInfo() {
       // Stuff specific for fungibles
       if(token.amount){
         tokenCard.querySelector("#tokenType").textContent = "Fungible Tokens";
-        const textTokenAmount = `${token.amount/(10**decimals)} ${symbol}`;
+        const tokenAmountDecimals = decimals ? Number(token.amount)/(10**decimals): token.amount;
+        const textTokenAmount = `${tokenAmountDecimals} ${symbol}`;
         tokenCard.querySelector("#tokenAmount").textContent = `Token amount: ${textTokenAmount}`;
         tokenCard.querySelector("#tokenDecimals").textContent = `Number of decimals: ${decimals}`;
         const tokenSend = tokenCard.querySelector('#tokenSend');
@@ -739,13 +745,16 @@ async function loadWalletInfo() {
         const sendSomeButton = tokenSend.querySelector("#sendSomeButton");
         const authButton = tokenCard.querySelector('#authButton');
         sendSomeButton.onclick = () => {
-          let tokenAmount = Number(tokenSend.querySelector('#sendTokenAmount').value);
+          let inputTokenAmount = tokenSend.querySelector('#sendTokenAmount').value;
           const inputAddress = tokenSend.querySelector('#tokenAddress').value;
-          sendTokens(inputAddress, tokenAmount, token.tokenId, tokenInfo, authButton);
+          sendTokens(inputAddress, inputTokenAmount, token.tokenId, tokenInfo, authButton);
         }
         function maxTokens(event) {
           let tokenAmount = token.amount;
-          if(tokenInfo) tokenAmount = token.amount / (10 ** tokenInfo.token.decimals);
+          if(tokenInfo){
+            const tokenAmountDecimals = decimals? Number(token.amount)/(10**decimals) : token.amount;
+            tokenAmount = tokenAmountDecimals;
+          }
           event.currentTarget.parentElement.querySelector('#sendTokenAmount').value = tokenAmount;
         }
         tokenCard.getElementById("maxButton").onclick = (event) => maxTokens(event);
@@ -855,8 +864,12 @@ async function loadWalletInfo() {
   async function sendTokens(address, amountEntered, tokenId, tokenInfo, authButton) {
     try {
       const decimals = tokenInfo? tokenInfo.token.decimals : 0;
-      const amountTokens = decimals ? amountEntered * (10 ** decimals) : amountEntered;
-      const validInput = Number.isInteger(amountTokens) && amountTokens > 0;
+      const amountTokens = decimals ? Number(amountEntered) * (10 ** decimals) : amountEntered;
+      function isValidBigInt(value) {
+        try { return BigInt(value) }
+        catch (e) { return false }
+      } 
+      const validInput = isValidBigInt(amountTokens)  && amountTokens > 0;
       if(!validInput && !decimals) throw(`Amount tokens to send must be a valid integer`);
       if(!validInput && decimals) throw(`Amount tokens to send must only have ${decimals} decimal places`);
       const hasAuth = !authButton.classList.contains("hide");
@@ -867,7 +880,7 @@ async function loadWalletInfo() {
       const { txId } = await wallet.send([
         new TokenSendRequest({
           cashaddr: address,
-          amount: amountTokens,
+          amount: BigInt(amountTokens),
           tokenId: tokenId,
         }),
       ]);
