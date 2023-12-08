@@ -634,7 +634,13 @@ async function loadWalletInfo() {
             transferAuthButton.onclick = () => {
               const reservedSupply = authTransfer.querySelector('#reservedSupply').value;
               const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-              transferAuth(utxo, authDestinationAddress, tokenCapabilityAuth, +reservedSupply);
+              const validInput = isValidBigInt(reservedSupply) && reservedSupply > 0;
+              function isValidBigInt(value) {
+                try { return BigInt(value) }
+                catch (e) { return false }
+              } 
+              if(!validInput){alert(`ReservedSupply must be a valid integer`); return}
+              transferAuth(utxo, authDestinationAddress, tokenCapabilityAuth, BigInt(reservedSupply));
             }
             if(! utxo?.token?.amount){
               reservedSupply.style.display = "none";
