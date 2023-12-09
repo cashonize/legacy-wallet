@@ -634,9 +634,9 @@ async function loadWalletInfo() {
             transferAuthButton.onclick = () => {
               const reservedSupply = authTransfer.querySelector('#reservedSupply').value;
               const authDestinationAddress = authTransfer.querySelector('#destinationAddr').value;
-              const validInput = isValidBigInt(reservedSupply) && reservedSupply > 0;
+              const validInput = isValidBigInt(reservedSupply) && reservedSupply >= 0;
               function isValidBigInt(value) {
-                try { return BigInt(value) }
+                try { BigInt(value); return true }
                 catch (e) { return false }
               } 
               if(!validInput){alert(`ReservedSupply must be a valid integer`); return}
