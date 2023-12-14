@@ -1,5 +1,5 @@
 // Import Wallet Connect
-import { WalletConnectService } from 'bch-wc2-experimental';
+import { CashConnectWallet } from 'cashconnect';
 
 // Import Libauth.
 import { stringify, authenticationTemplateP2pkhNonHd, binToHex, hexToBin, binToNumberUintLE, cashAddressToLockingBytecode, decodePrivateKeyWif, lockingBytecodeToCashAddress } from "@bitauth/libauth";
@@ -220,8 +220,12 @@ window.cashConnect = createApp({
 setTimeout(async () => {
 	const privateKey = await getPrivateKey();
 
+	console.log(privateKey);
+
 	// Setup Wallet Connect.
-	window.cashConnectService = new WalletConnectService(
+	window.cashConnectService = new CashConnectWallet(
+		// The master private key.
+		privateKey,
 		// Project ID.
 		'3fd234b8e2cd0e1da4bc08a0011bbf64',
 		// Metadata.
@@ -240,104 +244,113 @@ setTimeout(async () => {
 			onRPCRequest: window.cashConnect.onRPCRequest,
 			onError: window.cashConnect.onError,
 		},
-		// Wallet Callbacks.
+		// CashRPC Callbacks.
 		{
-			getUnspents: async () => {
-				const wallet = await walletClass.named("mywallet");
+			// Network-related callbacks.
+			network: {
+				// Get the source output of the given transaction and index.
+				getSourceOutput: async (outpointTransactionHash, outpointIndex) => {
+					const wallet = await walletClass.named("mywallet");
 
-				const utxos = await wallet.getUtxos();
+					const transaction = await wallet.provider.getRawTransactionObject(binToHex(outpointTransactionHash));
 
-				const privateKey = await getPrivateKey();
+					const outpoint = transaction.vout[outpointIndex];
 
-				const lockingBytecode = cashAddressToLockingBytecode(wallet.cashaddr);
-
-				if(typeof lockingBytecode === 'string') {
-					throw new Error('Failed to convert CashAddr to Locking Bytecode');
-				}
-
-				const transformed = utxos.map((utxo) => {
 					let token;
 
-					if(utxo.token) {
+					if(outpoint.tokenData) {
 						token = {
-							amount: BigInt(utxo.token.amount),
-							category: hexToBin(utxo.token.tokenId),
-						}
-
-						if(utxo.token.capability || utxo.token.commitment) {
-							token.nft = {
-								capability: utxo.token.capability,
-								commitment: hexToBin(utxo.token.commitment),
-							}
+							amount: BigInt(outpoint.tokenData.amount),
+							category: hexToBin(outpoint.tokenData.category),
+							nft: outpoint.tokenData.nft ? {
+								capability: outpoint.tokenData.nft.capability,
+								commitment: outpoint.tokenData.nft.commitment ? hexToBin(outpoint.tokenData.nft.commitment) : undefined,
+							} : undefined
 						}
 					}
 
-					return {
-						outpointTransactionHash: hexToBin(utxo.txid),
-						outpointIndex: utxo.vout,
-						lockingBytecode: lockingBytecode.bytecode,
-						unlockingBytecode: {
-							template: authenticationTemplateP2pkhNonHd,
-							valueSatoshis: BigInt(utxo.satoshis),
-							script: 'unlock',
-							data: {
-								keys: {
-									privateKeys: {
-										key: privateKey,
+					const formatted = {
+						valueSatoshis: BigInt(Math.round(outpoint.value * 100_000_000)),
+						lockingBytecode: hexToBin(outpoint.scriptPubKey.hex),
+						token,
+					}
+
+					return formatted;
+				},
+
+				// NOTE: Other callbacks may be supported in future (e.g. Block Height).
+			},
+
+			// Wallet-related callbacks.
+			wallet: {
+				getUnspents: async () => {
+					const wallet = await walletClass.named("mywallet");
+
+					const utxos = await wallet.getUtxos();
+
+					const privateKey = await getPrivateKey();
+
+					const lockingBytecode = cashAddressToLockingBytecode(wallet.cashaddr);
+
+					if(typeof lockingBytecode === 'string') {
+						throw new Error('Failed to convert CashAddr to Locking Bytecode');
+					}
+
+					const transformed = utxos.map((utxo) => {
+						let token;
+
+						if(utxo.token) {
+							token = {
+								amount: BigInt(utxo.token.amount),
+								category: hexToBin(utxo.token.tokenId),
+							}
+
+							if(utxo.token.capability || utxo.token.commitment) {
+								token.nft = {
+									capability: utxo.token.capability,
+									commitment: hexToBin(utxo.token.commitment),
+								}
+							}
+						}
+
+						return {
+							outpointTransactionHash: hexToBin(utxo.txid),
+							outpointIndex: utxo.vout,
+							lockingBytecode: lockingBytecode.bytecode,
+							unlockingBytecode: {
+								template: authenticationTemplateP2pkhNonHd,
+								valueSatoshis: BigInt(utxo.satoshis),
+								script: 'unlock',
+								data: {
+									keys: {
+										privateKeys: {
+											key: privateKey,
+										},
 									},
 								},
-							},
-							token,
+								token,
+							}
 						}
-					}
-				})
+					})
 
-				return transformed;
-			},
+					return transformed;
+				},
 
-			getSourceOutput: async (outpointTransactionHash, outpointIndex) => {
-				const wallet = await walletClass.named("mywallet");
-
-				const transaction = await wallet.provider.getRawTransactionObject(binToHex(outpointTransactionHash));
-
-				const outpoint = transaction.vout[outpointIndex];
-
-				let token;
-
-				if(outpoint.tokenData) {
-					token = {
-						amount: BigInt(outpoint.tokenData.amount),
-						category: hexToBin(outpoint.tokenData.category),
-						nft: outpoint.tokenData.nft ? {
-							capability: outpoint.tokenData.nft.capability,
-							commitment: outpoint.tokenData.nft.commitment ? hexToBin(outpoint.tokenData.nft.commitment) : undefined,
-						} : undefined
-					}
-				}
-
-				const formatted = {
-					valueSatoshis: BigInt(Math.round(outpoint.value * 100_000_000)),
-					lockingBytecode: hexToBin(outpoint.scriptPubKey.hex),
-					token,
-				}
-
-				return formatted;
-			},
-
-			getChangeTemplate: async () => {
-				return {
-					template: authenticationTemplateP2pkhNonHd,
-					data: {
-						keys: {
-							privateKeys: {
-								key: await getPrivateKey()
+				// Get the LibAuth change template for this wallet.
+				getChangeTemplate: async () => {
+					return {
+						template: authenticationTemplateP2pkhNonHd,
+						data: {
+							keys: {
+								privateKeys: {
+									key: await getPrivateKey()
+								}
 							}
 						}
 					}
-				}
+				},
 			},
 		},
-		privateKey,
 	);
 
 	// Start Wallet Connect.
