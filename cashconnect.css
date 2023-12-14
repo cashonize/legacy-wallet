@@ -22,7 +22,6 @@
 .cc-session-items-container {
   display: flex;
   flex-direction: column;
-  margin-top: 3rem;
 }
 
 .cc-session-item {
@@ -44,6 +43,12 @@
   align-items: center;
   height: 64px;
   width: 64px;
+}
+
+.cc-session-item-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .cc-session-item-action-icon {

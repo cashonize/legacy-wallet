@@ -566,6 +566,16 @@ brorand@^1.1.0:
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
   integrity sha512-cKV8tMCEpQs4hK/ik71d6LrPOnpkpGBR0wzxqr68g2m/LB2GxVYQroAjMJZRVM1Y4BCjCKc3vAamxSzOY2RP+w==
 
+"cashconnect@file:../../Developers.Cash/cashconnect-js":
+  version "0.0.1"
+  resolved "file:../../Developers.Cash/cashconnect-js"
+  dependencies:
+    "@bitauth/libauth" "2.0.0-alpha.8"
+    "@walletconnect/modal" "^2.6.2"
+    "@walletconnect/utils" "^2.8.0"
+    "@walletconnect/web3wallet" "^1.9.3"
+    idb "^7.1.1"
+
 decode-uri-component@^0.2.2:
   version "0.2.2"
   resolved "https://registry.npmjs.org/decode-uri-component/-/decode-uri-component-0.2.2.tgz"

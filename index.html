@@ -402,17 +402,21 @@
       </div>
 
       <div id="walletConnectView" class="hide">
-        <!-- WalletConnect -->
-        <fieldset id="sessions" style="display: block; margin-top: 15px">
-          <legend>WalletConnect Sessions</legend>
+        <fieldset style="display: block; margin-top: 15px;">
+          <legend>Connect</legend>
           <p class="inputGroup">
             <span style="width: 100%;" class="addressInput"><input id="wcUri" placeholder="Wallet Connect URI"></span>
           </p>
-          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 1rem;">
             <input type="button" class="primaryButton" id="connect-button" value="Connect New dApp">
             <input type="button" class="primaryButton" id="scan-button" value="Scan QR Code">
           </div>
-          <div id="wc-sessions" style="display: flex; flex-direction: column; margin-top: 3rem;">
+        </fieldset>
+
+        <!-- WalletConnect -->
+        <fieldset id="sessions" style="display: block; margin-top: 15px">
+          <legend>WalletConnect Sessions</legend>
+          <div id="wc-sessions" style="display: flex; flex-direction: column;">
           </div>
         </fieldset>
 
@@ -421,13 +425,6 @@
           <!-- Sessions -->
           <fieldset style="display: block; margin-top: 15px">
             <legend>CashConnect Sessions</legend>
-            <p class="inputGroup">
-              <span style="width: 100%;" class="addressInput"><input v-model="wcUri" placeholder="Cash Connect URI"></span>
-            </p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
-              <input type="button" class="primaryButton" value="Connect New dApp" @click="pair(wcUri)">
-              <input type="button" class="primaryButton" value="Scan QR Code">
-            </div>
             <div class="cc-session-items-container">
               <!-- Iterate over active sessions -->
               <template v-for="(session, topic) of sessions" :key="topic">
@@ -438,8 +435,7 @@
                     <div><a href="session.peer.metadata.url" target="_blank">{{ session.peer.metadata.url }}</a></div>
                     <div>{{ session.peer.metadata.description }}</div>
                   </div>
-                  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div class="cc-session-item-action-icon"><img class="cogIcon icon"></div>
+                  <div class="cc-session-item-action-container">
                     <div class="cc-session-item-action-icon" @click="disconnectSession(topic)"><img class="trashIcon icon"></div>
                   </div>
                 </div>

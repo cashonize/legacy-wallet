@@ -27,7 +27,7 @@ async function getPrivateKey() {
 //-----------------------------------------------------------------------------
 
 // Application Template
-const vueApp = createApp({
+window.cashConnect = createApp({
 	data() {
 		return {
 			// Form state.
@@ -53,12 +53,12 @@ const vueApp = createApp({
 	},
 	methods: {
 		disconnectSession: async function(topic) {
-			await window.walletConnectService.disconnectSession(topic);
+			await window.cashConnectService.disconnectSession(topic);
 		},
 
 		pair: async function(wcUri) {
 			// Pair with the service.
-			await window.walletConnectService.core.pairing.pair({ uri: wcUri });
+			await window.cashConnectService.core.pairing.pair({ uri: wcUri });
 
 			// Clear the input.
 			this.wcUri = '';
@@ -221,7 +221,7 @@ setTimeout(async () => {
 	const privateKey = await getPrivateKey();
 
 	// Setup Wallet Connect.
-	window.walletConnectService = new WalletConnectService(
+	window.cashConnectService = new WalletConnectService(
 		// Project ID.
 		'3fd234b8e2cd0e1da4bc08a0011bbf64',
 		// Metadata.
@@ -234,11 +234,11 @@ setTimeout(async () => {
 		// Event Callbacks.
 		{
 			// Session State Callbacks.
-			onSessionsUpdated: vueApp.onSessionsUpdated,
-			onSessionProposal: vueApp.onSessionProposal,
+			onSessionsUpdated: window.cashConnect.onSessionsUpdated,
+			onSessionProposal: window.cashConnect.onSessionProposal,
 			onSessionDelete: () => {},
-			onRPCRequest: vueApp.onRPCRequest,
-			onError: vueApp.onError,
+			onRPCRequest: window.cashConnect.onRPCRequest,
+			onError: window.cashConnect.onError,
 		},
 		// Wallet Callbacks.
 		{
@@ -341,20 +341,20 @@ setTimeout(async () => {
 	);
 
 	// Start Wallet Connect.
-	await window.walletConnectService.start();
+	await window.cashConnectService.start();
 
 	// Handle URL.
 	// NOTE: To differentiate from Pat's implementation, we use protohandler "cc:" (CashConnect:).
 	const wcuri = new URL(window.location.href.replace("#", "")).searchParams.get("uri");
 	if (wcuri && wcuri.indexOf("cc:") === 0) {
-		const pairings = window.walletConnectService.core.pairing.pairings.getAll();
+		const pairings = window.cashConnectService.core.pairing.pairings.getAll();
 		const topic = wcuri.match(/^cc:([a-zA-Z0-9]+).*/)?.[1];
 		if (pairings.some(val => val.topic === topic)) {
 			// skip
 		} else {
 			// Convert back into a WC URI.
 			const asWcUrl = wcuri.replace('cc:', 'wc:');
-			vueApp.pair(asWcUrl);
+			window.cashConnect.pair(asWcUrl);
 		}
 	}
 }, 2000);
