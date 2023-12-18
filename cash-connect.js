@@ -127,6 +127,27 @@ window.cashConnect = createApp({
 		},
 
 		onSessionProposal: async function(sessionProposal) {
+			// TODO: Not sure how to get the current network properly.
+			//       window.walletClass.network ALWAYS appears to return 'bitcoincash', regardless of what is being used.
+			//       @Mathieu you may want to rewrite this if there's a better way.
+			const currentChain = localStorage.getItem('network');
+			const targetChain = sessionProposal.params.requiredNamespaces.bch.chains[0].replace('bch:', '');
+
+			// Cashonize expects network to be either mainnet or chipnet.
+			const targetChainCashonizeFormat = (targetChain === 'bitcoincash') ? 'mainnet' : 'chipnet';
+
+			// Check if the current chain is the target chain.
+			if(currentChain !== targetChainCashonizeFormat) {
+				// If it is not, prompt user to switch.
+				if (!confirm(`Dapp requires ${targetChainCashonizeFormat}, but you are using ${currentChain}. Would you like to switch to ${targetChainCashonizeFormat}?`)) {
+					throw new Error(`Wallet is using ${currentChain}: ${targetChainCashonizeFormat} required`);
+				}
+
+				// Switch if user answered yes to prompt.
+				changeNetwork({ target: { value: targetChainCashonizeFormat } });
+				changeView(4);
+			}
+
 			// Show a modal to approve the session request.
 			return this.showApprovalModal('sessionRequests', {
 				session: sessionProposal,
@@ -283,6 +304,7 @@ setTimeout(async () => {
 
 			// Wallet-related callbacks.
 			wallet: {
+				// Get the unspents available for this wallet.
 				getUnspents: async () => {
 					const wallet = await walletClass.named("mywallet");
 

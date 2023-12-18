@@ -424,7 +424,7 @@
         <div id="cashconnect-vue">
           <!-- Sessions -->
           <fieldset style="display: block; margin-top: 15px">
-            <legend>CashConnect Sessions</legend>
+            <legend>CashConnect Sessions (Pre-Alpha)</legend>
             <div class="cc-session-items-container">
               <!-- Iterate over active sessions -->
               <template v-for="(session, topic) of sessions" :key="topic">
@@ -475,9 +475,10 @@
 
                     <!-- Methods -->
                     <div class="cc-modal-section">
-                      <div class="cc-modal-heading">Methods</div>
+                      <div class="cc-modal-heading">Methods/Events</div>
                       <ul>
                         <li v-for="method of request.session.params.requiredNamespaces?.bch?.methods">{{ method }}</li>
+                        <li v-for="event of request.session.params.requiredNamespaces?.bch?.events">{{ event }}</li>
                       </ul>
                     </div>
 

@@ -211,6 +211,9 @@ async function loadWalletInfo() {
       document.querySelector('#balanceUnit').innerText = bchUnit;
     }
     document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
+
+    // Emit an event to notify CashConnect sessions that balances have changed.
+    window.cashConnectService.emitBalancesChangedEvent();
   });
 
   document.querySelector('#sendAddr').addEventListener("input", () => {
