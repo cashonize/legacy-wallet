@@ -643,6 +643,28 @@
             </template>
           </div>
           <!-- End Request Approval Dialog -->
+
+          <!-- Error Dialog -->
+          <template v-for="({ error, modalId, accept, reject}, i) of errors" :key="i">
+            <div v-if="isErrorsVisible" class="cc-modal" style="width:1024px">
+              <fieldset class="cc-modal-fieldset">
+                <legend class="cc-modal-fieldset-legend">Error</legend>
+
+                <div v-if="error.message">{{ error.message }}</div>
+
+                <template v-if="error.stackTrace">
+                  <div>Stack Trace:</div>
+                  <pre class="cc-pre">{{ error.stackTrace }}</pre>
+                </template>
+
+                <!-- Bottom Buttons -->
+                <div class="cc-modal-bottom-buttons">
+                  <input class="button primary" type="button" value="Close" @click="accept(modalId)">
+                </div>
+              </fieldset>
+            </div>
+          </template>
+          <!-- End Error Dialog -->
         </div>
       </div>
 

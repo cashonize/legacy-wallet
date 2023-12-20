@@ -30,9 +30,6 @@ async function getPrivateKey() {
 window.cashConnect = createApp({
 	data() {
 		return {
-			// Form state.
-			wcUri: '',
-
 			// List of Sessions.
 			sessions: {},
 
@@ -41,6 +38,9 @@ window.cashConnect = createApp({
 
 			// List of Modals displaying for RPC Requests.
 			rpcRequests: [],
+
+			// List of Modals displaying for Errors.
+			errors: [],
 		}
 	},
 	computed: {
@@ -49,7 +49,10 @@ window.cashConnect = createApp({
 		},
 		isRequestApprovalVisible: function() {
 			return this.rpcRequests.length ? true : false;
-		}
+		},
+		isErrorsVisible: function() {
+			return this.errors.length ? true : false;
+		},
 	},
 	methods: {
 		disconnectSession: async function(topic) {
@@ -59,9 +62,6 @@ window.cashConnect = createApp({
 		pair: async function(wcUri) {
 			// Pair with the service.
 			await window.cashConnectService.core.pairing.pair({ uri: wcUri });
-
-			// Clear the input.
-			this.wcUri = '';
 		},
 
 		onSessionsUpdated: async function(sessions) {
@@ -172,8 +172,14 @@ window.cashConnect = createApp({
 			}
 		},
 
-		onError: async function(message) {
-			alert(message);
+		onError: async function(error) {
+			// Print error to console first in case something goes wrong in render.
+			console.error(error);
+
+			// Show the error in a dialog.
+			return this.showApprovalModal('errors', {
+				error
+			});
 		},
 
 		//-----------------------------------------------------------------------------
@@ -240,8 +246,6 @@ window.cashConnect = createApp({
 // Otherwise, "walletClass" isn't available.
 setTimeout(async () => {
 	const privateKey = await getPrivateKey();
-
-	console.log(privateKey);
 
 	// Setup Wallet Connect.
 	window.cashConnectService = new CashConnectWallet(
@@ -380,16 +384,15 @@ setTimeout(async () => {
 
 	// Handle URL.
 	// NOTE: To differentiate from Pat's implementation, we use protohandler "cc:" (CashConnect:).
+	// NOTE: "web+cc:" is also supported to support PWA Wallets.
 	const wcuri = new URL(window.location.href.replace("#", "")).searchParams.get("uri");
-	if (wcuri && wcuri.indexOf("cc:") === 0) {
+	if (wcuri && (wcuri.indexOf("cc:") === 0 || wcuri.indexOf('web+cc:') === 0)) {
 		const pairings = window.cashConnectService.core.pairing.pairings.getAll();
 		const topic = wcuri.match(/^cc:([a-zA-Z0-9]+).*/)?.[1];
 		if (pairings.some(val => val.topic === topic)) {
 			// skip
 		} else {
-			// Convert back into a WC URI.
-			const asWcUrl = wcuri.replace('cc:', 'wc:');
-			window.cashConnect.pair(asWcUrl);
+			window.cashConnectService.pair(wcuri);
 		}
 	}
 }, 2000);

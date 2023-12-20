@@ -15,7 +15,6 @@
     "@bitauth/libauth": "^2.0.0-alpha.8",
     "@walletconnect/utils": "^2.8.0",
     "@walletconnect/web3wallet": "^1.8.0",
-    "bch-wc2-experimental": "file:../../Jimtendo/bch-wc2-experimental",
     "cashconnect": "file:../../Developers.Cash/cashconnect-js"
   },
   "devDependencies": {
