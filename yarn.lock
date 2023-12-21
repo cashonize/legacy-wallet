@@ -541,16 +541,6 @@ atomic-sleep@^1.0.0:
   resolved "https://registry.npmjs.org/atomic-sleep/-/atomic-sleep-1.0.0.tgz"
   integrity sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==
 
-"bch-wc2-experimental@file:../../Jimtendo/bch-wc2-experimental":
-  version "0.0.4"
-  resolved "file:../../Jimtendo/bch-wc2-experimental"
-  dependencies:
-    "@bitauth/libauth" "2.0.0-alpha.8"
-    "@walletconnect/modal" "^2.6.2"
-    "@walletconnect/utils" "^2.8.0"
-    "@walletconnect/web3wallet" "^1.9.3"
-    idb "^7.1.1"
-
 bn.js@^4.11.9:
   version "4.12.0"
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz"
@@ -566,7 +556,7 @@ brorand@^1.1.0:
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
   integrity sha512-cKV8tMCEpQs4hK/ik71d6LrPOnpkpGBR0wzxqr68g2m/LB2GxVYQroAjMJZRVM1Y4BCjCKc3vAamxSzOY2RP+w==
 
-"cashconnect@file:../../Developers.Cash/cashconnect-js":
+cashconnect@0.0.1:
   version "0.0.1"
   resolved "file:../../Developers.Cash/cashconnect-js"
   dependencies:

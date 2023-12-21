@@ -41,6 +41,9 @@ window.cashConnect = createApp({
 
 			// List of Modals displaying for Errors.
 			errors: [],
+
+			// Auto-approved methods.
+			autoApprove: ['wc_authRequest', 'bch_getTokens_V0', 'bch_getBalance_V0', 'bch_getChangeLockingBytecode_V0'],
 		}
 	},
 	computed: {
@@ -152,16 +155,15 @@ window.cashConnect = createApp({
 			return this.showApprovalModal('sessionRequests', {
 				session: sessionProposal,
 			}, async () => {
-				return await getPrivateKey();
+				return {
+					autoApprove: this.autoApprove
+				}
 			});
 		},
 
 		onRPCRequest: async function(session, request, response) {
-			// Define a list of whitelisted methods that do not require approval.
-			const whitelistedMethods = ['wc_authRequest', 'bch_getTokens_V0', 'bch_getBalance_V0', 'bch_getChangeLockingBytecode_V0'];
-
 			// If this method is not whitelisted...
-			if(!whitelistedMethods.includes(request.method)) {
+			if(!this.autoApprove.includes(request.method)) {
 				// Show a modal to approve the RPC Request.
 				return this.showApprovalModal('rpcRequests', {
 					method: request.method,

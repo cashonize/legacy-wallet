@@ -646,8 +646,8 @@
 
           <!-- Error Dialog -->
           <template v-for="({ error, modalId, accept, reject}, i) of errors" :key="i">
-            <div v-if="isErrorsVisible" class="cc-modal" style="width:1024px">
-              <fieldset class="cc-modal-fieldset">
+            <div v-if="isErrorsVisible" class="cc-modal">
+              <fieldset class="cc-modal-fieldset" style="width:1024px">
                 <legend class="cc-modal-fieldset-legend">Error</legend>
 
                 <div v-if="error.message">{{ error.message }}</div>

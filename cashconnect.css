@@ -137,4 +137,5 @@
 .cc-pre {
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.6em;
 }

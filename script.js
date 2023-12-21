@@ -213,7 +213,10 @@ async function loadWalletInfo() {
     document.querySelector('#balanceUsd').innerText = `${balance.usd} $`;
 
     // Emit an event to notify CashConnect sessions that balances have changed.
-    window.cashConnectService.emitBalancesChangedEvent();
+    // TODO: @Mathieu, you might want to re-write this (if there's a more elegant approach than localStorage).
+    const chainId = localStorage.getItem('network');
+    const chainIdFormatted = chainId === 'mainnet' ? 'bch:bitcoincash' : 'bch:bchtest';
+    window.cashConnectService.walletStateHasChanged(chainIdFormatted);
   });
 
   document.querySelector('#sendAddr').addEventListener("input", () => {
