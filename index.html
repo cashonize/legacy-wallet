@@ -421,7 +421,7 @@
         </fieldset>
 
         <!-- CashConnect (Vue Container) -->
-        <div id="cashconnect-vue">
+        <div id="cashconnect-sessions-vue">
           <!-- Sessions -->
           <fieldset style="display: block; margin-top: 15px">
             <legend>CashConnect Sessions (Pre-Alpha)</legend>
@@ -442,229 +442,6 @@
               </template>
             </div>
           </fieldset>
-
-          <!-- Session Approval Dialog -->
-          <div v-if="isSessionApprovalVisible" class="cc-modal">
-            <!-- Iterate over pending session approval dialogs -->
-            <template v-for="(request, i) of sessionRequests" :key="request.session.topic">
-              <fieldset class="cc-modal-fieldset">
-                <legend style="font-size: larger;">Approve Session?</legend>
-                <div  style="display: flex; flex-direction: column; gap: 1rem;">
-                  <!-- App Info -->
-                  <div style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
-                    <!-- App Icon -->
-                    <div style="display: flex; align-items: center; height: 64px; width: 64px;">
-                      <img :src="request.session.params.proposer.metadata.icons[0]">
-                    </div>
-
-                    <!-- Metadata -->
-                    <div style="display: flex; flex-direction: column; width: 100%;">
-                      <div>{{ request.session.params.proposer.metadata.name }}</div>
-                      <div><a :href="request.session.params.proposer.metadata.url" target="_blank">{{ request.session.params.proposer.metadata.url }}</a></div>
-                      <div>{{ request.session.params.proposer.metadata.description }}</div>
-                    </div>
-                  </div>
-
-                  <!-- Namespaces -->
-                  <div class="cc-modal-details">
-                    <!-- Template -->
-                    <div class="cc-modal-section">
-                      <div class="cc-modal-heading">Template</div>
-                      <a @click="viewTemplate(request.session.params.requiredNamespaces?.bch?.template)">{{ request.session.params.requiredNamespaces?.bch?.template.name }}</a> (Untrusted)
-                    </div>
-
-                    <!-- Methods -->
-                    <div class="cc-modal-section">
-                      <div class="cc-modal-heading">Methods/Events</div>
-                      <ul>
-                        <li v-for="method of request.session.params.requiredNamespaces?.bch?.methods">{{ method }}</li>
-                        <li v-for="event of request.session.params.requiredNamespaces?.bch?.events">{{ event }}</li>
-                      </ul>
-                    </div>
-
-                    <!-- Allowed Tokens -->
-                    <div class="cc-modal-section">
-                      <div class="cc-modal-heading">Allowed Tokens</div>
-                      <ul>
-                        <li v-for="allowedToken of request.session.params.requiredNamespaces?.bch?.allowedTokens">{{ allowedToken }}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <!-- Approve/Reject Buttons -->
-                <div class="cc-modal-bottom-buttons">
-                  <input class="button primary" type="button" value="Approve" @click="request.accept()">
-                  <input class="button" type="button" value="Reject" @click="request.reject()">
-                </div>
-              </fieldset>
-            </template>
-          </div>
-          <!-- End Session Approval Dialog -->
-
-          <!-- Request Approval Dialog -->
-          <div v-if="isRequestApprovalVisible" class="cc-modal">
-            <!-- Iterate over our session requests and display them. -->
-            <template v-for="({ method, session, params, response, modalId, accept, reject}, i) of rpcRequests" :key="i">
-              <!-- bch_signTransaction_V0 -->
-              <template v-if="method === 'bch_signTransaction_V0'">
-                <fieldset class="cc-modal-fieldset">
-                  <legend class="cc-modal-fieldset-legend">Sign Transaction</legend>
-
-                  <!-- Origin -->
-                  <div style="font-size: large; margin-top: 2rem;">Origin:</div>
-                  <div style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
-                    <div style="display: flex; align-items: center; height: 64px; width: 64px;"><img :src="session.peer.metadata.icons[0]"></div>
-                    <div style="display: flex; flex-direction: column; width: 100%;">
-                      <div>{{ session.peer.metadata.name }}</div>
-                      <div style="overflow-wrap: anywhere;"><a :href="session.peer.metadata.url" target="_blank">{{ session.peer.metadata.url }}</a></div>
-                      <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">{{ formatSessionSigner(session) }}</div>
-                    </div>
-                  </div>
-
-                  <hr style="margin-top:3rem" />
-
-                  <div v-for="(tx, i) of params" class="cc-modal-details">
-                    <!-- User Prompt -->
-                    <div v-if="tx.userPrompt" style="display: flex; justify-content: center; font-size: larger;">{{ tx.userPrompt }}</div>
-
-                    <!-- Inputs -->
-                    <div class="cc-modal-heading">Inputs</div>
-                    <table class="cc-data-table">
-                      <tbody v-for="(input, index) of response[i].transaction.inputs">
-                        <tr>
-                          <td>{{ index }}</td>
-                          <td>{{ formatBin(input.outpointTransactionHash) }}:{{ input.outpointIndex }}</td>
-                          <td class="satoshis">
-                            {{ formatSats(response[i].sourceOutputs[index].valueSatoshis) }}
-                          </td>
-                        </tr>
-                        <!-- If there is data available for this input -->
-                        <tr v-if="tx.transaction.inputs?.[index]?.data">
-                          <td colspan="3">
-                            <table class="tx-data-table">
-                              <tbody>
-                                <tr>
-                                  <td colspan="2">
-                                    <strong>{{ formatScriptName(tx.transaction.inputs[index].script, session.requiredNamespaces.bch.template) }}</strong>
-                                  </td>
-                                </tr>
-                                <tr v-for="(value, id) of tx.transaction.inputs?.[index]?.data">
-                                  <td>{{ formatDataName(id, session.requiredNamespaces.bch.template) }}</td>
-                                  <td>{{ formatDataValue(value, id, session.requiredNamespaces.bch.template) }}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                    <!-- Outputs -->
-                    <div class="cc-modal-heading">Outputs</div>
-                    <table class="cc-data-table">
-                      <tbody v-for="(output, index) of response[i].transaction.outputs">
-                        <tr>
-                          <td>{{ index }}</td>
-                          <td>{{ formatLockscript(output.lockingBytecode) }}</td>
-                          <td class="satoshis">{{ formatSats(output.valueSatoshis) }}</td>
-                        </tr>
-                        <!-- If there is a token available on this output -->
-                        <tr v-if="output.token">
-                          <td colspan="3">
-                            <table class="tx-data-table">
-                              <tbody>
-                                <tr>
-                                  <td>
-                                    Token: {{ formatBin(output.token.category) }}
-                                  </td>
-                                  <td>
-                                    Amount: {{ Number(output.token.amount) }}
-                                  </td>
-                                </tr>
-                                <tr v-if="output.token?.nft">
-                                  <td>Commitment: {{ formatBin(output.token.nft.commitment) }}</td>
-                                  <td>Capability: {{ output.token.nft.capability }}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                        <!-- If there is data available for this output -->
-                        <tr v-if="tx.transaction.outputs?.[index]?.data">
-                          <td colspan="3">
-                            <table class="tx-data-table">
-                              <tbody>
-                                <tr>
-                                  <td colspan="2">
-                                    <strong>{{ formatScriptName(tx.transaction.outputs[index].script, session.requiredNamespaces.bch.template) }}</strong>
-                                  </td>
-                                </tr>
-                                <tr v-for="(value, id) of tx.transaction.outputs?.[index]?.data">
-                                  <td>{{ formatDataName(id, session.requiredNamespaces.bch.template) }}</td>
-                                  <td>{{ formatDataValue(value, id, session.requiredNamespaces.bch.template) }}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                    <hr style="margin-top: 3rem;" />
-                  </div>
-
-                  <!-- Bottom Buttons -->
-                  <div class="cc-modal-bottom-buttons">
-                    <input class="button primary" type="button" value="Sign" @click="accept(modalId)">
-                    <input class="button" type="button" value="Cancel" @click="reject(modalId)">
-                  </div>
-                </fieldset>
-              </template>
-              <!-- End bch_signTransaction_V0 -->
-
-              <!-- Unhandled Method -->
-              <template v-else>
-                <fieldset class="cc-modal-fieldset">
-                  <legend class="cc-modal-fieldset-legend">{{ method }}</legend>
-
-                  <div>Params:</div>
-                  <pre class="cc-pre">{{ params }}</pre>
-                  <div>Response:</div>
-                  <pre class="cc-pre">{{ response }}</pre>
-
-                  <!-- Bottom Buttons -->
-                  <div class="cc-modal-bottom-buttons">
-                    <input class="button primary" type="button" value="Sign" @click="accept(modalId)">
-                    <input class="button" type="button" value="Cancel" @click="reject(modalId)">
-                  </div>
-                </fieldset>
-              </template>
-              <!-- End Unhandled Method -->
-            </template>
-          </div>
-          <!-- End Request Approval Dialog -->
-
-          <!-- Error Dialog -->
-          <template v-for="({ error, modalId, accept, reject}, i) of errors" :key="i">
-            <div v-if="isErrorsVisible" class="cc-modal">
-              <fieldset class="cc-modal-fieldset" style="width:1024px">
-                <legend class="cc-modal-fieldset-legend">Error</legend>
-
-                <div v-if="error.message">{{ error.message }}</div>
-
-                <template v-if="error.stackTrace">
-                  <div>Stack Trace:</div>
-                  <pre class="cc-pre">{{ error.stackTrace }}</pre>
-                </template>
-
-                <!-- Bottom Buttons -->
-                <div class="cc-modal-bottom-buttons">
-                  <input class="button primary" type="button" value="Close" @click="accept(modalId)">
-                </div>
-              </fieldset>
-            </div>
-          </template>
-          <!-- End Error Dialog -->
         </div>
       </div>
 
@@ -737,6 +514,232 @@
         <legend style="font-size: larger;">Scan QR Code</legend>
         <div id="reader"></div>
       </fieldset>
+    </div>
+
+    <!-- CashConnect Dialogs -->
+    <div id="cashconnect-dialogs-vue">
+      <!-- Session Approval Dialog -->
+      <div v-if="isSessionApprovalVisible" class="cc-modal">
+        <!-- Iterate over pending session approval dialogs -->
+        <template v-for="(request, i) of sessionRequests" :key="request.session.topic">
+          <fieldset class="cc-modal-fieldset">
+            <legend style="font-size: larger;">Approve Session?</legend>
+            <div  style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- App Info -->
+              <div style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
+                <!-- App Icon -->
+                <div style="display: flex; align-items: center; height: 64px; width: 64px;">
+                  <img :src="request.session.params.proposer.metadata.icons[0]">
+                </div>
+
+                <!-- Metadata -->
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                  <div>{{ request.session.params.proposer.metadata.name }}</div>
+                  <div><a :href="request.session.params.proposer.metadata.url" target="_blank">{{ request.session.params.proposer.metadata.url }}</a></div>
+                  <div>{{ request.session.params.proposer.metadata.description }}</div>
+                </div>
+              </div>
+
+              <!-- Namespaces -->
+              <div class="cc-modal-details">
+                <!-- Template -->
+                <div class="cc-modal-section">
+                  <div class="cc-modal-heading">Template</div>
+                  <a @click="viewTemplate(request.session.params.requiredNamespaces?.bch?.template)">{{ request.session.params.requiredNamespaces?.bch?.template.name }}</a> (Untrusted)
+                </div>
+
+                <!-- Methods -->
+                <div class="cc-modal-section">
+                  <div class="cc-modal-heading">Methods/Events</div>
+                  <ul>
+                    <li v-for="method of request.session.params.requiredNamespaces?.bch?.methods">{{ method }}</li>
+                    <li v-for="event of request.session.params.requiredNamespaces?.bch?.events">{{ event }}</li>
+                  </ul>
+                </div>
+
+                <!-- Allowed Tokens -->
+                <div class="cc-modal-section">
+                  <div class="cc-modal-heading">Allowed Tokens</div>
+                  <ul>
+                    <li v-for="allowedToken of request.session.params.requiredNamespaces?.bch?.allowedTokens">{{ allowedToken }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <!-- Approve/Reject Buttons -->
+            <div class="cc-modal-bottom-buttons">
+              <input class="button primary" type="button" value="Approve" @click="request.accept()">
+              <input class="button" type="button" value="Reject" @click="request.reject()">
+            </div>
+          </fieldset>
+        </template>
+      </div>
+      <!-- End Session Approval Dialog -->
+
+      <!-- Request Approval Dialog -->
+      <div v-if="isRequestApprovalVisible" class="cc-modal">
+        <!-- Iterate over our session requests and display them. -->
+        <template v-for="({ method, session, params, response, modalId, accept, reject}, i) of rpcRequests" :key="i">
+          <!-- bch_signTransaction_V0 -->
+          <template v-if="method === 'bch_signTransaction_V0'">
+            <fieldset class="cc-modal-fieldset">
+              <legend class="cc-modal-fieldset-legend">Sign Transaction</legend>
+
+              <!-- Origin -->
+              <div style="font-size: large; margin-top: 2rem;">Origin:</div>
+              <div style="display: flex; align-items: center; flex-direction: row; gap: 10px; padding: 7px;">
+                <div style="display: flex; align-items: center; height: 64px; width: 64px;"><img :src="session.peer.metadata.icons[0]"></div>
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                  <div>{{ session.peer.metadata.name }}</div>
+                  <div style="overflow-wrap: anywhere;"><a :href="session.peer.metadata.url" target="_blank">{{ session.peer.metadata.url }}</a></div>
+                  <div style="overflow-x: hidden; text-overflow: ellipsis; font-size: smaller;">{{ formatSessionSigner(session) }}</div>
+                </div>
+              </div>
+
+              <hr style="margin-top:3rem" />
+
+              <div v-for="(tx, i) of params" class="cc-modal-details">
+                <!-- User Prompt -->
+                <div v-if="tx.userPrompt" style="display: flex; justify-content: center; font-size: larger;">{{ tx.userPrompt }}</div>
+
+                <!-- Inputs -->
+                <div class="cc-modal-heading">Inputs</div>
+                <table class="cc-data-table">
+                  <tbody v-for="(input, index) of response[i].transaction.inputs">
+                    <tr>
+                      <td>{{ index }}</td>
+                      <td>{{ formatBin(input.outpointTransactionHash) }}:{{ input.outpointIndex }}</td>
+                      <td class="satoshis">
+                        {{ formatSats(response[i].sourceOutputs[index].valueSatoshis) }}
+                      </td>
+                    </tr>
+                    <!-- If there is data available for this input -->
+                    <tr v-if="tx.transaction.inputs?.[index]?.data">
+                      <td colspan="3">
+                        <table class="tx-data-table">
+                          <tbody>
+                            <tr>
+                              <td colspan="2">
+                                <strong>{{ formatScriptName(tx.transaction.inputs[index].script, session.requiredNamespaces.bch.template) }}</strong>
+                              </td>
+                            </tr>
+                            <tr v-for="(value, id) of tx.transaction.inputs?.[index]?.data">
+                              <td>{{ formatDataName(id, session.requiredNamespaces.bch.template) }}</td>
+                              <td>{{ formatDataValue(value, id, session.requiredNamespaces.bch.template) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Outputs -->
+                <div class="cc-modal-heading">Outputs</div>
+                <table class="cc-data-table">
+                  <tbody v-for="(output, index) of response[i].transaction.outputs">
+                    <tr>
+                      <td>{{ index }}</td>
+                      <td>{{ formatLockscript(output.lockingBytecode) }}</td>
+                      <td class="satoshis">{{ formatSats(output.valueSatoshis) }}</td>
+                    </tr>
+                    <!-- If there is a token available on this output -->
+                    <tr v-if="output.token">
+                      <td colspan="3">
+                        <table class="tx-data-table">
+                          <tbody>
+                            <tr>
+                              <td>
+                                Token: {{ formatBin(output.token.category) }}
+                              </td>
+                              <td>
+                                Amount: {{ Number(output.token.amount) }}
+                              </td>
+                            </tr>
+                            <tr v-if="output.token?.nft">
+                              <td>Commitment: {{ formatBin(output.token.nft.commitment) }}</td>
+                              <td>Capability: {{ output.token.nft.capability }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <!-- If there is data available for this output -->
+                    <tr v-if="tx.transaction.outputs?.[index]?.data">
+                      <td colspan="3">
+                        <table class="tx-data-table">
+                          <tbody>
+                            <tr>
+                              <td colspan="2">
+                                <strong>{{ formatScriptName(tx.transaction.outputs[index].script, session.requiredNamespaces.bch.template) }}</strong>
+                              </td>
+                            </tr>
+                            <tr v-for="(value, id) of tx.transaction.outputs?.[index]?.data">
+                              <td>{{ formatDataName(id, session.requiredNamespaces.bch.template) }}</td>
+                              <td>{{ formatDataValue(value, id, session.requiredNamespaces.bch.template) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <hr style="margin-top: 3rem;" />
+              </div>
+
+              <!-- Bottom Buttons -->
+              <div class="cc-modal-bottom-buttons">
+                <input class="button primary" type="button" value="Sign" @click="accept(modalId)">
+                <input class="button" type="button" value="Cancel" @click="reject(modalId)">
+              </div>
+            </fieldset>
+          </template>
+          <!-- End bch_signTransaction_V0 -->
+
+          <!-- Unhandled Method -->
+          <template v-else>
+            <fieldset class="cc-modal-fieldset">
+              <legend class="cc-modal-fieldset-legend">{{ method }}</legend>
+
+              <div>Params:</div>
+              <pre class="cc-pre">{{ params }}</pre>
+              <div>Response:</div>
+              <pre class="cc-pre">{{ response }}</pre>
+
+              <!-- Bottom Buttons -->
+              <div class="cc-modal-bottom-buttons">
+                <input class="button primary" type="button" value="Sign" @click="accept(modalId)">
+                <input class="button" type="button" value="Cancel" @click="reject(modalId)">
+              </div>
+            </fieldset>
+          </template>
+          <!-- End Unhandled Method -->
+        </template>
+      </div>
+      <!-- End Request Approval Dialog -->
+
+      <!-- Error Dialog -->
+      <template v-for="({ error, modalId, accept, reject}, i) of errors" :key="i">
+        <div v-if="isErrorsVisible" class="cc-modal">
+          <fieldset class="cc-modal-fieldset" style="width:1024px">
+            <legend class="cc-modal-fieldset-legend">Error</legend>
+
+            <div v-if="error.message">{{ error.message }}</div>
+
+            <template v-if="error.stackTrace">
+              <div>Stack Trace:</div>
+              <pre class="cc-pre">{{ error.stackTrace }}</pre>
+            </template>
+
+            <!-- Bottom Buttons -->
+            <div class="cc-modal-bottom-buttons">
+              <input class="button primary" type="button" value="Close" @click="accept(modalId)">
+            </div>
+          </fieldset>
+        </div>
+      </template>
+      <!-- End Error Dialog -->
     </div>
   </main>
 

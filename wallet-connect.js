@@ -556,7 +556,7 @@ Web3Wallet.init({
 
       // If the URL begins with "cc:" (CashConnect), invoke the CashConnect pairing instead.
       if(uri.startsWith('cc:')) {
-        await window.cashConnect.pair(uri);
+        await window.cashConnectService.pair(uri);
       }
 
       // Otherwise, proceed with normal WalletConnect.

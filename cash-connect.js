@@ -26,13 +26,28 @@ async function getPrivateKey() {
 // Setup Vue
 //-----------------------------------------------------------------------------
 
-// Application Template
-window.cashConnect = createApp({
+// WalletConnect Tab (CashConnect Section).
+window.cashConnectSessions = createApp({
 	data() {
 		return {
 			// List of Sessions.
 			sessions: {},
+		}
+	},
+	methods: {
+		disconnectSession: async function(topic) {
+			await window.cashConnectService.disconnectSession(topic);
+		},
+		onSessionsUpdated: async function(sessions) {
+			this.sessions = sessions;
+		},
+	}
+}).mount('#cashconnect-sessions-vue');
 
+// CashConnect Dialogs.
+window.cashConnectDialogs = createApp({
+	data() {
+		return {
 			// List of Modals displaying for Session Requests.
 			sessionRequests: [],
 
@@ -58,17 +73,9 @@ window.cashConnect = createApp({
 		},
 	},
 	methods: {
-		disconnectSession: async function(topic) {
-			await window.cashConnectService.disconnectSession(topic);
-		},
-
 		pair: async function(wcUri) {
 			// Pair with the service.
 			await window.cashConnectService.core.pairing.pair({ uri: wcUri });
-		},
-
-		onSessionsUpdated: async function(sessions) {
-			this.sessions = sessions;
 		},
 
 		viewTemplate: function(template) {
@@ -238,7 +245,7 @@ window.cashConnect = createApp({
 				return stringify(payload);
 		}
 	}
-}).mount('#cashconnect-vue');
+}).mount('#cashconnect-dialogs-vue');
 
 //-----------------------------------------------------------------------------
 // Start Wallet Connect
@@ -265,11 +272,11 @@ setTimeout(async () => {
 		// Event Callbacks.
 		{
 			// Session State Callbacks.
-			onSessionsUpdated: window.cashConnect.onSessionsUpdated,
-			onSessionProposal: window.cashConnect.onSessionProposal,
+			onSessionsUpdated: window.cashConnectSessions.onSessionsUpdated,
+			onSessionProposal: window.cashConnectDialogs.onSessionProposal,
 			onSessionDelete: () => {},
-			onRPCRequest: window.cashConnect.onRPCRequest,
-			onError: window.cashConnect.onError,
+			onRPCRequest: window.cashConnectDialogs.onRPCRequest,
+			onError: window.cashConnectDialogs.onError,
 		},
 		// CashRPC Callbacks.
 		{
