@@ -251,9 +251,9 @@ window.cashConnectDialogs = createApp({
 // Start Wallet Connect
 //-----------------------------------------------------------------------------
 
-// Dirty, but we need to wait for Mainnet to load.
-// Otherwise, "walletClass" isn't available.
-setTimeout(async () => {
+// NOTE: We have to wait for the wallet to load.
+//       So this gets called in script.js under loadWalletInfo() (at the very end).
+window.initCashConnect = async () => {
 	const privateKey = await getPrivateKey();
 
 	// Setup Wallet Connect.
@@ -404,4 +404,4 @@ setTimeout(async () => {
 			window.cashConnectService.pair(wcuri);
 		}
 	}
-}, 2000);
+};

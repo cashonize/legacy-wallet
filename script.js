@@ -1022,6 +1022,9 @@ async function loadWalletInfo() {
       console.log(error);
     }
   }
+
+  // Initialize CashConnect.
+  window.initCashConnect();
 }
 
 // Verified only switch
