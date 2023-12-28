@@ -5,7 +5,7 @@ import { CashConnectWallet } from 'cashconnect';
 import { stringify, authenticationTemplateP2pkhNonHd, binToHex, hexToBin, binToNumberUintLE, cashAddressToLockingBytecode, decodePrivateKeyWif, lockingBytecodeToCashAddress } from "@bitauth/libauth";
 
 // Import Vue.
-import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+import { createApp } from 'vue/dist/vue.esm-browser.js'
 
 //-----------------------------------------------------------------------------
 // Setup Utilities

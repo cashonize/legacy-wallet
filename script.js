@@ -214,7 +214,7 @@ async function loadWalletInfo() {
 
     // Emit an event to notify CashConnect sessions that balances have changed.
     // TODO: @Mathieu, you might want to re-write this (if there's a more elegant approach than localStorage).
-    const chainId = localStorage.getItem('network');
+    const chainId = network;
     const chainIdFormatted = chainId === 'mainnet' ? 'bch:bitcoincash' : 'bch:bchtest';
     window.cashConnectService.walletStateHasChanged(chainIdFormatted);
   });
@@ -1127,6 +1127,13 @@ window.selectUnit = function selectUnit(event){
 
 // Change network
 window.changeNetwork = function changeNetwork(event){
+  // Disconnect all existing CashConnect sessions.
+  // NOTE: There is likely a slim chance a user could invoke this before CashConnect is init'd.
+  //       So we check if it's initialized first.
+  if(window.cashConnectService) {
+    window.cashConnectService.disconnectAllSessions();
+  }
+
   network = event.target.value;
   window.walletClass = network === "chipnet" ? TestNetWallet : Wallet;
   localStorage.setItem("network", network);
