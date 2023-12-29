@@ -553,7 +553,17 @@ Web3Wallet.init({
       if (!uri) {
         throw new Error("Please paste valid Wallet Connect V2 connection URI");
       }
-      await web3wallet.core.pairing.pair({ uri });
+
+      // If the URL begins with "cc:" (CashConnect), invoke the CashConnect pairing instead.
+      if(uri.startsWith('cc:')) {
+        await window.cashConnectService.pair(uri);
+      }
+
+      // Otherwise, proceed with normal WalletConnect.
+      else {
+        await web3wallet.core.pairing.pair({ uri });
+      }
+
       document.getElementById("wcUri").value = "";
     } catch (err) {
       alert(`Error connecting with dApp:\n${err.mesage ?? err}`);

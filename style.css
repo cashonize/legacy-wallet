@@ -48,7 +48,7 @@ header {
 .cogIcon{
   content:url("/images/cogGrey.svg");
 }
-.trashIcon.dark{
+.dark .trashIcon {
   content:url("/images/trashGrey.svg");
 }
 .trashIcon{

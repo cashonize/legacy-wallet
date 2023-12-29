@@ -14,7 +14,9 @@
   "dependencies": {
     "@bitauth/libauth": "^2.0.0-alpha.8",
     "@walletconnect/utils": "^2.8.0",
-    "@walletconnect/web3wallet": "^1.8.0"
+    "@walletconnect/web3wallet": "^1.8.0",
+    "cashconnect": "^0.0.9",
+    "vue": "^3.3.13"
   },
   "devDependencies": {
     "vite": "^4.3.9"
