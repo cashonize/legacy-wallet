@@ -1139,7 +1139,8 @@ window.changeNetwork = function changeNetwork(event){
   localStorage.setItem("network", network);
   watchAddressCancel()
   watchBalanceCancel()
-  loadWalletInfo();
+  // quick fix: relaod the application
+  location.reload();
 }
 
 window.toggleSeedphrase = (event) => {
