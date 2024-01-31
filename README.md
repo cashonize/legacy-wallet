@@ -50,4 +50,4 @@ Finally, [bitjson/qr-code](https://github.com/bitjson/qr-code) is used to genera
 Netlify automatically publishes the latest version of this repo: [cashonize/wallet](https://github.com/cashonize/wallet).
 
 #### Special thanks to
-bitcoincashautist, pat from mainnet-js, damascene & bitjson
+bitcoincashautist, mainnet-pat, damascene, samrock5000 & bitjson
