@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
   if(network === "chipnet") window.walletClass = TestNetWallet;
   footer.classList.remove("hide");
   if(!walletExists) newWalletView.classList.remove("hide");
-  else{loadWalletInfo()};
+  else{initCashonizeWallet()};
 })
 
 window.createNewWallet = async function createNewWallet() {
@@ -111,7 +111,7 @@ window.createNewWallet = async function createNewWallet() {
   const mainnetWallet = await Wallet.named(nameWallet);
   const walletId = mainnetWallet.toDbString().replace("mainnet", "testnet");
   await TestNetWallet.replaceNamed("mywallet", walletId);
-  loadWalletInfo();
+  initCashonizeWallet();
   initWalletConnect();
 }
 
@@ -126,11 +126,11 @@ window.importWallet = async function importWallet() {
   await Wallet.replaceNamed(nameWallet, walletId);
   const walletIdTestnet = `seed:testnet:${seedphrase}:${derivationPath}`;
   await TestNetWallet.replaceNamed("mywallet", walletIdTestnet);
-  loadWalletInfo();
+  initCashonizeWallet();
   initWalletConnect();
 }
 
-async function loadWalletInfo() {
+async function initCashonizeWallet() {
   // Show My Wallet View
   changeView(0);
   const nav = document.querySelector('.nav');
