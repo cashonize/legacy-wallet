@@ -13,7 +13,7 @@ const nameWallet = "mywallet";
 const walletDomain = "https://cashonize.com/";
 
 const currentLocation = window.location.href;
-if(walletDomain == currentLocation)  document.querySelector('#banner').classList.add("hide");
+if(currentLocation.startsWith(walletDomain))  document.querySelector('#banner').classList.add("hide");
 
 const newWalletView = document.querySelector('#newWalletView');
 const footer = document.querySelector('.footer');
