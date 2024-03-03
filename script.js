@@ -259,7 +259,7 @@ async function initCashonizeWallet() {
     const promiseGetNFTs = wallet.getAllNftTokenBalances();
     const balancePromises = [promiseGetFungibleTokens, promiseGetNFTs];
     const [getFungibleTokensResponse, getNFTsResponse] = await Promise.all(balancePromises);
-    console.time('fetchTokens Promises');
+    console.timeEnd('fetchTokens Promises');
 
     tokenCategories = Object.keys({...getFungibleTokensResponse, ...getNFTsResponse})
     document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different token categories`;
@@ -267,12 +267,13 @@ async function initCashonizeWallet() {
       arrayTokens.push({ tokenId, amount: getFungibleTokensResponse[tokenId] });
     }
     console.time('Utxo Promises');
-    const nftUtxoPromises = [];
+    const tokenUtxos = await wallet.getTokenUtxos();
+    const listNftUtxos = [];
     for (const tokenId of Object.keys(getNFTsResponse)) {
-      nftUtxoPromises.push(wallet.getTokenUtxos(tokenId));
+      const utxosNftTokenid = tokenUtxos.filter((val) =>val.token?.tokenId === tokenId)
+      listNftUtxos.push(utxosNftTokenid);
     }
-    const nftUtxoResults = await Promise.all(nftUtxoPromises);
-    for (const utxos of nftUtxoResults) {
+    for (const utxos of listNftUtxos) {
       const tokenId = utxos[0].token?.tokenId;
       if(utxos.length == 1){
         const tokenData = utxos[0].token;
