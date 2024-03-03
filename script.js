@@ -254,22 +254,41 @@ async function initCashonizeWallet() {
   fetchTokens();
   async function fetchTokens() {
     arrayTokens = [];
-    console.time('fetchTokens Promises');
-    const promiseGetFungibleTokens = wallet.getAllTokenBalances();
-    const promiseGetNFTs = wallet.getAllNftTokenBalances();
-    const balancePromises = [promiseGetFungibleTokens, promiseGetNFTs];
-    const [getFungibleTokensResponse, getNFTsResponse] = await Promise.all(balancePromises);
-    console.timeEnd('fetchTokens Promises');
-
-    tokenCategories = Object.keys({...getFungibleTokensResponse, ...getNFTsResponse})
-    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different token categories`;
-    for (const tokenId of Object.keys(getFungibleTokensResponse)) {
-      arrayTokens.push({ tokenId, amount: getFungibleTokensResponse[tokenId] });
-    }
-    console.time('Utxo Promises');
+    console.time('fetch tokenUtxos Promise');
     const tokenUtxos = await wallet.getTokenUtxos();
+    function getAllNftTokenBalances(){
+      const result = {};
+      const nftUtxos = tokenUtxos.filter((val) => val.token?.commitment !== undefined);
+      for (const utxo of nftUtxos) {
+        if (!result[utxo.token?.tokenId]) {
+          result[utxo.token?.tokenId] = 0;
+        }
+        result[utxo.token?.tokenId] += 1;
+      }
+      return result
+    }
+    function getFungibleTokenBalances(){
+      const result = {};
+      const fungiblesUtxos = tokenUtxos.filter((val) => val.token?.amount);
+      for (const utxo of fungiblesUtxos) {
+        if (!result[utxo.token?.tokenId]) {
+          result[utxo.token?.tokenId] = 0n;
+        }
+        result[utxo.token?.tokenId] += utxo.token.amount;
+      }
+      return result
+    }
+    const fungibleTokensResult = getFungibleTokenBalances();
+    const nftsResult = getAllNftTokenBalances();
+    console.timeEnd('fetch tokenUtxos Promise');
+
+    tokenCategories = Object.keys({...fungibleTokensResult, ...nftsResult})
+    document.querySelector('#tokenBalance').innerText = `${tokenCategories.length} different token categories`;
+    for (const tokenId of Object.keys(fungibleTokensResult)) {
+      arrayTokens.push({ tokenId, amount: fungibleTokensResult[tokenId] });
+    }
     const listNftUtxos = [];
-    for (const tokenId of Object.keys(getNFTsResponse)) {
+    for (const tokenId of Object.keys(nftsResult)) {
       const utxosNftTokenid = tokenUtxos.filter((val) =>val.token?.tokenId === tokenId)
       listNftUtxos.push(utxosNftTokenid);
     }
@@ -288,7 +307,6 @@ async function initCashonizeWallet() {
         arrayTokens.push({ tokenId, nfts });
       }
     }
-    console.timeEnd('Utxo Promises');
     // Either display tokens in wallet or display there are no tokens
     const divNoTokens = document.querySelector('#noTokensFound');
     document.querySelector('#loadingTokenData').classList.add("hide");
