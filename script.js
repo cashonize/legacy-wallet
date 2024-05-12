@@ -243,8 +243,12 @@ async function initCashonizeWallet() {
   document.querySelector('#qr1').classList.remove("hide");
 
   // Import BCMRs in the trusted tokenlists
-  for await(const tokenListUrl of trustedTokenLists){
-    await BCMR.addMetadataRegistryFromUri(tokenListUrl);
+  try{
+    for await(const tokenListUrl of trustedTokenLists){
+      await BCMR.addMetadataRegistryFromUri(tokenListUrl);
+    }
+  } catch(error){
+    console.log(error)
   }
 
   // Display token categories, construct arrayTokens and watch for changes
