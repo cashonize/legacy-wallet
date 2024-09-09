@@ -1,3 +1,7 @@
+⚠️ *Note: This codebase has been deprecated & archived in favor of the new, fully rewritten codebase with Quasar, Vue and TypeScript.* ⚠️
+
+The transition to the new codebase was part of the [flipstarter goals](https://flipstarter.cashonize.com/) and completed 09/09/'24.
+
 # Cashonize
 
 Cashonize is a Bitcoin Cash WebWallet with CashTokens support  - [cashonize.com](https://cashonize.com)<br>
